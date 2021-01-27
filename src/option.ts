@@ -1,6 +1,12 @@
 import {Collection} from "./collection";
 import {Left, Right, Either, left, right} from "./either";
 
+export interface OptionMatch<A, T> {
+    some: (value: A) => T;
+    none: () => T;
+}
+
+
 export interface Option<A> {
 
     exists(p: (value: A) => boolean): boolean;
@@ -45,6 +51,8 @@ export interface Option<A> {
     toLeft<X>(right: () => X): Either<A, X>;
 
     toArray: A[];
+
+    match<T>(matcher: OptionMatch<A, T>): T;
 
 }
 
@@ -148,6 +156,9 @@ export class Some<A> implements Option<A> {
         return x === this.value;
     }
 
+    match<T>(matcher: OptionMatch<A, T>): T {
+        return matcher.some(this.value);
+    }
 }
 
 
@@ -245,6 +256,10 @@ export class None<A> implements Option<A> {
 
     toLeft<X>(right: () => X): Either<A, X> {
         return new Right(right());
+    }
+
+    match<T>(matcher: OptionMatch<A, T>): T {
+        return matcher.none();
     }
 
 }

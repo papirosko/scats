@@ -143,6 +143,23 @@ describe('Option', () => {
 
     });
 
+    test('should support match', () => {
+        const r1 = option(null).match({
+            some: a => 2,
+            none: () => 3
+        });
+
+        expect(r1).toEqual(3);
+
+        const r2 = option(1).match({
+            some: a => 2,
+            none: () => 3
+        });
+
+        expect(r2).toEqual(2);
+
+    });
+
 
 });
 
