@@ -123,12 +123,14 @@ export function Try<T, E extends Error>(block: () => T): TryLike<T, E> {
     }
 }
 
-
-Try.promise = function<T, E extends Error>(block: () => Promise<T>): Promise<TryLike<T, E>> {
-    return block()
-        .then(res => new Success(res))
-        .catch(e => new Failure(e));
+export namespace Try {
+    export function promise<T, E extends Error>(block: () => Promise<T>): Promise<TryLike<T, E>> {
+        return block()
+            .then(res => new Success(res))
+            .catch(e => new Failure(e));
+    }
 }
+
 
 
 export function success<T>(x: T): Success<T> {
