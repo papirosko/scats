@@ -1,14 +1,14 @@
-import {failure, success, Try} from "./try";
+import {failure, success, Try, TryLike} from "./try";
 import {none, some} from "./option";
 import {left, right} from "./either";
 
 describe('Try', () => {
 
-    const successAware = () => {
+    const successAware: () => any = () => {
         return 'success';
     }
 
-    const errorAware = () => {
+    const errorAware: () => any = () => {
         throw new Error('error');
     }
 
@@ -39,5 +39,52 @@ describe('Try', () => {
         expect(Try(successAware).map(_ => 123)).toEqual(success(123));
         expect(Try(errorAware).map(_ => 123)).toEqual(failure(new Error('error')));
     })
+
+    test('isSuccess, isFailure', () => {
+        expect(success(1).isSuccess).toBeTruthy();
+        expect(success(1).isFailure).toBeFalsy();
+        expect(failure(new Error('123')).isSuccess).toBeFalsy();
+        expect(failure(new Error('123')).isFailure).toBeTruthy();
+    });
+
+    test('getOrElse, getOrElseValue, orElse, get', () => {
+        expect(Try(successAware).getOrElse(() => '')).toEqual('success');
+        expect(Try(successAware).getOrElseValue('')).toEqual('success');
+        expect(Try(successAware).orElse(() => success(''))).toEqual(success('success'));
+        expect(Try(successAware).get).toEqual('success');
+
+        expect(Try(errorAware).getOrElse(() => 'fallback')).toEqual('fallback');
+        expect(Try(errorAware).getOrElseValue('fallback')).toEqual('fallback');
+        expect(Try(errorAware).orElse(() => success('fallback'))).toEqual(success('fallback'));
+        expect(() => Try(errorAware).get).toThrowError('error');
+    });
+
+    test('match', () => {
+        expect(Try(successAware).match<number>({
+            success: () => 1,
+            failure: () => 2
+        })).toEqual(1);
+
+        expect(Try(errorAware).match<number>({
+            success: () => 1,
+            failure: () => 2
+        })).toEqual(2);
+
+    })
+
+});
+
+
+describe('Try.promise', () => {
+
+
+
+
+    test('work with promises promise', async () => {
+
+        expect(await Try.promise(() => Promise.resolve(1))).toEqual(success(1));
+        expect(await Try.promise(() => Promise.reject(new Error('123')))).toEqual(failure(new Error('123')));
+
+    });
 
 });
