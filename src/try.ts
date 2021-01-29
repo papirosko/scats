@@ -24,7 +24,9 @@ export abstract class TryLike<T> {
     abstract filter(p: (value: T) => boolean): TryLike<T>;
     abstract readonly failed: TryLike<Error>;
     abstract fold<U>(fa: (e: Error) => U, fb: (result: T) => U): U;
-
+    // no lower bound generic in typescript: https://github.com/Microsoft/TypeScript/issues/14520
+    abstract recover(f: (e: Error) => any): TryLike<any>;
+    abstract recoverWith(f: (e: Error) => TryLike<any>): TryLike<any>;
 }
 
 
@@ -106,6 +108,15 @@ export class Success<T> extends TryLike<T> {
         }
     }
 
+    recover(f: (e: Error) => any): TryLike<any> {
+        return this;
+    }
+
+    recoverWith(f: (e: Error) => TryLike<any>): TryLike<any> {
+        return this;
+    }
+
+
 
 
 }
@@ -173,6 +184,23 @@ export class Failure extends TryLike<any> {
     fold<U>(fa: (e: Error) => U, fb: (result: any) => U): U {
         return fa(this.error);
     }
+
+    recover(f: (e: Error) => any): TryLike<any> {
+        try {
+            return success(f(this.error));
+        } catch (ex) {
+            return failure(ex);
+        }
+    }
+
+    recoverWith(f: (e: Error) => TryLike<any>): TryLike<any> {
+        try {
+            return f(this.error);
+        } catch (ex) {
+            return failure(ex);
+        }
+    }
+
 
 }
 

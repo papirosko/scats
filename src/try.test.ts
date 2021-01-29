@@ -8,6 +8,7 @@ describe('Try', () => {
         return 'success';
     }
 
+
     const errorAware: () => any = () => {
         throw new Error('error');
     }
@@ -15,11 +16,12 @@ describe('Try', () => {
 
     test('store the response', () => {
 
-        expect(Try(() => 1/1)).toEqual(success(1));
-        expect(Try(() => 1/1).toOption).toEqual(some(1));
-        expect(Try(() => 1/1).toEither).toEqual(right(1));
+        expect(Try(() => 1 / 1)).toEqual(success(1));
+        expect(Try(() => 1 / 1).toOption).toEqual(some(1));
+        expect(Try(() => 1 / 1).toEither).toEqual(right(1));
 
     });
+
 
     test('should catch errors', () => {
 
@@ -35,10 +37,12 @@ describe('Try', () => {
 
     });
 
-    test('should map', () => {
+
+    test('map', () => {
         expect(Try(successAware).map(_ => 123)).toEqual(success(123));
         expect(Try(errorAware).map(_ => 123)).toEqual(failure(new Error('error')));
-    })
+    });
+
 
     test('isSuccess, isFailure', () => {
         expect(success(1).isSuccess).toBeTruthy();
@@ -46,6 +50,7 @@ describe('Try', () => {
         expect(failure(new Error('123')).isSuccess).toBeFalsy();
         expect(failure(new Error('123')).isFailure).toBeTruthy();
     });
+
 
     test('getOrElse, getOrElseValue, orElse, get', () => {
         expect(Try(successAware).getOrElse(() => '')).toEqual('success');
@@ -62,6 +67,7 @@ describe('Try', () => {
         expect(() => Try(errorAware).get).toThrowError('error');
     });
 
+
     test('match', () => {
         expect(Try(successAware).match<number>({
             success: () => 1,
@@ -73,18 +79,23 @@ describe('Try', () => {
             failure: () => 2
         })).toEqual(2);
 
-    })
+    });
 
 
     test('foreach', () => {
         let s = 1;
-        Try(successAware).foreach(() => {s = 2;});
+        Try(successAware).foreach(() => {
+            s = 2;
+        });
         expect(s).toEqual(2);
 
         let f = 1;
-        Try(errorAware).foreach(() => {f = 2;});
+        Try(errorAware).foreach(() => {
+            f = 2;
+        });
         expect(f).toEqual(1);
-    })
+    });
+
 
     test('flatMap', () => {
         expect(Try(successAware).flatMap(() => success(2))).toEqual(success(2));
@@ -95,18 +106,20 @@ describe('Try', () => {
 
         expect(Try(errorAware).flatMap(() => success(2))).toEqual(failure(new Error('error')));
 
-    })
+    });
+
 
     test('filter', () => {
         expect(Try(successAware).filter(x => x === 'success')).toEqual(success('success'));
         expect(Try(successAware).filter(x => x === 'success1').isFailure).toBeTruthy();
         expect(Try(errorAware).filter(x => x === 'success')).toEqual(failure(new Error('error')));
-    })
+    });
+
 
     test('failed', () => {
         expect(Try(successAware).failed.isFailure).toBeTruthy();
         expect(Try(errorAware).failed).toEqual(success(new Error('error')));
-    })
+    });
 
 
     test('fold', () => {
@@ -127,15 +140,31 @@ describe('Try', () => {
             e => 1,
             result => 2
         )).toEqual(1);
-    })
+    });
+
+
+    test('recover', () => {
+        expect(Try(successAware).recover(x => '1')).toEqual(success('success'));
+        expect(Try(errorAware).recover(x => '1')).toEqual(success('1'));
+        expect(Try(errorAware).recover(x => {
+            throw new Error('fallback_error');
+        })).toEqual(failure(new Error('fallback_error')));
+    });
+
+
+    test('recoverWith', () => {
+        expect(Try(successAware).recoverWith(x => success('1'))).toEqual(success('success'));
+        expect(Try(errorAware).recoverWith(x => success('1'))).toEqual(success('1'));
+        expect(Try(errorAware).recoverWith(x => failure(new Error('2')))).toEqual(failure(new Error('2')));
+        expect(Try(errorAware).recoverWith(x => {
+            throw new Error('fallback_error');
+        })).toEqual(failure(new Error('fallback_error')));
+    });
 
 });
 
 
 describe('Try.promise', () => {
-
-
-
 
     test('work with promises promise', async () => {
 
