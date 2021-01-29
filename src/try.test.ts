@@ -56,6 +56,9 @@ describe('Try', () => {
         expect(Try(errorAware).getOrElse(() => 'fallback')).toEqual('fallback');
         expect(Try(errorAware).getOrElseValue('fallback')).toEqual('fallback');
         expect(Try(errorAware).orElse(() => success('fallback'))).toEqual(success('fallback'));
+        expect(Try(errorAware).orElse(() => {
+            throw new Error('fallback_error');
+        })).toEqual(failure(new Error('fallback_error')));
         expect(() => Try(errorAware).get).toThrowError('error');
     });
 
@@ -70,6 +73,17 @@ describe('Try', () => {
             failure: () => 2
         })).toEqual(2);
 
+    })
+
+
+    test('foreach', () => {
+        let s = 1;
+        Try(successAware).foreach(() => {s = 2;});
+        expect(s).toEqual(2);
+
+        let f = 1;
+        Try(errorAware).foreach(() => {f = 2;});
+        expect(f).toEqual(1);
     })
 
 });
