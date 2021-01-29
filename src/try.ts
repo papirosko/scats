@@ -21,6 +21,7 @@ export abstract class TryLike<T, E extends Error> {
     abstract match<R>(matcher: TryMatch<T, E, R>): R;
     abstract foreach<U>(f: (value: T) => U): void;
     abstract flatMap<U>(f: (value: T) => TryLike<U, E>): TryLike<U, E>;
+    abstract filter(p: (value: T) => boolean): TryLike<T, E>;
 
 }
 
@@ -79,6 +80,17 @@ export class Success<T> extends TryLike<T, Error> {
         }
     }
 
+    filter(p: (value: T) => boolean): TryLike<T, Error> {
+        try {
+            if (p(this.result)) {
+                return this;
+            } else {
+                return failure(new Error('Predicate does not hold for ' + this.result))
+            }
+        } catch (e) {
+            return failure(e);
+        }
+    }
 
 
 }
@@ -135,6 +147,9 @@ export class Failure<E extends Error> extends TryLike<any, E> {
         return this;
     }
 
+    filter(p: (value: any) => boolean): TryLike<any, E> {
+        return this;
+    }
 
 
 }
