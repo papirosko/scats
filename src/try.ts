@@ -1,6 +1,8 @@
 import {none, Option, some} from "./option";
 import {Either, left, right} from "./either";
 
+const idFunction: <T>(x: T) => T = <T>(x: T) => x;
+
 export interface TryMatch<T, R> {
     success: (result: T) => R;
     failure: (error: Error) => R;
@@ -27,6 +29,7 @@ export abstract class TryLike<T> {
     // no lower bound generic in typescript: https://github.com/Microsoft/TypeScript/issues/14520
     abstract recover(f: (e: Error) => any): TryLike<any>;
     abstract recoverWith(f: (e: Error) => TryLike<any>): TryLike<any>;
+    abstract transform<U>(s: (value: T) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U>;
 }
 
 
@@ -116,6 +119,10 @@ export class Success<T> extends TryLike<T> {
         return this;
     }
 
+    transform<U>(s: (value: T) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U> {
+        return this.flatMap(s);
+    }
+
 
 
 
@@ -194,6 +201,10 @@ export class Failure extends TryLike<any> {
     }
 
     recoverWith(f: (e: Error) => TryLike<any>): TryLike<any> {
+        return this.transform(idFunction, f);
+    }
+
+    transform<U>(s: (value: any) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U> {
         try {
             return f(this.error);
         } catch (ex) {
