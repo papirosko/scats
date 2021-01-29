@@ -103,6 +103,11 @@ describe('Try', () => {
         expect(Try(errorAware).filter(x => x === 'success')).toEqual(failure(new Error('error')));
     })
 
+    test('failed', () => {
+        expect(Try(successAware).failed.isFailure).toBeTruthy();
+        expect(Try(errorAware).failed).toEqual(success(new Error('error')));
+    })
+
 });
 
 
