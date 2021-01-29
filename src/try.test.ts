@@ -86,6 +86,17 @@ describe('Try', () => {
         expect(f).toEqual(1);
     })
 
+    test('flatMap', () => {
+        expect(Try(successAware).flatMap(() => success(2))).toEqual(success(2));
+        expect(Try(successAware).flatMap(() => failure(new Error('2')))).toEqual(failure(new Error('2')));
+        expect(Try(successAware).flatMap(() => {
+            throw new Error('3');
+        })).toEqual(failure(new Error('3')));
+
+        expect(Try(errorAware).flatMap(() => success(2))).toEqual(failure(new Error('error')));
+
+    })
+
 });
 
 

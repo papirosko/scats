@@ -20,6 +20,7 @@ export abstract class TryLike<T, E extends Error> {
     abstract readonly get: T;
     abstract match<R>(matcher: TryMatch<T, E, R>): R;
     abstract foreach<U>(f: (value: T) => U): void;
+    abstract flatMap<U>(f: (value: T) => TryLike<U, E>): TryLike<U, E>;
 
 }
 
@@ -68,6 +69,14 @@ export class Success<T> extends TryLike<T, Error> {
 
     foreach<U>(f: (value: T) => U): void {
         f(this.result);
+    }
+
+    flatMap<U>(f: (value: T) => TryLike<U, Error>): TryLike<U, Error> {
+        try {
+            return f(this.result);
+        } catch (e) {
+            return failure(e);
+        }
     }
 
 
@@ -121,6 +130,11 @@ export class Failure<E extends Error> extends TryLike<any, E> {
 
     foreach<U>(f: (value: any) => U): void {
     }
+
+    flatMap<U>(f: (value: any) => TryLike<U, E>): TryLike<U, E> {
+        return this;
+    }
+
 
 
 }
