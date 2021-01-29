@@ -23,6 +23,7 @@ export abstract class TryLike<T> {
     abstract flatMap<U>(f: (value: T) => TryLike<U>): TryLike<U>;
     abstract filter(p: (value: T) => boolean): TryLike<T>;
     abstract readonly failed: TryLike<Error>;
+    abstract fold<U>(fa: (e: Error) => U, fb: (result: T) => U): U;
 
 }
 
@@ -97,6 +98,14 @@ export class Success<T> extends TryLike<T> {
         return failure(new Error('Success.failed'))
     };
 
+    fold<U>(fa: (e: Error) => U, fb: (result: T) => U): U {
+        try {
+            return fb(this.result);
+        } catch (e) {
+            return fa(e);
+        }
+    }
+
 
 
 }
@@ -161,7 +170,9 @@ export class Failure extends TryLike<any> {
         return success(this.error)
     };
 
-
+    fold<U>(fa: (e: Error) => U, fb: (result: any) => U): U {
+        return fa(this.error);
+    }
 
 }
 

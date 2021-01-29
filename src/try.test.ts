@@ -108,6 +108,27 @@ describe('Try', () => {
         expect(Try(errorAware).failed).toEqual(success(new Error('error')));
     })
 
+
+    test('fold', () => {
+
+        expect(Try(successAware).fold(
+            e => 1,
+            result => 2
+        )).toEqual(2);
+
+        expect(Try(successAware).fold(
+            e => 1,
+            result => {
+                throw new Error('1');
+            }
+        )).toEqual(1);
+
+        expect(Try(errorAware).fold(
+            e => 1,
+            result => 2
+        )).toEqual(1);
+    })
+
 });
 
 
