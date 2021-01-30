@@ -1,4 +1,5 @@
 import {none, Option, option, some} from "./option";
+import {HashMap} from "./hashmap";
 
 export class Collection<T> {
 
@@ -187,4 +188,9 @@ export class Collection<T> {
     sort(param: (a: T, b: T) => number) {
         return new Collection(this.items.sort(param));
     }
+
+    toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
+        return HashMap.of(...this.map(mapper).toArray);
+    }
+
 }
