@@ -1,5 +1,6 @@
 import {Collection} from "./collection";
 import {none, some} from "./option";
+import {idFunction} from "./util";
 
 describe('Collection', () => {
 
@@ -35,8 +36,8 @@ describe('Collection', () => {
 
     test('should sum', () => {
 
-        expect(Collection.empty.sum).toEqual(0);
-        expect(Collection.of<any>(1, 2).sum).toEqual(3);
+        expect(Collection.empty.sum(idFunction)).toEqual(0);
+        expect(Collection.of<any>(1, 2).sum(idFunction)).toEqual(3);
 
     });
 

@@ -1,5 +1,6 @@
 import {none, Option, option, some} from "./option";
 import {HashMap} from "./hashmap";
+import {idFunction} from "./util";
 
 export class Collection<T> {
 
@@ -148,11 +149,11 @@ export class Collection<T> {
         return this.items;
     }
 
-    get sum(): number {
+    sum(elementToNum: (element: T) => number): number {
         if (this.isEmpty) {
             return 0
         } else {
-            return this.items.reduce((a, b) => (a as unknown as number) + (b as unknown as number), 0)
+            return this.items.reduce<number>((acc, next) => acc + elementToNum(next), 0)
         }
     }
 
