@@ -49,18 +49,30 @@ export class HashMap<K, V> {
         return this.map.keys();
     }
 
-    get values(): IterableIterator<V> {
+    get keys(): Collection<K> {
+        return new Collection(Array.from(this.map.keys()));
+    }
+
+    get values(): Collection<V> {
+        return new Collection(Array.from(this.map.values()));
+    }
+
+    get valueIterator(): IterableIterator<V> {
         return this.map.values();
     }
 
-    get entries(): IterableIterator<[K, V]> {
+    get entries(): Collection<[K, V]> {
+        return new Collection(Array.from(this.map.entries()));
+    }
+
+    get entriesIterator(): IterableIterator<[K, V]> {
         return this.map.entries();
     }
 
     addAll(map: HashMap<K, V>): HashMap<K, V> {
         const mergedMap = new Map<K, V>([
-            ...Array.from(this.entries),
-            ...Array.from(map.entries)
+            ...this.entries.toArray,
+            ...map.entries.toArray
         ]);
         return new HashMap<K, V>(mergedMap);
     }
