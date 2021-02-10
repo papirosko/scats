@@ -1,6 +1,7 @@
 import {Collection} from "./collection";
 import {none, some} from "./option";
 import {idFunction} from "./util";
+import {HashMap} from "./hashmap";
 
 describe('Collection', () => {
 
@@ -172,6 +173,17 @@ describe('Collection', () => {
             ({
                 sum: b.sum + a
             }))).toEqual({sum: 6});
+    });
+
+    test('groupBy', () => {
+        expect(Collection.of(
+            {name: 'Foo1', amount: 1},
+            {name: 'Foo2', amount: 3},
+            {name: 'Foo1', amount: 2},
+        ).groupBy(x => x.name)).toEqual(HashMap.of(
+            ['Foo1', Collection.of({name: 'Foo1', amount: 1}, {name: 'Foo1', amount: 2})],
+            ['Foo2', Collection.of({name: 'Foo2', amount: 3})],
+        ))
     });
 
 });

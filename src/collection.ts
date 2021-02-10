@@ -211,4 +211,12 @@ export class Collection<T> {
         return HashMap.of(...this.map(mapper).toArray);
     }
 
+    groupBy<K>(field: (item: T) => K): HashMap<K, Collection<T>> {
+        return this.foldLeft<HashMap<K, Collection<T>>>(HashMap.empty)((acc, next) => {
+            const key = field(next);
+            const existing = acc.get(key).getOrElseValue(Collection.empty);
+            return acc.set(key, new Collection<T>(existing.toArray.concat(next)));
+        });
+    }
+
 }
