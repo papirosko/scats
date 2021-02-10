@@ -156,4 +156,21 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(Collection.empty);
     });
 
+    test('foldLeft', () => {
+        expect(Collection.of(1, 2, 3).foldLeft(0)((a, b) => a + b)).toEqual(6);
+        expect(Collection.of(1, 2, 3).fold(0)((a, b) => a + b)).toEqual(6);
+        expect(Collection.of(1, 2, 3).fold({sum: 0})((a, b) =>
+            ({
+                sum: a.sum + b
+            }))).toEqual({sum: 6});
+    });
+
+    test('foldRight', () => {
+        expect(Collection.of(1, 2, 3).foldRight(0)((a, b) => a + b)).toEqual(6);
+        expect(Collection.of(1, 2, 3).foldRight({sum: 0})((a, b) =>
+            ({
+                sum: b.sum + a
+            }))).toEqual({sum: 6});
+    });
+
 });

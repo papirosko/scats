@@ -187,4 +187,21 @@ export class Collection<T> {
     sort(param: (a: T, b: T) => number) {
         return new Collection(this.items.sort(param));
     }
+
+
+    foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
+        return (op: (acc: B, next: T) => B) => {
+            return this.items.reduce((a, n) => op(a, n), initial);
+        };
+    }
+
+    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
+        return (op: (next: T, acc: B) => B) => {
+            return this.reverse().foldLeft(initial)((a, n) => op(n, a));
+        };
+    }
+
+    fold<B>(initial: B): (op: (acc: B, next: T) => B) => B {
+        return this.foldLeft(initial);
+    }
 }
