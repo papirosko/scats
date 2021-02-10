@@ -57,22 +57,22 @@ export class HashMap<K, V> {
         return this.map.entries();
     }
 
-    addAll(map: HashMap<K, V>) {
+    addAll(map: HashMap<K, V>): HashMap<K, V> {
         const mergedMap = new Map<K, V>([
             ...Array.from(this.entries),
             ...Array.from(map.entries)
         ]);
-
+        return new HashMap<K, V>(mergedMap);
     }
 
     set(key: K, value: V): HashMap<K, V> {
         this.map.set(key, value);
-        return this;
+        return new HashMap<K, V>(this.map);
     }
 
     remove(key: K): HashMap<K, V> {
         this.map.delete(key);
-        return this;
+        return new HashMap<K, V>(this.map);
     }
 
     contains(key: K): boolean {
@@ -81,7 +81,7 @@ export class HashMap<K, V> {
 
     updated(key: K, value: V) {
         this.map.set(key, value);
-        return this;
+        return new HashMap<K, V>(this.map);
     }
 
     toCollection(): Collection<[K, V]> {
