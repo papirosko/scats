@@ -19,8 +19,12 @@ export class HashMap<K, V> {
         return this.map.size;
     }
 
-    get isEmpty(): Boolean {
+    get isEmpty(): boolean {
         return this.size === 0;
+    }
+
+    get nonEmpty(): boolean {
+        return !this.isEmpty;
     }
 
     foreach<U>(f: (key: K, value: V) => U): void {

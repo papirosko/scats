@@ -113,6 +113,7 @@ describe('Try', () => {
         expect(Try(successAware).filter(x => x === 'success')).toEqual(success('success'));
         expect(Try(successAware).filter(x => x === 'success1').isFailure).toBeTruthy();
         expect(Try(errorAware).filter(x => x === 'success')).toEqual(failure(new Error('error')));
+        expect(Try(successAware).filter(errorAware)).toEqual(failure(new Error('error')));
     });
 
 
