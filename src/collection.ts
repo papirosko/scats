@@ -190,6 +190,23 @@ export class Collection<T> {
         return new Collection(this.items.sort(param));
     }
 
+
+    foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
+        return (op: (acc: B, next: T) => B) => {
+            return this.items.reduce((a, n) => op(a, n), initial);
+        };
+    }
+
+    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
+        return (op: (next: T, acc: B) => B) => {
+            return this.reverse().foldLeft(initial)((a, n) => op(n, a));
+        };
+    }
+
+    fold<B>(initial: B): (op: (acc: B, next: T) => B) => B {
+        return this.foldLeft(initial);
+    }
+
     toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
         return HashMap.of(...this.map(mapper).toArray);
     }
