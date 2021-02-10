@@ -47,3 +47,6 @@ const a = await Try.promise(() => Promise.resolve(1)); // a = success(1);
 
 ## Either
 Represents the value, marked as left or right.
+
+
+## HashMap
