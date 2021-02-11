@@ -300,8 +300,7 @@ describe('Collection', () => {
         expect(Collection.empty.sliding(2)).toEqual(Collection.empty);
         expect(Collection.of(1).sliding(2)).toEqual(Collection.of(Collection.of(1)));
         expect(Collection.of(1, 2).sliding(2)).toEqual(Collection.of(Collection.of(1, 2)));
-        let actual1 = Collection.of(1, 2, 3).sliding(2);
-        expect(actual1).toEqual(Collection.of(
+        expect(Collection.of(1, 2, 3).sliding(2)).toEqual(Collection.of(
             Collection.of(1, 2),
             Collection.of(2, 3),
         ));
@@ -309,11 +308,21 @@ describe('Collection', () => {
         expect(Collection.empty.sliding(2, 2)).toEqual(Collection.empty);
         expect(Collection.of(1).sliding(2, 2)).toEqual(Collection.of(Collection.of(1)));
         expect(Collection.of(1, 2).sliding(2, 2)).toEqual(Collection.of(Collection.of(1, 2)));
-        let actual = Collection.of(1, 2, 3).sliding(2, 2);
-        expect(actual).toEqual(Collection.of(
+        expect(Collection.of(1, 2, 3).sliding(2, 2)).toEqual(Collection.of(
             Collection.of(1, 2),
             Collection.of(3),
         ));
+    });
+
+    test('grouped', () => {
+        expect(Collection.empty.grouped(2)).toEqual(Collection.empty);
+        expect(Collection.of(1).grouped(2)).toEqual(Collection.of(Collection.of(1)));
+        expect(Collection.of(1, 2).grouped(2)).toEqual(Collection.of(Collection.of(1, 2)));
+        expect(Collection.of(1, 2, 3).grouped(2)).toEqual(Collection.of(
+            Collection.of(1, 2),
+            Collection.of(3),
+        ));
+
     })
 
 });

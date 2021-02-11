@@ -331,4 +331,8 @@ export class Collection<T> {
 
     }
 
+    grouped(length: number): Collection<Collection<T>> {
+        return this.sliding(length, length);
+    }
+
 }
