@@ -309,4 +309,26 @@ export class Collection<T> {
         return this.isEmpty ? none : some(this.maxBy(toNumber));
     }
 
+    sliding(length: number, step: number = 1): Collection<Collection<T>> {
+        if (this.isEmpty) {
+            return Collection.empty;
+        } else if (this.size <= length) {
+            return Collection.of(this);
+        } else {
+            const result: Array<Collection<T>> = [];
+            let left = 0;
+            let done = false;
+            let right = step;
+            while (!done) {
+                done = right >= this.size;
+                result.push(new Collection(this.items.slice(left, left + length)));
+                left += step;
+                right = left + length;
+            }
+
+            return new Collection(result);
+        }
+
+    }
+
 }

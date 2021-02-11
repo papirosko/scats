@@ -296,5 +296,24 @@ describe('Collection', () => {
 
     })
 
+    test('sliding', () => {
+        expect(Collection.empty.sliding(2)).toEqual(Collection.empty);
+        expect(Collection.of(1).sliding(2)).toEqual(Collection.of(Collection.of(1)));
+        expect(Collection.of(1, 2).sliding(2)).toEqual(Collection.of(Collection.of(1, 2)));
+        let actual1 = Collection.of(1, 2, 3).sliding(2);
+        expect(actual1).toEqual(Collection.of(
+            Collection.of(1, 2),
+            Collection.of(2, 3),
+        ));
+
+        expect(Collection.empty.sliding(2, 2)).toEqual(Collection.empty);
+        expect(Collection.of(1).sliding(2, 2)).toEqual(Collection.of(Collection.of(1)));
+        expect(Collection.of(1, 2).sliding(2, 2)).toEqual(Collection.of(Collection.of(1, 2)));
+        let actual = Collection.of(1, 2, 3).sliding(2, 2);
+        expect(actual).toEqual(Collection.of(
+            Collection.of(1, 2),
+            Collection.of(3),
+        ));
+    })
 
 });
