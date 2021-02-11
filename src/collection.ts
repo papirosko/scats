@@ -157,6 +157,7 @@ export class Collection<T> {
         }
     }
 
+
     mkString(separator: string = ''): string {
         return this.items.join(separator);
     }
@@ -191,6 +192,52 @@ export class Collection<T> {
     }
 
 
+    sortBy(fieldToNumber: (a: T) => number) {
+        return this.sort((a, b) => fieldToNumber(a) - fieldToNumber(b));
+    }
+
+    reduce(op: (i1: T, i2: T) => T): T {
+        return this.reduceLeft(op);
+    }
+
+    reduceOption(op: (i1: T, i2: T) => T): Option<T> {
+        return this.reduceLeftOption(op);
+    }
+
+    reduceLeft(op: (i1: T, i2: T) => T): T {
+        if (this.isEmpty) {
+            throw new Error('empty.reduceLeft')
+        }
+
+        let acc = this.head
+        this.drop(1).foreach(next => {
+            acc = op(acc, next)
+        })
+        return acc
+    }
+
+    reduceLeftOption(op: (i1: T, i2: T) => T): Option<T> {
+        return this.isEmpty ? none : some(this.reduceLeft(op));
+    }
+
+
+    reduceRight(op: (i1: T, i2: T) => T): T {
+        if (this.isEmpty) {
+            throw new Error('empty.reduceRight')
+        }
+
+        let acc = this.last
+        this.reverse().drop(1).foreach(next => {
+            acc = op(acc, next)
+        })
+        return acc
+    }
+
+    reduceRightOption(op: (i1: T, i2: T) => T): Option<T> {
+        return this.isEmpty ? none : some(this.reduceRight(op));
+    }
+
+
     foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
         return (op: (acc: B, next: T) => B) => {
             return this.items.reduce((a, n) => op(a, n), initial);
@@ -217,6 +264,49 @@ export class Collection<T> {
             const existing = acc.get(key).getOrElseValue(Collection.empty);
             return acc.set(key, new Collection<T>(existing.toArray.concat(next)));
         });
+    }
+
+    minBy(toNumber: (item: T) => number): T {
+        if (this.isEmpty) {
+            throw new Error('empty.minBy');
+        } else {
+            let res = this.head;
+            let min = toNumber(res);
+            this.drop(1).foreach(i => {
+                const next = toNumber(i);
+                if (next < min) {
+                    res = i;
+                    min = next;
+                }
+            });
+            return res;
+        }
+    }
+
+    minByOption(toNumber: (item: T) => number): Option<T> {
+        return this.isEmpty ? none : some(this.minBy(toNumber));
+    }
+
+    maxBy(toNumber: (item: T) => number): T {
+
+        if (this.isEmpty) {
+            throw new Error('empty.maxBy');
+        } else {
+            let res = this.head;
+            let max = toNumber(res);
+            this.drop(1).foreach(i => {
+                const next = toNumber(i);
+                if (next > max) {
+                    res = i;
+                    max = next;
+                }
+            });
+            return res;
+        }
+    }
+
+    maxByOption(toNumber: (item: T) => number): Option<T> {
+        return this.isEmpty ? none : some(this.maxBy(toNumber));
     }
 
 }

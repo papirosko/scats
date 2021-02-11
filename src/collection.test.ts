@@ -186,4 +186,115 @@ describe('Collection', () => {
         ))
     });
 
+    test('sortBy', () => {
+        expect(Collection.of(
+            {name: 'Foo1', amount: 1},
+            {name: 'Foo2', amount: 3},
+            {name: 'Foo1', amount: 2},
+        ).sortBy(x => x.amount)).toEqual(Collection.of(
+            {name: 'Foo1', amount: 1},
+            {name: 'Foo1', amount: 2},
+            {name: 'Foo2', amount: 3},
+        ))
+    });
+
+
+    test('reduce, reduceLeft, reduceRight', () => {
+
+        expect(() => Collection.empty.reduce(idFunction)).toThrow(Error);
+        expect(() => Collection.empty.reduceLeft(idFunction)).toThrow(Error);
+        expect(() => Collection.empty.reduceRight(idFunction)).toThrow(Error);
+
+        expect(Collection.empty.reduceOption(idFunction)).toEqual(none);
+        expect(Collection.empty.reduceLeftOption(idFunction)).toEqual(none);
+        expect(Collection.empty.reduceRightOption(idFunction)).toEqual(none);
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduce((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual({amount: 6});
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduceLeft((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual({amount: 6});
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduceRight((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual({amount: 6});
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduceOption((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual(some({amount: 6}));
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduceLeftOption((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual(some({amount: 6}));
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).reduceRightOption((x1, x2) => ({
+            amount: x1.amount + x2.amount
+        }))).toEqual(some({amount: 6}));
+    });
+
+
+    test('minBy, minByOption, maxBy, maxByOption', () => {
+        expect(() => Collection.empty.minBy(idFunction)).toThrow(Error);
+        expect(() => Collection.empty.maxBy(idFunction)).toThrow(Error);
+
+        expect(Collection.empty.minByOption(idFunction)).toEqual(none);
+        expect(Collection.empty.maxByOption(idFunction)).toEqual(none);
+
+        expect(Collection.of(
+            {amount: 4},
+            {amount: 5},
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).minBy(x => x.amount)).toEqual({amount: 1});
+
+        expect(Collection.of(
+            {amount: 4},
+            {amount: 5},
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).minByOption(x => x.amount)).toEqual(some({amount: 1}));
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).maxBy(x => x.amount)).toEqual({amount: 3});
+
+        expect(Collection.of(
+            {amount: 1},
+            {amount: 3},
+            {amount: 2},
+        ).maxByOption(x => x.amount)).toEqual(some({amount: 3}));
+
+    })
+
+
 });
