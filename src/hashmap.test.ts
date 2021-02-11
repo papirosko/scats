@@ -151,4 +151,22 @@ describe('Hashmap', () => {
         expect(map.toMap).toEqual(new Map([['1', 1], ['2', 3]]));
     });
 
+    test('immutability on set', () => {
+        const originalMap = new Map([['1', 1], ['2', 2]]);
+        const hm = new HashMap(originalMap);
+        const hmSet = hm.set('3', 3);
+        expect(hmSet.get('3')).toEqual(some(3));
+        expect(hmSet.toMap.get('3')).toEqual(3);
+        expect(originalMap.get('3')).toBeUndefined();
+    });
+
+    test('immutability on remove', () => {
+        const originalMap = new Map([['1', 1], ['2', 2]]);
+        const hm = new HashMap(originalMap);
+        const hmDel = hm.remove('2');
+        expect(hmDel.get('2')).toEqual(none);
+        expect(hmDel.toMap.get('2')).toBeUndefined();
+        expect(originalMap.get('2')).toEqual(2);
+    })
+
 });

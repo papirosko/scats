@@ -82,13 +82,15 @@ export class HashMap<K, V> {
     }
 
     set(key: K, value: V): HashMap<K, V> {
-        this.map.set(key, value);
-        return new HashMap<K, V>(this.map);
+        const next = new Map(this.map);
+        next.set(key, value);
+        return new HashMap<K, V>(new Map(next));
     }
 
     remove(key: K): HashMap<K, V> {
-        this.map.delete(key);
-        return new HashMap<K, V>(this.map);
+        const next = new Map(this.map);
+        next.delete(key);
+        return new HashMap<K, V>(next);
     }
 
     contains(key: K): boolean {
