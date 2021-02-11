@@ -312,6 +312,9 @@ describe('Collection', () => {
             Collection.of(1, 2),
             Collection.of(3),
         ));
+
+        expect(Collection.of(1, 2).sliding(5, 3)).toEqual(Collection.of(Collection.of(1, 2)));
+
     });
 
     test('grouped', () => {

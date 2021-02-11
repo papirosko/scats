@@ -318,10 +318,10 @@ export class Collection<T> {
             const result: Array<Collection<T>> = [];
             let left = 0;
             let done = false;
-            let right = step;
+            let right = length;
             while (!done) {
                 done = right >= this.size;
-                result.push(new Collection(this.items.slice(left, left + length)));
+                result.push(new Collection(this.items.slice(left, right)));
                 left += step;
                 right = left + length;
             }
