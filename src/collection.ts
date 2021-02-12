@@ -335,4 +335,23 @@ export class Collection<T> {
         return this.sliding(length, length);
     }
 
+    appended(item: T) {
+        return new Collection(this.items.concat([item]));
+    }
+
+    appendedAll(other: Collection<T>) {
+        return new Collection(this.items.concat(other.items));
+    }
+
+    prepended(item: T) {
+        return new Collection([item].concat(this.items));
+    }
+
+    prependedAll(other: Collection<T>) {
+        return new Collection(other.items.concat(this.items));
+    }
+
+    concat(other: Collection<T>) {
+        return this.appendedAll(other);
+    }
 }

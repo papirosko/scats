@@ -326,6 +326,15 @@ describe('Collection', () => {
             Collection.of(3),
         ));
 
+    });
+
+    test("appended, appendedAll, prepended, prependedAll, concat", () => {
+        expect(Collection.of(2).appended(1)).toEqual(Collection.of(2, 1));
+        expect(Collection.of(2).prepended(1)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(2).appendedAll(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
+        expect(Collection.of(2).concat(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
+        expect(Collection.of(2).prependedAll(Collection.of(0, 1))).toEqual(Collection.of(0, 1, 2));
     })
+
 
 });
