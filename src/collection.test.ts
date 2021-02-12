@@ -2,6 +2,7 @@ import {Collection} from "./collection";
 import {none, some} from "./option";
 import {idFunction} from "./util";
 import {HashMap} from "./hashmap";
+import {HashSet} from "./hashset";
 
 describe('Collection', () => {
 
@@ -336,5 +337,26 @@ describe('Collection', () => {
         expect(Collection.of(2).prependedAll(Collection.of(0, 1))).toEqual(Collection.of(0, 1, 2));
     })
 
+    test('distinct', () => {
+        expect(Collection.of(1, 1, 2, 2, 3).distinct).toEqual(Collection.of(1, 2, 3));
+    })
+
+    test('indexOf', () => {
+        expect(Collection.of(1, 2, 3).indexOf(2)).toEqual(1);
+    });
+
+    test('contains', () => {
+        expect(Collection.of(1, 2, 3).contains(2)).toBeTruthy();
+    });
+
+    test('toSet', () => {
+        expect(Collection.of(1, 2, 2, 3).toSet()).toEqual(HashSet.of(1, 2, 3));
+    });
+
+    test('toMap', () => {
+        expect(Collection.of(
+            {id: 1, name: 'foo1'}, {id: 2, name: 'foo2'}
+        ).toMap(o => [o.id, o.name]).toMap).toEqual(new Map([[1, 'foo1'], [2, 'foo2']]));
+    });
 
 });

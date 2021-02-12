@@ -1,11 +1,14 @@
 import {none, Option, option, some} from "./option";
 import {HashMap} from "./hashmap";
 import {idFunction} from "./util";
+import {HashSet} from "./hashset";
+import {ArrayIterable} from "./array-iterable";
 
-export class Collection<T> {
+export class Collection<T> extends ArrayIterable<T>{
 
 
     constructor(private readonly items: T[]) {
+        super();
     }
 
     static empty = new Collection([]);
@@ -102,47 +105,9 @@ export class Collection<T> {
         return new Collection<B>(res);
     }
 
-    foreach<U>(job: (item: T) => U): void {
-        this.items.forEach(x => job(x));
-    }
-
-
-    forall(p: (item: T) => boolean): boolean {
-        return this.items.every(i => p(i));
-    }
-
-    exists(p: (item: T) => boolean): boolean {
-        return this.items.find(i => p(i)) !== undefined;
-    }
-
-    count(p: (item: T) => boolean): number {
-        let res = 0;
-        this.items.forEach(i => {
-            if (p(i)) { res++; }
-        });
-
-        return res;
-    }
-
-    find(p: (item: T) => boolean): Option<T> {
-        return option(this.items.find(i => p(i)));
-    }
-
-
-    get isEmpty() {
-        return this.items.length <= 0;
-    }
-
-    get nonEmpty() {
-        return !this.isEmpty;
-    }
 
     get(idx: number): T {
         return this.items[idx];
-    }
-
-    get size(): number {
-        return this.items.length;
     }
 
     get toArray(): T[] {
@@ -162,64 +127,24 @@ export class Collection<T> {
         return this.items.join(separator);
     }
 
-    get headOption(): Option<T> {
-        return this.isEmpty ? none : some(this.items[0]);
-    }
-
-    get head(): T {
-        return this.headOption.getOrElse(() => {
-            throw new Error('head on empty collection')
-        });
-    }
-
-    get lastOption(): Option<T> {
-        return this.isEmpty ? none : some(this.items[this.items.length - 1]);
-    }
-
-
-    get last(): T {
-        return this.lastOption.getOrElse(() => {
-            throw new Error('last on empty collection')
-        });
-    }
-
     reverse(): Collection<T> {
         return new Collection(this.items.reverse());
     }
 
-    sort(param: (a: T, b: T) => number) {
+    sort(param: (a: T, b: T) => number): Collection<T> {
         return new Collection(this.items.sort(param));
     }
 
 
-    sortBy(fieldToNumber: (a: T) => number) {
+    sortBy(fieldToNumber: (a: T) => number): Collection<T> {
         return this.sort((a, b) => fieldToNumber(a) - fieldToNumber(b));
     }
 
-    reduce(op: (i1: T, i2: T) => T): T {
-        return this.reduceLeft(op);
+    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
+        return (op: (next: T, acc: B) => B) => {
+            return this.reverse().foldLeft(initial)((a, n) => op(n, a));
+        };
     }
-
-    reduceOption(op: (i1: T, i2: T) => T): Option<T> {
-        return this.reduceLeftOption(op);
-    }
-
-    reduceLeft(op: (i1: T, i2: T) => T): T {
-        if (this.isEmpty) {
-            throw new Error('empty.reduceLeft')
-        }
-
-        let acc = this.head
-        this.drop(1).foreach(next => {
-            acc = op(acc, next)
-        })
-        return acc
-    }
-
-    reduceLeftOption(op: (i1: T, i2: T) => T): Option<T> {
-        return this.isEmpty ? none : some(this.reduceLeft(op));
-    }
-
 
     reduceRight(op: (i1: T, i2: T) => T): T {
         if (this.isEmpty) {
@@ -238,76 +163,7 @@ export class Collection<T> {
     }
 
 
-    foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
-        return (op: (acc: B, next: T) => B) => {
-            return this.items.reduce((a, n) => op(a, n), initial);
-        };
-    }
 
-    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
-        return (op: (next: T, acc: B) => B) => {
-            return this.reverse().foldLeft(initial)((a, n) => op(n, a));
-        };
-    }
-
-    fold<B>(initial: B): (op: (acc: B, next: T) => B) => B {
-        return this.foldLeft(initial);
-    }
-
-    toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
-        return HashMap.of(...this.map(mapper).toArray);
-    }
-
-    groupBy<K>(field: (item: T) => K): HashMap<K, Collection<T>> {
-        return this.foldLeft<HashMap<K, Collection<T>>>(HashMap.empty)((acc, next) => {
-            const key = field(next);
-            const existing = acc.get(key).getOrElseValue(Collection.empty);
-            return acc.set(key, new Collection<T>(existing.toArray.concat(next)));
-        });
-    }
-
-    minBy(toNumber: (item: T) => number): T {
-        if (this.isEmpty) {
-            throw new Error('empty.minBy');
-        } else {
-            let res = this.head;
-            let min = toNumber(res);
-            this.drop(1).foreach(i => {
-                const next = toNumber(i);
-                if (next < min) {
-                    res = i;
-                    min = next;
-                }
-            });
-            return res;
-        }
-    }
-
-    minByOption(toNumber: (item: T) => number): Option<T> {
-        return this.isEmpty ? none : some(this.minBy(toNumber));
-    }
-
-    maxBy(toNumber: (item: T) => number): T {
-
-        if (this.isEmpty) {
-            throw new Error('empty.maxBy');
-        } else {
-            let res = this.head;
-            let max = toNumber(res);
-            this.drop(1).foreach(i => {
-                const next = toNumber(i);
-                if (next > max) {
-                    res = i;
-                    max = next;
-                }
-            });
-            return res;
-        }
-    }
-
-    maxByOption(toNumber: (item: T) => number): Option<T> {
-        return this.isEmpty ? none : some(this.maxBy(toNumber));
-    }
 
     sliding(length: number, step: number = 1): Collection<Collection<T>> {
         if (this.isEmpty) {
@@ -335,23 +191,39 @@ export class Collection<T> {
         return this.sliding(length, length);
     }
 
-    appended(item: T) {
+    appended(item: T): Collection<T> {
         return new Collection(this.items.concat([item]));
     }
 
-    appendedAll(other: Collection<T>) {
+    appendedAll(other: Collection<T>): Collection<T> {
         return new Collection(this.items.concat(other.items));
     }
 
-    prepended(item: T) {
+    prepended(item: T): Collection<T> {
         return new Collection([item].concat(this.items));
     }
 
-    prependedAll(other: Collection<T>) {
+    prependedAll(other: Collection<T>): Collection<T> {
         return new Collection(other.items.concat(this.items));
     }
 
-    concat(other: Collection<T>) {
+    concat(other: Collection<T>): Collection<T> {
         return this.appendedAll(other);
+    }
+
+    toSet(): HashSet<T> {
+        return HashSet.of(...this.items);
+    }
+
+    get distinct(): Collection<T> {
+        return HashSet.of(...this.items).toCollection();
+    }
+
+    toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
+        return HashMap.of(...this.map(mapper).toArray);
+    }
+
+    indexOf(item: T): number {
+        return this.items.indexOf(item);
     }
 }

@@ -1,16 +1,12 @@
 import {Collection} from "./collection";
 import {HashMap} from "./hashmap";
 import {none, some} from "./option";
+import {HashSet} from "./hashset";
 
 describe('Hashmap', () => {
 
     test('should create map of', () => {
         expect(HashMap.of(['1', 1], ['2', 3]).toMap).toEqual(new Map([['1', 1], ['2', 3]]));
-
-        expect(Collection.of(
-            {id: 1, name: 'foo1'}, {id: 2, name: 'foo2'}
-        ).toMap(o => [o.id, o.name]).toMap).toEqual(new Map([[1, 'foo1'], [2, 'foo2']]));
-
     });
 
     test('size', () => {
@@ -61,7 +57,7 @@ describe('Hashmap', () => {
 
     test('keySet', () => {
         const map = HashMap.of(['1', 1], ['2', 3]);
-        expect(map.keySet).toEqual(new Set(['1', '2']));
+        expect(map.keySet).toEqual(HashSet.of('1', '2'));
     });
 
     test('keyIterator', () => {
@@ -115,6 +111,7 @@ describe('Hashmap', () => {
         const map2 = map.set('1', 2);
         expect(map2.get('1')).toEqual(some(2));
         expect(map === map2).toBeFalsy();
+        expect(map.toMap === map2.toMap).toBeFalsy();
     });
 
     test('remove', () => {
@@ -138,6 +135,7 @@ describe('Hashmap', () => {
         expect(updated.get('foo2')).toEqual(some(2));
         expect(updated.get('foo3')).toEqual(some(3));
         expect(updated === original).toBeFalsy();
+        expect(updated.toMap === original.toMap).toBeFalsy();
     });
 
 

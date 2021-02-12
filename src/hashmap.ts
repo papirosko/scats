@@ -1,5 +1,6 @@
 import {option, Option} from "./option";
 import {Collection} from "./collection";
+import {HashSet} from "./hashset";
 
 export class HashMap<K, V> {
 
@@ -10,8 +11,6 @@ export class HashMap<K, V> {
     static of<K, V>(...values: [k: K, v: V][]) {
         return new HashMap<K, V>(new Map(values));
     }
-
-
 
     static empty = new HashMap(new Map());
 
@@ -45,8 +44,8 @@ export class HashMap<K, V> {
         return this.get(key).getOrElseValue(defaultValue);
     }
 
-    get keySet(): Set<K> {
-        return new Set(this.map.keys());
+    get keySet(): HashSet<K> {
+        return HashSet.of(...Array.from(this.map.keys()));
     }
 
     get keyIterator(): IterableIterator<K> {
@@ -98,8 +97,7 @@ export class HashMap<K, V> {
     }
 
     updated(key: K, value: V) {
-        this.map.set(key, value);
-        return new HashMap<K, V>(this.map);
+        return this.set(key, value);
     }
 
     toCollection(): Collection<[K, V]> {
