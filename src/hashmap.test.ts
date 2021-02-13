@@ -28,7 +28,7 @@ describe('Hashmap', () => {
 
     test('foreach', () => {
         let sum = 0;
-        HashMap.of(['1', 1], ['2', 3]).foreach((k, v) => {
+        HashMap.of(['1', 1], ['2', 3]).foreach(([k, v]) => {
             sum = sum + v;
         });
         expect(sum).toEqual(4);
@@ -97,10 +97,19 @@ describe('Hashmap', () => {
         expect(map.entries).toEqual(Collection.of(['1', 1], ['2', 3]));
     });
 
-    test('addAll', () => {
+    test('appendedAll', () => {
         const map = HashMap.of(['1', 1], ['2', 3]);
         const map2 = HashMap.of(['1', 2], ['4', 4]);
-        const merged = map.addAll(map2);
+        const merged = map.appendedAll(map2);
+        expect(merged).toEqual(HashMap.of(['1', 2], ['2', 3], ['4', 4]));
+        expect(merged === map).toBeFalsy();
+        expect(merged === map2).toBeFalsy();
+    });
+
+    test('concat', () => {
+        const map = HashMap.of(['1', 1], ['2', 3]);
+        const map2 = HashMap.of(['1', 2], ['4', 4]);
+        const merged = map.concat(map2);
         expect(merged).toEqual(HashMap.of(['1', 2], ['2', 3], ['4', 4]));
         expect(merged === map).toBeFalsy();
         expect(merged === map2).toBeFalsy();
@@ -121,10 +130,10 @@ describe('Hashmap', () => {
         expect(map === map2).toBeFalsy();
     });
 
-    test('contains', () => {
+    test('containsKey', () => {
         const map = HashMap.of(['1', 1], ['2', 3]);
-        expect(map.contains('1')).toBeTruthy();
-        expect(map.contains('3')).toBeFalsy();
+        expect(map.containsKey('1')).toBeTruthy();
+        expect(map.containsKey('3')).toBeFalsy();
     });
 
 
@@ -165,6 +174,10 @@ describe('Hashmap', () => {
         expect(hmDel.get('2')).toEqual(none);
         expect(hmDel.toMap.get('2')).toBeUndefined();
         expect(originalMap.get('2')).toEqual(2);
-    })
+    });
+
+    test('toArray', () => {
+        expect(HashMap.of(['1', 1], ['2', 2]).toArray).toEqual([['1', 1], ['2', 2]]);
+    });
 
 });

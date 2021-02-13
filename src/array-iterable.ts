@@ -100,6 +100,35 @@ export abstract class ArrayIterable<T> {
         return this.isEmpty ? none : some(this.reduceLeft(op));
     }
 
+    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
+        return (op: (next: T, acc: B) => B) => {
+            return new Collection(this.toArray)
+                .reverse()
+                .foldLeft(initial)((a, n) => op(n, a));
+        };
+    }
+
+    reduceRight(op: (i1: T, i2: T) => T): T {
+        if (this.isEmpty) {
+            throw new Error('empty.reduceRight')
+        }
+
+        let acc = this.last
+        const array = this.toArray.reverse()
+        if (array.length > 1) {
+            for (let i = 1; i< array.length; i++) {
+                acc = op(acc, array[i]);
+            }
+        }
+        return acc;
+    }
+
+    reduceRightOption(op: (i1: T, i2: T) => T): Option<T> {
+        return this.isEmpty ? none : some(this.reduceRight(op));
+    }
+
+
+
     foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
         return (op: (acc: B, next: T) => B) => {
             return this.toArray.reduce((a, n) => op(a, n), initial);
@@ -109,6 +138,7 @@ export abstract class ArrayIterable<T> {
     fold<B>(initial: B): (op: (acc: B, next: T) => B) => B {
         return this.foldLeft(initial);
     }
+
 
     groupBy<K>(field: (item: T) => K): HashMap<K, Collection<T>> {
         return this.foldLeft<HashMap<K, Collection<T>>>(HashMap.empty)((acc, next) => {
@@ -160,4 +190,6 @@ export abstract class ArrayIterable<T> {
     maxByOption(toNumber: (item: T) => number): Option<T> {
         return this.isEmpty ? none : some(this.maxBy(toNumber));
     }
+
+
 }

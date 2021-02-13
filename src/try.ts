@@ -1,7 +1,6 @@
 import {none, Option, some} from "./option";
 import {Either, left, right} from "./either";
-
-const idFunction: <T>(x: T) => T = <T>(x: T) => x;
+import {idFunction} from "./util";
 
 export interface TryMatch<T, R> {
     success: (result: T) => R;

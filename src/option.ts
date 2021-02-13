@@ -1,5 +1,8 @@
 import {Collection} from "./collection";
 import {Left, Right, Either, left, right} from "./either";
+import {ArrayIterable} from "./array-iterable";
+import {HashSet} from "./hashset";
+import {HashMap} from "./hashmap";
 
 export interface OptionMatch<A, T> {
     some: (value: A) => T;
@@ -7,259 +10,150 @@ export interface OptionMatch<A, T> {
 }
 
 
-export interface Option<A> {
+export abstract class Option<A> extends ArrayIterable<A>{
 
-    exists(p: (value: A) => boolean): boolean;
+    abstract readonly get: A;
 
-    filter(p: (value: A) => boolean): Option<A>;
+    exists(p: (value: A) => boolean): boolean {
+        if (this.isEmpty) {
+            return false;
+        } else {
+            return p(this.get);
+        }
+    };
 
-    filterNot(p: (value: A) => boolean): Option<A>;
+    filter(p: (value: A) => boolean): Option<A> {
+        if (this.isEmpty) {
+            return none;
+        } else {
+            return p(this.get) ? this : none;
+        }
+    }
 
-    flatMap<B>(p: (value: A) => Option<B>): Option<B>;
+    filterNot(p: (value: A) => boolean): Option<A> {
+        if (this.isEmpty) {
+            return none;
+        } else {
+            return p(this.get) ? none : this;
+        }
+    }
 
-    fold<B>(ifEmpty: () => B): (f: (_: A) => B) => B
+    flatMap<B>(p: (value: A) => Option<B>): Option<B> {
+        return this.isEmpty ? none : p(this.get);
+    }
 
-    forall(p: (_: A) => boolean): boolean
+    foldValue<B>(ifEmpty: () => B): (f: (_: A) => B) => B {
+        if (this.isEmpty) {
+            return function() { return ifEmpty() };
+        } else {
+            return (f: (_: A) => B) => { return f(this.get) };
+        }
+    }
 
-    foreach(f: (_: A) => void): void
+    forall(p: (_: A) => boolean): boolean {
+        return this.isEmpty ? false : p(this.get);
+    }
 
-    readonly get: A;
 
-    getOrElse(f: () => A): A;
+    foreach(f: (_: A) => void): void {
+        if (this.nonEmpty) {
+            f(this.get);
+        }
+    }
 
-    getOrElseValue(other: A): A;
+    getOrElse(f: () => A): A {
+        return this.isEmpty ? f() : this.get;
+    };
 
-    contains<A1 extends A>(x: A1): boolean;
+    getOrElseValue(other: A): A {
+        return this.isEmpty ? other : this.get;
+    };
 
-    readonly isDefined: boolean
-    readonly isEmpty: boolean
+    contains<A1 extends A>(x: A1): boolean {
+        return this.isEmpty ? false : x === this.get;
+    }
 
-    map<B>(f: (item: A) => B): Option<B>;
+    get isDefined(): boolean {
+        return !this.isEmpty;
+    }
 
-    readonly nonEmpty: boolean
+    map<B>(f: (item: A) => B): Option<B> {
+        return this.isEmpty ? none : option<B>(f(this.get));
+    }
 
-    orElse(alternative: () => Option<A>): Option<A>
+    orElse(alternative: () => Option<A>): Option<A> {
+        return this.isEmpty ? alternative() : this;
+    }
 
-    orElseValue(alternative: Option<A>): Option<A>
 
-    readonly orNull: A | null
-    readonly orUndefined: A | undefined
+    orElseValue(alternative: Option<A>): Option<A> {
+        return this.isEmpty ? alternative : this;
+    }
 
-    toCollection: Collection<A>;
+    get orNull(): A | null {
+        return this.isEmpty ? null : this.get;
+    }
 
-    toRight<X>(left: () => X): Either<X, A>;
-    toLeft<X>(right: () => X): Either<A, X>;
+    get orUndefined(): A | undefined {
+        return this.isEmpty ? undefined : this.get;
+    }
 
-    toArray: A[];
+    get toCollection(): Collection<A> {
+        return this.isEmpty ? Collection.empty : Collection.of(this.get);
+    }
 
-    match<T>(matcher: OptionMatch<A, T>): T;
+    toRight<X>(left: () => X): Either<X, A> {
+        return this.isEmpty ? new Left(left()) : right(this.get);
+    }
+
+    toLeft<X>(right: () => X): Either<A, X> {
+        return this.isEmpty ? new Right(right()) : left(this.get);
+    }
+
+    get toArray(): A[] {
+        return this.isEmpty ? [] : [this.get];
+    }
+
+    get toSet(): HashSet<A> {
+        return this.isEmpty ? HashSet.empty : HashSet.of(this.get);
+    }
+
+    match<T>(matcher: OptionMatch<A, T>): T {
+        return this.isEmpty ? matcher.none() : matcher.some(this.get);
+    }
+
+    toMap<K, V>(mapper: (item: A) => [K, V]): HashMap<K, V> {
+        return this.isEmpty ? HashMap.empty : HashMap.of(...this.map(mapper).toArray);
+    }
 
 }
 
 
-export class Some<A> implements Option<A> {
+export class Some<A> extends Option<A> {
 
     constructor(private readonly value: A) {
-    }
-
-    map<B>(f: (item: A) => B): Option<B> {
-        return option<B>(f(this.value));
+        super();
     }
 
     get get() {
         return this.value;
     }
 
-    get toCollection(): Collection<A> {
-        return Collection.of(this.value);
-    }
-
-    get toArray(): A[] {
-        return [this.value];
-    }
-
-    get isDefined(): boolean {
-        return true;
-    }
-
     get isEmpty(): boolean {
         return false;
     }
 
-
-    get nonEmpty(): boolean {
-        return true;
-    }
-
-    get orNull() {
-        return this.value;
-    }
-
-    get orUndefined() {
-        return this.value;
-    }
-
-    exists(p: (value: A) => boolean): boolean {
-        return p(this.value);
-    }
-
-    filter(p: (value: A) => boolean): Option<A> {
-        return p(this.value) ? this : none;
-    }
-
-    filterNot(p: (value: A) => boolean): Option<A> {
-        return p(this.value) ? none : this;
-    }
-
-    flatMap<B>(p: (value: A) => Option<B>): Option<B> {
-        return p(this.value);
-    }
-
-    fold<B>(ifEmpty: () => B): (f: (_: A) => B) => B {
-        return (f: (_: A) => B) => { return f(this.value) };
-    }
-
-    forall(p: (_: A) => boolean): boolean {
-        return p(this.value);
-    }
-
-    foreach(f: (_: A) => void): void {
-        f(this.value);
-    }
-
-    getOrElse(f: () => A): A {
-        return this.value;
-    }
-
-    getOrElseValue(other: A): A {
-        return this.value;
-    }
-
-    orElse(alternative: () => Option<A>): Option<A> {
-        return this;
-    }
-
-    orElseValue(alternative: Option<A>): Option<A> {
-        return this;
-    }
-
-
-    toRight<X>(left: () => X): Either<X, A> {
-        return right(this.value);
-    }
-
-    toLeft<X>(right: () => X): Either<A, X> {
-        return left(this.value);
-    }
-
-    contains<A1 extends A>(x: A1): boolean {
-        return x === this.value;
-    }
-
-    match<T>(matcher: OptionMatch<A, T>): T {
-        return matcher.some(this.value);
-    }
 }
 
 
-export class None<A> implements Option<A> {
-
-    map<B>(f: (item: A) => B): Option<B> {
-        return none;
-    }
+export class None<A> extends Option<A> {
 
     get get(): A {
         throw new Error('No such element.');
     }
 
-
-    get toCollection(): Collection<A> {
-        return Collection.empty;
-    }
-
-    get toArray(): A[] {
-        return [];
-    }
-
-    exists(p: (value: A) => boolean): boolean {
-        return false;
-    }
-
-    get isDefined(): boolean {
-        return false;
-    }
-
     get isEmpty(): boolean {
         return true;
-    }
-
-
-    get nonEmpty(): boolean {
-        return false;
-    }
-
-    get orNull() {
-        return null;
-    }
-
-    get orUndefined() {
-        return undefined;
-    }
-
-
-    filter(p: (value: A) => boolean): Option<A> {
-        return none;
-    }
-
-    filterNot(p: (value: A) => boolean): Option<A> {
-        return none;
-    }
-
-    flatMap<B>(p: (value: A) => Option<B>): Option<B> {
-        return none;
-    }
-
-    fold<B>(ifEmpty: () => B): (f: (_: A) => B) => B {
-        return function() { return ifEmpty() };
-    }
-
-    forall(p: (_: A) => boolean): boolean {
-        return false;
-    }
-
-    foreach(f: (_: A) => void): void {
-    }
-
-    getOrElse(f: () => A): A {
-        return f();
-    }
-
-    getOrElseValue(other: A): A {
-        return other;
-    }
-
-    orElse(alternative: () => Option<A>): Option<A> {
-        return alternative();
-    }
-
-    orElseValue(alternative: Option<A>): Option<A> {
-        return alternative;
-    }
-
-    contains<A1 extends A>(x: A1) {
-        return false;
-    }
-
-    toRight<X>(left: () => X): Either<X, A> {
-        return new Left(left());
-    }
-
-    toLeft<X>(right: () => X): Either<A, X> {
-        return new Right(right());
-    }
-
-    match<T>(matcher: OptionMatch<A, T>): T {
-        return matcher.none();
     }
 
 }

@@ -1,11 +1,13 @@
 import {option, Option} from "./option";
 import {Collection} from "./collection";
 import {HashSet} from "./hashset";
+import {ArrayIterable} from "./array-iterable";
 
-export class HashMap<K, V> {
+export class HashMap<K, V> extends ArrayIterable<[K, V]> {
 
 
     constructor(private readonly map: Map<K, V>) {
+        super();
     }
 
     static of<K, V>(...values: [k: K, v: V][]) {
@@ -18,18 +20,8 @@ export class HashMap<K, V> {
         return this.map.size;
     }
 
-    get isEmpty(): boolean {
-        return this.size === 0;
-    }
-
-    get nonEmpty(): boolean {
-        return !this.isEmpty;
-    }
-
-    foreach<U>(f: (key: K, value: V) => U): void {
-        this.map.forEach((v, k) => {
-            f(k, v);
-        })
+    get isEmpty() {
+        return this.map.size <= 0;
     }
 
     get(key: K): Option<V> {
@@ -72,7 +64,11 @@ export class HashMap<K, V> {
         return this.map.entries();
     }
 
-    addAll(map: HashMap<K, V>): HashMap<K, V> {
+    appendedAll(map: HashMap<K, V>): HashMap<K, V> {
+        return this.concat(map);
+    }
+
+    concat(map: HashMap<K, V>): HashMap<K, V> {
         const mergedMap = new Map<K, V>([
             ...this.entries.toArray,
             ...map.entries.toArray
@@ -92,7 +88,7 @@ export class HashMap<K, V> {
         return new HashMap<K, V>(next);
     }
 
-    contains(key: K): boolean {
+    containsKey(key: K): boolean {
         return this.map.has(key);
     }
 
@@ -106,5 +102,9 @@ export class HashMap<K, V> {
 
     get toMap(): Map<K, V> {
         return this.map;
+    }
+
+    get toArray(): Array<[K, V]> {
+        return Array.from(this.map.entries());
     }
 }

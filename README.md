@@ -55,6 +55,7 @@ import {HashMap} from "scats";
 
 const map = HashMap.of(['1', 1], ['2', 3]);
 map.toMap; // Map('1' -> 1, '2' -> 2)
+map.toArray; // [['1', 1], ['2', 2]]
 map.size; // 1
 map.isEmpty; // false
 HashMap.empty.isEmpty; // true
@@ -68,10 +69,10 @@ map.keySet; // HashSet.of('1', '2')
 map.keys; // Collection.of('1', '2')
 map.values; // Collection.of(1, 2)
 map.entries; // Collection.of(['1', 1], ['2', 2])
-map.addAll(HashMap.of(['3', 3])); // HashMap.of(['1', 1], ['2', 2], ['3', 3])
+map.appendedAll(HashMap.of(['3', 3])); // HashMap.of(['1', 1], ['2', 2], ['3', 3])
 map.set('2', 3); // HashMap.of(['1', 1], ['2', 3])
 map.remove('2'); // HashMap.of(['1', 1])
-map.updated('2'); // HashMap.of(['1', 1])
+map.updated('2', 4); // HashMap.of(['1', 1], ['2', 4])
 ```
 
 ## HashSet
@@ -88,6 +89,7 @@ set1.filter(x => x > 1); // HashSet.of(2)
 set1.filterNot(x => x > 1); // HashSet.of(1)
 set1.map(x => x + 1); // HashSet.of(2, 3)
 set1.toCollection(); // Collection.of(2, 3) - order may be different
+set1.toMap(x => [x, x]); // HashMap.of([1, 1], [2, 2])
 set1.contains(1); // true
 set1.appended(2); // HashSet.of(1, 2)
 set1.appendedAll(HashSet.of(1, 2)); // HashSet.of(1, 2)

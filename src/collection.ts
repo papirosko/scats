@@ -140,29 +140,6 @@ export class Collection<T> extends ArrayIterable<T>{
         return this.sort((a, b) => fieldToNumber(a) - fieldToNumber(b));
     }
 
-    foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
-        return (op: (next: T, acc: B) => B) => {
-            return this.reverse().foldLeft(initial)((a, n) => op(n, a));
-        };
-    }
-
-    reduceRight(op: (i1: T, i2: T) => T): T {
-        if (this.isEmpty) {
-            throw new Error('empty.reduceRight')
-        }
-
-        let acc = this.last
-        this.reverse().drop(1).foreach(next => {
-            acc = op(acc, next)
-        })
-        return acc
-    }
-
-    reduceRightOption(op: (i1: T, i2: T) => T): Option<T> {
-        return this.isEmpty ? none : some(this.reduceRight(op));
-    }
-
-
 
 
     sliding(length: number, step: number = 1): Collection<Collection<T>> {
