@@ -204,3 +204,6 @@ export class Collection<T> extends ArrayIterable<T>{
         return this.items.indexOf(item);
     }
 }
+
+
+export const Nil = Collection.empty;
