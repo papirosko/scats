@@ -1,5 +1,5 @@
 import {none, Option, some} from "./option";
-import {Collection} from "./collection";
+import {Collection, Nil} from "./collection";
 import {failure, success, TryLike} from "./try";
 import {toErrorConversion} from "./util";
 import {Mappable} from "./mappable";
@@ -32,6 +32,72 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     get isRight(): boolean {
         return !this.isLeft;
     }
+
+    /** Projects this `Either` as a `Left`.
+     *
+     *  This allows for-comprehensions over the left side of `Either` instances,
+     *  reversing `Either`'s usual right-bias.
+     *
+     *  For example ```
+     *  forComprehension(
+     *      step('s', () => left("flower").left)
+     *  ).yield(state => state.s.length) // Left(6)
+     *  ```
+     *
+     *  Continuing the analogy with [[Option]], a `LeftProjection` declares
+     *  that `Left` should be analogous to `Some` in some code.
+     *
+     *  ```
+     *  // using Option
+     *  function interactWithDB(x: Query): Option<Result> {
+     *    try {
+     *        return some(getResultFromDatabase(x));
+     *    }
+     *    catch(e) {
+     *        return none;
+     *    }
+     *  }
+     *
+     *  // this will only be executed if interactWithDB returns a Some
+     *  const report = forComprehension(
+     *    step('result', () => interactWithDB(someQuery))
+     *  ).yield(state => generateReport(state.result));
+     *
+     *  report.match({
+     *    some: (r) => send(r),
+     *    none: ()  => console.log("report not generated, not sure why...")
+     *  })
+     *
+     *  // using Either
+     *  function interactWithDB(x: Query): Either<Exception, Result> =
+     *    try {
+     *      return Right(getResultFromDatabase(x));
+     *    }
+     *    catch(e) {
+     *      return left(e);
+     *    }
+     *  }
+     *
+     *   // run a report only if interactWithDB returns a Right
+     *   const report = forComprehension(
+     *      step('result', () => interactWithDB(someQuery))
+     *   ).yield(state => generateReport(state.result));
+     *
+     *   report.match({
+     *     right: (r) => send(r),
+     *     left: (e)  => console.log(`report not generated, reason was ${e}`)
+     *   })
+     *
+     *   // only report errors
+     *   forComprehension(
+     *      step('e', () => interactWithDB('1').left)
+     *   ).yield(state => console.log(`query failed, reason was ${state.e}`));
+     *   ```
+     */
+    get left(): Either.LeftProjection<LEFT, RIGHT> {
+        return new Either.LeftProjection(this);
+    }
+
 
     /** Applies `fa` if this is a `Left` or `fb` if this is a `Right`.
      *
@@ -227,7 +293,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     map<RIGHT1>(f: (value: RIGHT) => RIGHT1): Either<LEFT, RIGHT1> {
         return this.match<Either<LEFT, RIGHT1>>({
             right: v => right(f(v)),
-            left: (e) => left(e)
+            left: e => left(e)
         });
     }
 
@@ -245,7 +311,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     filterOrElse(p: (v: RIGHT) => Boolean, zero: () => LEFT): Either<LEFT, RIGHT> {
         return this.match({
             right: (v) => p(v) ? this : left(zero()),
-            left: (v) => this,
+            left: () => this,
         })
     }
 
@@ -263,7 +329,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     filterOrElseValue(p: (v: RIGHT) => Boolean, zero: LEFT): Either<LEFT, RIGHT> {
         return this.match({
             right: (v) => p(v) ? this : left(zero),
-            left: (v) => this,
+            left: () => this,
         })
     }
 
@@ -348,6 +414,155 @@ export class Right<T> extends Either<any, T> {
         return this;
     }
 
+}
+
+export module Either {
+    export class LeftProjection<A, B> {
+
+        constructor(private readonly e: Either<A, B>) {
+        }
+
+        /** Executes the given side-effecting function if this is a `Left`.
+         *
+         *  ```
+         *  left(12).left.foreach(x => println(x))  // prints "12"
+         *  right(12).left.foreach(x => println(x)) // doesn't print
+         *  ```
+         *  @param f The side-effecting function to execute.
+         */
+        foreach<U>(f: (value: A) => U): void {
+            this.e.match({
+                left: l => f(l),
+                right: () => {
+                }
+            });
+        }
+
+        /** Returns the value from this `Left` or the given argument if this is a `Right`.
+         *
+         *  ```
+         *  Left(12).left.getOrElse(17)  // 12
+         *  Right(12).left.getOrElse(17) // 17
+         *  ```
+         */
+        getOrElse(or: () => A): A {
+            return this.e.match({
+                left: a => a,
+                right: or
+            })
+        }
+
+
+        /** Returns `true` if `Right` or returns the result of the application of
+         *  the given function to the `Left` value.
+         *
+         *  ```
+         *  left(12).left.forall(_ > 10)  // true
+         *  left(7).left.forall(_ > 10)   // false
+         *  right(12).left.forall(_ > 10) // true
+         *  ```
+         */
+        forall(p: (value: A) => boolean): boolean {
+            return this.e.match({
+                left: (a) => p(a),
+                right: () => true
+            });
+        }
+
+        /** Returns `false` if `Right` or returns the result of the application of
+         *  the given function to the `Left` value.
+         *
+         *  ```
+         *  left(12).left.exists(_ > 10)  // true
+         *  left(7).left.exists(_ > 10)   // false
+         *  right(12).left.exists(_ > 10) // false
+         *  ```
+         */
+        exists(p: (value: A) => boolean): boolean {
+            return this.e.match({
+                left: (a) => p(a),
+                right: () => false
+            });
+        }
+
+
+        /** Binds the given function across `Left`.
+         *
+         *  ```
+         *  left(12).left.flatMap(x => Left("scala")) // Left("scala")
+         *  right(12).left.flatMap(x => Left("scala")) // Right(12)
+         *  ```
+         *  @param f The function to bind across `Left`.
+         */
+        flatMap<A1>(f: (value: A) => Either<A1, B>): Either<A1, B> {
+            return this.e.match<Either<A1, B>>({
+                left: (a) => f(a),
+                right: r => right(r)
+            });
+        }
+
+        /** Maps the function argument through `Left`.
+         *
+         *  ```
+         *  left(12).left.map(_ + 2) // Left(14)
+         *  right<number, number>(12).left.map(_ => _ + 2) // Right(12)
+         *  ```
+         */
+        map<A1>(f: (value: A) => A1): Either<A1, B> {
+            return this.e.match<Either<A1, B>>({
+                left: a => left(f(a)),
+                right: e => right(e)
+            });
+        }
+
+
+        /** Returns `None` if this is a `Right` or if the given predicate
+         *  `p` does not hold for the left value, otherwise, returns a `Left`.
+         *
+         *  ```
+         *  left(12).left.filterToOption(_ => _ > 10)  // Some(Left(12))
+         *  left(7).left.filterToOption(_ => _ > 10)   // None
+         *  right(12).left.filterToOption(_ => _ > 10) // None
+         *  ```
+         */
+        filterToOption(p: (value: A) => boolean): Option<Either<A, B>> {
+            return this.e.match<Option<Either<A, B>>>({
+                left: l => p(l) ? some(this.e) : none,
+                right: () => none
+            });
+        }
+
+        /** Returns a `Seq` containing the `Left` value if it exists or an empty
+         *  `Seq` if this is a `Right`.
+         *
+         *  ```
+         *  left(12).left.toSeq // Seq(12)
+         *  right(12).left.toSeq // Seq()
+         *  ```
+         */
+        get toCollection(): Collection<A> {
+            return this.e.match({
+                left: l => Collection.of(l),
+                right: () => Nil
+            });
+        }
+
+        /** Returns a `Some` containing the `Left` value if it exists or a
+         *  `None` if this is a `Right`.
+         *
+         *  {{{
+         *  Left(12).left.toOption // Some(12)
+         *  Right(12).left.toOption // None
+         *  }}}
+         */
+        get toOption(): Option<A> {
+            return this.e.match<Option<A>>({
+                left: l => some(l),
+                right: () => none
+            });
+        }
+
+    }
 }
 
 

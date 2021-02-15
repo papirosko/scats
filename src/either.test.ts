@@ -1,7 +1,8 @@
-import {Right, Left, right, left} from './either';
-import {some, none} from './option';
+import {Right, Left, right, left, Either} from './either';
+import {some, none, Option} from './option';
 import {failure, success, Try} from "./try";
 import {Collection, Nil} from "./collection";
+import {forComprehension, step} from "./util";
 
 describe('Either', () => {
 
@@ -138,5 +139,11 @@ describe('Either', () => {
         expect(left(new Error('123')).toTry()).toEqual(failure(new Error('123')));
     });
 
+
+    test('left docs', () => {
+        expect(forComprehension(
+           step('s', () => left("flower").left)
+        ).yield(state => state.s.length)).toEqual(left(6));
+    });
 
 });
