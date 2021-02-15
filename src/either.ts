@@ -494,10 +494,10 @@ export module Either {
          *  ```
          *  @param f The function to bind across `Left`.
          */
-        flatMap<A1>(f: (value: A) => Either<A1, B>): Either<A1, B> {
-            return this.e.match<Either<A1, B>>({
+        flatMap<A1, B1 extends B>(f: (value: A) => Either<A1, B1>): Either<A1, B1> {
+            return this.e.match<Either<A1, B1>>({
                 left: (a) => f(a),
-                right: r => right(r)
+                right: r => right(r) as unknown as Either<A1, B1>
             });
         }
 

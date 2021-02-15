@@ -127,13 +127,6 @@ export abstract class Option<A> extends ArrayIterable<A> implements Mappable<A> 
         return this.isEmpty ? HashMap.empty : HashMap.of(...this.map(mapper).toArray);
     }
 
-    for(...fns: ((x: any) => Option<any>)[]): Option<any> {
-        let result: Option<any> = this
-        for (let i = 0; i < fns.length - 1; ++i) {
-            result = result.flatMap<any>(fns[i])
-        }
-        return result.map(fns[fns.length - 1])
-    }
 }
 
 
