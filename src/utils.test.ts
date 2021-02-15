@@ -54,6 +54,12 @@ describe('forComprehension', () => {
             step('num3', () => toNum('3')),
         ).yield(state => state.num1 + state.num2 + state.num3);
         expect(resError).toEqual(failure(new Error('s2 is not a number')));
+
+        expect(forComprehension(
+            step('num1', () => toNum('1')),
+            step('num2', () => toNum('s2').transform(x => success(x), e => failure(new Error('failed to convert')))),
+            step('num3', () => toNum('3')),
+        ).yield(state => state.num1 + state.num2 + state.num3)).toEqual(failure(new Error('failed to convert')));
     });
 
     test('successful result', () => {
