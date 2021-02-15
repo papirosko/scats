@@ -1,6 +1,7 @@
 import {none, Option, some} from "./option";
 import {Either, left, right} from "./either";
 import {idFunction} from "./util";
+import {Mappable} from "./mappable";
 
 export interface TryMatch<T, R> {
     success: (result: T) => R;
@@ -8,7 +9,7 @@ export interface TryMatch<T, R> {
 }
 
 
-export abstract class TryLike<T> {
+export abstract class TryLike<T> implements Mappable<T>{
 
     abstract readonly toOption: Option<T>;
     abstract readonly toEither: Either<Error, T>;

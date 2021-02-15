@@ -1,8 +1,9 @@
 import {Collection} from "./collection";
-import {Left, Right, Either, left, right} from "./either";
+import {Either, Left, left, Right, right} from "./either";
 import {ArrayIterable} from "./array-iterable";
 import {HashSet} from "./hashset";
 import {HashMap} from "./hashmap";
+import {Mappable} from "./mappable";
 
 export interface OptionMatch<A, T> {
     some: (value: A) => T;
@@ -10,7 +11,7 @@ export interface OptionMatch<A, T> {
 }
 
 
-export abstract class Option<A> extends ArrayIterable<A>{
+export abstract class Option<A> extends ArrayIterable<A> implements Mappable<A> {
 
     abstract readonly get: A;
 
@@ -126,6 +127,13 @@ export abstract class Option<A> extends ArrayIterable<A>{
         return this.isEmpty ? HashMap.empty : HashMap.of(...this.map(mapper).toArray);
     }
 
+    for(...fns: ((x: any) => Option<any>)[]): Option<any> {
+        let result: Option<any> = this
+        for (let i = 0; i < fns.length - 1; ++i) {
+            result = result.flatMap<any>(fns[i])
+        }
+        return result.map(fns[fns.length - 1])
+    }
 }
 
 

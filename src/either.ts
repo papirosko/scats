@@ -2,13 +2,14 @@ import {none, Option, some} from "./option";
 import {Collection} from "./collection";
 import {failure, success, TryLike} from "./try";
 import {toErrorConversion} from "./util";
+import {Mappable} from "./mappable";
 
 export interface EitherMatch<LEFT, RIGHT, T> {
     right: (right: RIGHT) => T;
     left: (left: LEFT) => T;
 }
 
-export abstract class Either<LEFT, RIGHT> {
+export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
 
     abstract match<T>(matcher: EitherMatch<LEFT, RIGHT, T>): T;
 
