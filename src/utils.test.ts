@@ -28,6 +28,33 @@ describe('forComprehension', () => {
 
     }
 
+    test('sum', () => {
+        function toNum(x: string) {
+            return Try(() => {
+                const res = parseInt(x);
+                if (isNaN(res)) {
+                    throw new Error(`${x} is not a number`);
+                } else {
+                    return res;
+                }
+            });
+        }
+
+
+        const res = forComprehension(
+            step('num1', () => toNum('1')),
+            step('num2', () => toNum('2')),
+            step('num3', () => toNum('3')),
+        ).yield(state => state.num1 + state.num2 + state.num3);
+        expect(res).toEqual(success(6));
+
+        const resError = forComprehension(
+            step('num1', () => toNum('1')),
+            step('num2', () => toNum('s2')),
+            step('num3', () => toNum('3')),
+        ).yield(state => state.num1 + state.num2 + state.num3);
+        expect(resError).toEqual(failure(new Error('s2 is not a number')));
+    });
 
     test('successful result', () => {
 
@@ -87,14 +114,6 @@ describe('forComprehension', () => {
 
     });
 
-
-    test('filter', () => {
-        expect(forComprehension<Either<any, any>>(
-            step('profileJson', () => Try(() => JSON.parse(badRequest)).toEither),
-            step('profile', (json, state) => profileValidator(json)).filter(p => !!p.name)
-        ).yield(state => state.profile)).toEqual(failure(new Error('Age too small')));
-
-    })
 
 });
 

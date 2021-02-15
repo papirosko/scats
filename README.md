@@ -99,3 +99,33 @@ set1.intersect(set2); // HashSet.of(2)
 set1.union(set2); // HashSet.of(1, 2, 3)
 ```
 
+## forComprehension
+
+```typescript
+import {forComprehension, step} from "./util";
+
+function toNum(x: string) {
+    return Try(() => {
+        const res = parseInt(x);
+        if (isNaN(res)) {
+            throw new Error(`${x} is not a number`);
+        } else {
+            return res;
+        }
+    });
+}
+
+
+forComprehension(
+    step('num1', () => toNum('1')),
+    step('num2', () => toNum('2')),
+    step('num3', () => toNum('3')),
+).yield(state => state.num1 + state.num2 + state.num3); // success(6)
+
+
+forComprehension(
+    step('num1', () => toNum('1')),
+    step('num2', () => toNum('s2')),
+    step('num3', () => toNum('3')),
+).yield(state => state.num1 + state.num2 + state.num3); // failure(new Error('s2 is not a number')
+```

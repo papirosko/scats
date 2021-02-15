@@ -1,8 +1,4 @@
-import {none, Option, some} from "./option";
-import * as fs from "fs";
-import {Either} from "./either";
-import {TryLike} from "./try";
-import {Collection} from "./collection";
+import {Option, some} from "./option";
 import {Mappable} from "./mappable";
 
 export function idFunction<T>(x: T): T {
@@ -19,18 +15,13 @@ export function toErrorConversion(x: any): Error {
 }
 
 export type StepFunction<C extends Mappable<any>> = (prev: any, state: any) => C;
-export type StepCondition = (curr: any, state: any) => boolean;
 
 export class Step<C extends Mappable<any>> {
 
     constructor(readonly name: Option<string>,
-                readonly f: StepFunction<C>,
-                readonly filterFunction: Option<StepCondition> = none) {
+                readonly f: StepFunction<C>) {
     }
 
-    filter(x: StepCondition) {
-        return new Step(this.name, this.f, some(x))
-    }
 }
 
 export function step<C extends Mappable<any>>(name: string, f: StepFunction<C>) {
