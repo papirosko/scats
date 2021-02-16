@@ -12,7 +12,11 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
     static empty = new Collection([]);
 
     protected fromArray(array: T[]): Collection<T> {
-        return new Collection(array);
+        if (!array || array.length <= 0) {
+            return Nil;
+        } else {
+            return new Collection(array);
+        }
     }
 
 
