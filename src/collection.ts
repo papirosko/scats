@@ -27,11 +27,11 @@ export class Collection<T> extends ArrayIterable<T>{
         };
     }
 
-    filter(p: (item: T) => Boolean): Collection<T> {
+    filter(p: (item: T) => boolean): Collection<T> {
         return new Collection<T>(this.items.filter(i => p(i)));
     }
 
-    filterNot(p: (item: T) => Boolean): Collection<T> {
+    filterNot(p: (item: T) => boolean): Collection<T> {
         return new Collection<T>(this.items.filter(i => !p(i)));
     }
 

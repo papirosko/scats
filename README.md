@@ -135,4 +135,10 @@ forComprehension(
     step('i', () => Collection.of(1, 2)),
     step('j', () => Collection.of(4, 3))
 ).yield(({i, j}) => [i, j]); // Collection.of([1, 4], [1, 3], [2, 4], [2, 3])
+
+forComprehension(
+    step('i', () => Collection.of(1, 2)),
+    step('j', () => Collection.of(2, 1)).if(({i, j}) => i + j === 3)
+).yield(({i, j}) => [i, j]); // Collection.of([1, 2], [2, 1])
+
 ```

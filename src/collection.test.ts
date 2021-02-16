@@ -365,6 +365,10 @@ describe('Collection', () => {
         ).yield(({n}) => n + 1)
         expect(res).toEqual(Collection.of(2, 3, 4));
 
+        expect(forComprehension(
+            step('n', () => Collection.of(1,2,3)).if(({n}) => n % 2 === 0)
+        ).yield(({n}) => n + 1)).toEqual(Collection.of(3));
+
 
         const y = Collection.of(1, 2).flatMap(i =>
             Collection.of(4, 3).map(j =>
@@ -378,6 +382,12 @@ describe('Collection', () => {
             step('j', () => Collection.of(4, 3))
         ).yield(({i, j}) => [i, j]);
         expect(x).toEqual(Collection.of([1, 4], [1, 3], [2, 4], [2, 3]));
+
+        const z = forComprehension(
+            step('i', () => Collection.of(1, 2)),
+            step('j', () => Collection.of(2, 1)).if(({i, j}) => i + j === 3)
+        ).yield(({i, j}) => [i, j]);
+        expect(z).toEqual(Collection.of([1, 2], [2, 1]));
 
         expect(forComprehension(
             step('i', () => Collection.of(1, 2)),
