@@ -1,6 +1,6 @@
 import {Collection} from "./collection";
 import {none, some} from "./option";
-import {idFunction} from "./util";
+import {forComprehension, idFunction, step} from "./util";
 import {HashMap} from "./hashmap";
 import {HashSet} from "./hashset";
 
@@ -357,6 +357,41 @@ describe('Collection', () => {
         expect(Collection.of(
             {id: 1, name: 'foo1'}, {id: 2, name: 'foo2'}
         ).toMap(o => [o.id, o.name]).toMap).toEqual(new Map([[1, 'foo1'], [2, 'foo2']]));
+    });
+
+    test('forComprehension', () => {
+        const res = forComprehension(
+            step('n', () => Collection.of(1,2,3))
+        ).yield(({n}) => n + 1)
+        expect(res).toEqual(Collection.of(2, 3, 4));
+
+
+        const y = Collection.of(1, 2).flatMap(i =>
+            Collection.of(4, 3).map(j =>
+                [i, j]
+            )
+        );
+        expect(y).toEqual(Collection.of([1, 4], [1, 3], [2, 4], [2, 3]));
+
+        const x = forComprehension(
+            step('i', () => Collection.of(1, 2)),
+            step('j', () => Collection.of(4, 3))
+        ).yield(({i, j}) => [i, j]);
+        expect(x).toEqual(Collection.of([1, 4], [1, 3], [2, 4], [2, 3]));
+
+        expect(forComprehension(
+            step('i', () => Collection.of(1, 2)),
+            step('j', () => Collection.of(4, 3)),
+            step('k', () => Collection.of(5, 6))
+        ).yield(({i, j, k}) => [i, j, k])).toEqual(
+            Collection.of(
+                [1, 4, 5], [1, 4, 6],
+                [1, 3, 5], [1, 3, 6],
+                [2, 4, 5], [2, 4, 6],
+                [2, 3, 5], [2, 3, 6]
+            )
+        );
+
     });
 
 });

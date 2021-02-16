@@ -143,7 +143,7 @@ describe('Either', () => {
     test('left docs', () => {
         expect(forComprehension(
            step('s', () => left("flower").left)
-        ).yield(state => state.s.length)).toEqual(left(6));
+        ).yield(({s}) => s.length)).toEqual(left(6));
     });
 
 });

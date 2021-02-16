@@ -45,39 +45,39 @@ describe('forComprehension', () => {
             step('num1', () => toNum('1')),
             step('num2', () => toNum('2')),
             step('num3', () => toNum('3')),
-        ).yield(state => state.num1 + state.num2 + state.num3);
+        ).yield(({num1, num2, num3}) => num1 + num2 + num3);
         expect(res).toEqual(success(6));
 
         const resError = forComprehension(
             step('num1', () => toNum('1')),
             step('num2', () => toNum('s2')),
             step('num3', () => toNum('3')),
-        ).yield(state => state.num1 + state.num2 + state.num3);
+        ).yield(({num1, num2, num3}) => num1 + num2 + num3);
         expect(resError).toEqual(failure(new Error('s2 is not a number')));
 
         expect(forComprehension(
             step('num1', () => toNum('1')),
-            step('num2', () => toNum('s2').transform(x => success(x), e => failure(new Error('failed to convert')))),
+            step('num2', () => toNum('s2').transform(x => success(x), () => failure(new Error('failed to convert')))),
             step('num3', () => toNum('3')),
-        ).yield(state => state.num1 + state.num2 + state.num3)).toEqual(failure(new Error('failed to convert')));
+        ).yield(({num1, num2, num3}) => num1 + num2 + num3)).toEqual(failure(new Error('failed to convert')));
     });
 
     test('successful result', () => {
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse(goodRequest)).toOption),
-            step('profile', (json, state) => profileValidator(json).toOption)
-        ).yield(state => state.profile)).toEqual(some(profileOriginal));
+            step('profile', ({profileJson}) => profileValidator(profileJson).toOption)
+        ).yield(({profile}) => profile)).toEqual(some(profileOriginal));
 
         expect(forComprehension<Either<any, any>>(
             step('profileJson', () => Try(() => JSON.parse(goodRequest)).toEither),
-            step('profile', (json, state) => profileValidator(json))
-        ).yield(state => state.profile)).toEqual(right(profileOriginal));
+            step('profile', ({profileJson}) => profileValidator(profileJson))
+        ).yield(({profile}) => profile)).toEqual(right(profileOriginal));
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse(goodRequest))),
-            step('profile', (json, state) => profileValidator(json).toTry(e => new Error(e)))
-        ).yield(state => state.profile)).toEqual(success(profileOriginal));
+            step('profile', ({profileJson}) => profileValidator(profileJson).toTry(e => new Error(e)))
+        ).yield(({profile}) => profile)).toEqual(success(profileOriginal));
 
     });
 
@@ -86,18 +86,18 @@ describe('forComprehension', () => {
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse('*')).toOption),
-            step('profile', (json, state) => profileValidator(json).toOption)
-        ).yield(state => state.profile)).toEqual(none);
+            step('profile', ({profileJson}) => profileValidator(profileJson).toOption)
+        ).yield(({profile}) => profile)).toEqual(none);
 
         expect(forComprehension<Either<any, any>>(
             step('profileJson', () => Try(() => JSON.parse('*')).toEither),
-            step('profile', (json, state) => profileValidator(json))
-        ).yield(state => state.profile).isLeft).toBeTruthy();
+            step('profile', ({profileJson}) => profileValidator(profileJson))
+        ).yield(({profile}) => profile).isLeft).toBeTruthy();
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse('*'))),
-            step('profile', (json, state) => profileValidator(json).toTry(e => new Error(e)))
-        ).yield(state => state.profile).isFailure).toBeTruthy();
+            step('profile', ({profileJson}) => profileValidator(profileJson).toTry(e => new Error(e)))
+        ).yield(({profile}) => profile).isFailure).toBeTruthy();
 
     });
 
@@ -105,18 +105,18 @@ describe('forComprehension', () => {
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse(badRequest)).toOption),
-            step('profile', (json, state) => profileValidator(json).toOption)
-        ).yield(state => state.profile)).toEqual(none);
+            step('profile', ({profileJson}) => profileValidator(profileJson).toOption)
+        ).yield(({profile}) => profile)).toEqual(none);
 
         expect(forComprehension<Either<any, any>>(
             step('profileJson', () => Try(() => JSON.parse(badRequest)).toEither),
-            step('profile', (json, state) => profileValidator(json))
-        ).yield(state => state.profile)).toEqual(left('Age too small'));
+            step('profile', ({profileJson}) => profileValidator(profileJson))
+        ).yield(({profile}) => profile)).toEqual(left('Age too small'));
 
         expect(forComprehension(
             step('profileJson', () => Try(() => JSON.parse(badRequest))),
-            step('profile', (json, state) => profileValidator(json).toTry(e => new Error(e)))
-        ).yield(state => state.profile)).toEqual(failure(new Error('Age too small')));
+            step('profile', ({profileJson}) => profileValidator(profileJson).toTry(e => new Error(e)))
+        ).yield(({profile}) => profile)).toEqual(failure(new Error('Age too small')));
 
     });
 

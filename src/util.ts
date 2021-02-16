@@ -14,7 +14,7 @@ export function toErrorConversion(x: any): Error {
     }
 }
 
-export type StepFunction<C extends Mappable<any>> = (prev: any, state: any) => C;
+export type StepFunction<C extends Mappable<any>> = (state: any) => C;
 
 export class Step<C extends Mappable<any>> {
 
@@ -34,19 +34,31 @@ export function forComprehension<C extends Mappable<any>>(...steps: Step<C>[]): 
         yield: function(final: (state: any) => any): C {
 
             const acc: any = {};
-
-            let result: C = steps[0].f(undefined, acc);
-            for (let i = 1; i < steps.length; i++) {
-                result = result.flatMap(x => {
-                    steps[i - 1].name.foreach(n => acc[n] = x);
-                    return steps[i].f(x, acc);
-                }) as C;
-
+            function processStep(stepIdx: number, result: C, acc: any): C {
+                return result.flatMap(x => {
+                    steps[stepIdx - 1].name.foreach(name => acc[name] = x);
+                    const nextResult = steps[stepIdx].f(acc);
+                    if (stepIdx < steps.length - 1) {
+                        return processStep(stepIdx + 1, nextResult, acc);
+                    } else {
+                        return nextResult.map(x => {
+                            steps[stepIdx].name.foreach(name => acc[name] = x);
+                            return final(acc);
+                        }) as C
+                    }
+                }) as C
             }
-            return result.map(x => {
-                steps[steps.length - 1].name.foreach(n => acc[n] = x);
-                return final(acc);
-            }) as C;
+
+            let result: C = steps[0].f(acc);
+            if (steps.length > 1) {
+                return processStep(1, result, acc);
+            } else {
+                return result.map(x => {
+                    steps[steps.length - 1].name.foreach(n => acc[n] = x);
+                    return final(acc);
+                }) as C;
+            }
+
 
         }
     }

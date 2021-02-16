@@ -120,12 +120,19 @@ forComprehension(
     step('num1', () => toNum('1')),
     step('num2', () => toNum('2')),
     step('num3', () => toNum('3')),
-).yield(state => state.num1 + state.num2 + state.num3); // success(6)
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // success(6)
 
 
 forComprehension(
     step('num1', () => toNum('1')),
     step('num2', () => toNum('s2')),
     step('num3', () => toNum('3')),
-).yield(state => state.num1 + state.num2 + state.num3); // failure(new Error('s2 is not a number')
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // failure(new Error('s2 is not a number')
+
+
+// with collections:
+forComprehension(
+    step('i', () => Collection.of(1, 2)),
+    step('j', () => Collection.of(4, 3))
+).yield(({i, j}) => [i, j]); // Collection.of([1, 4], [1, 3], [2, 4], [2, 3])
 ```
