@@ -36,11 +36,9 @@ describe('Collection', () => {
 
     });
 
-    test('should sum', () => {
-
+    test('sum', () => {
         expect(Collection.empty.sum(idFunction)).toEqual(0);
         expect(Collection.of<any>(1, 2).sum(idFunction)).toEqual(3);
-
     });
 
     test('take', () => {
@@ -384,6 +382,13 @@ describe('Collection', () => {
     test('partition', () => {
         const actual = Collection.of(1, 2, 3, 4).partition(i => i % 2 === 0);
         expect(actual).toEqual([Collection.of(2, 4), Collection.of(1, 3)]);
+    });
+
+    test('splitAt', () => {
+        expect(Collection.of(1, 2, 3, 4).splitAt(2)).toEqual([Collection.of(1, 2), Collection.of(3, 4)]);
+        expect(Collection.of(1, 2, 3, 4).splitAt(0)).toEqual([Nil, Collection.of(1, 2, 3, 4)]);
+        expect(Collection.of(1, 2, 3, 4).splitAt(5)).toEqual([Collection.of(1, 2, 3, 4), Nil]);
+        expect(Nil.splitAt(1)).toEqual([Nil, Nil]);
     });
 
     test('forComprehension', () => {

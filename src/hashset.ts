@@ -34,14 +34,6 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return HashSet.of(...Array.from(this.items).map(i => f(i)));
     }
 
-    filter(p: (item: T) => Boolean): HashSet<T> {
-        return HashSet.of(...Array.from(this.items).filter(i => p(i)));
-    }
-
-    filterNot(p: (item: T) => Boolean): HashSet<T> {
-        return HashSet.of(...Array.from(this.items).filter(i => !p(i)));
-    }
-
     get toArray(): Array<T> {
         return Array.from(this.items.keys());
     }

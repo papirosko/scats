@@ -2,6 +2,7 @@ import {Collection} from "./collection";
 import {HashMap} from "./hashmap";
 import {none, some} from "./option";
 import {HashSet} from "./hashset";
+import {idFunction} from "./util";
 
 describe('Hashmap', () => {
 
@@ -237,5 +238,15 @@ describe('Hashmap', () => {
         expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).dropWhile(([_, v]) => v <= 4)).toEqual(HashMap.empty);
     });
 
+    test('sum', () => {
+        expect(HashMap.empty.sum(([_, v]) => v)).toEqual(0);
+        expect(HashMap.of(['1', 1], ['2', 2]).sum(([_, v]) => v)).toEqual(3);
+    });
+
+    test('filter, filterNot', () => {
+        expect(HashMap.of(['1', 1], ['2', 2]).filter(([_, v]) => v <= 1)).toEqual(HashMap.of(['1', 1]));
+        expect(HashMap.of(['1', 1], ['2', 2]).filter(([_, v]) => v <= 0)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).filterNot(([_, v]) => v <= 1)).toEqual(HashMap.of(['2', 2]));
+    });
 
 });

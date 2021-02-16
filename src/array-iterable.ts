@@ -194,8 +194,9 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
     }
 
     partition(p: (item: T) => boolean): [C, C] {
-        const first = this.toArray.filter(i => p(i));
-        const second = this.toArray.filter(i => !p(i));
+        const array = this.toArray;
+        const first = array.filter(i => p(i));
+        const second = array.filter(i => !p(i));
         return [this.fromArray(first), this.fromArray(second)];
     }
 
@@ -294,6 +295,30 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return this.sliding(length, length);
     }
 
+    mkString(separator: string = ''): string {
+        return this.toArray.join(separator);
+    }
+
+
+    sum(elementToNum: (element: T) => number): number {
+        if (this.isEmpty) {
+            return 0
+        } else {
+            return this.toArray.reduce<number>((acc, next) => acc + elementToNum(next), 0)
+        }
+    }
+
+    filter(p: (item: T) => boolean): C {
+        return this.fromArray(this.toArray.filter(i => p(i)));
+    }
+
+    filterNot(p: (item: T) => boolean): C {
+        return this.fromArray(this.toArray.filter(i => !p(i)));
+    }
+
+    splitAt(n: number): [C, C] {
+        return [this.take(n), this.drop(n)];
+    }
 
 
 }

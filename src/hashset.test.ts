@@ -222,5 +222,9 @@ describe('HashSet', () => {
         expect(HashSet.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(HashSet.empty);
     });
 
+    test('sum', () => {
+        expect(HashSet.empty.sum(idFunction)).toEqual(0);
+        expect(HashSet.of(1, 2, 2).sum(idFunction)).toEqual(3);
+    });
 
 });

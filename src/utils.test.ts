@@ -28,7 +28,7 @@ describe('forComprehension', () => {
 
     }
 
-    test('sum', () => {
+    test('forComprehension', () => {
         function toNum(x: string) {
             return Try(() => {
                 const res = parseInt(x);

@@ -35,14 +35,6 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         };
     }
 
-    filter(p: (item: T) => boolean): Collection<T> {
-        return new Collection<T>(this.items.filter(i => p(i)));
-    }
-
-    filterNot(p: (item: T) => boolean): Collection<T> {
-        return new Collection<T>(this.items.filter(i => !p(i)));
-    }
-
     slice(from: number, until: number): Collection<T> {
         return new Collection<T>(this.items.slice(from, until));
     }
@@ -80,18 +72,6 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         return this.items;
     }
 
-    sum(elementToNum: (element: T) => number): number {
-        if (this.isEmpty) {
-            return 0
-        } else {
-            return this.items.reduce<number>((acc, next) => acc + elementToNum(next), 0)
-        }
-    }
-
-
-    mkString(separator: string = ''): string {
-        return this.items.join(separator);
-    }
 
     reverse(): Collection<T> {
         return new Collection(this.items.reverse());
@@ -105,8 +85,6 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
     sortBy(fieldToNumber: (a: T) => number): Collection<T> {
         return this.sort((a, b) => fieldToNumber(a) - fieldToNumber(b));
     }
-
-
 
 
     appended(item: T): Collection<T> {
