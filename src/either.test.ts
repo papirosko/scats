@@ -144,6 +144,11 @@ describe('Either', () => {
         expect(forComprehension(
            step('s', () => left("flower").left)
         ).yield(({s}) => s.length)).toEqual(left(6));
+
+        expect(forComprehension(
+           step('s', () => left("flower").left),
+           step('m', () => left("bird").left),
+        ).yield(({s, m}) => s.length + m.length)).toEqual(left(10));
     });
 
 });

@@ -21,24 +21,18 @@ export interface Filterable<T> {
 }
 export type MaybeWithFilter<C extends Mappable<any>> = C extends Filterable<any> ? StepWithFilter<C> : Step<C>;
 
-export class Step<C extends Mappable<any>> {
+export interface Step<C extends Mappable<any>> {
 
-    constructor(readonly name: Option<string>,
-                protected readonly f: StepFunction<C>) {
-    }
-
-    invokeStep(state: any): C {
-        return this.f(state) as unknown as C;
-    }
+    readonly name: Option<string>;
+    invokeStep(state: any): C;
 
 }
 
-export class StepWithFilter<C extends Mappable<any>> extends Step<C>{
+export class StepWithFilter<C extends Mappable<any>> implements Step<C>{
 
-    constructor(name: Option<string>,
-                f: StepFunction<C>,
+    constructor(readonly name: Option<string>,
+                readonly f: StepFunction<C>,
                 readonly filter: Option<StepCondition>) {
-        super(name, f);
     }
 
     if(condition: (state: any) => boolean): Step<C> {
