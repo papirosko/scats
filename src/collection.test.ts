@@ -67,6 +67,11 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 4)).toEqual(Collection.of(1, 2, 3));
     });
 
+    test('span', () => {
+        expect(Collection.of(1, 2, 3).span(_ => _ <= 2))
+            .toEqual([Collection.of(1, 2), Collection.of(3)]);
+    });
+
     test('drop', () => {
 
         expect(Collection.empty.drop(1).toArray).toEqual([]);

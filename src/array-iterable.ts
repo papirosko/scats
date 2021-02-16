@@ -320,5 +320,19 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return [this.take(n), this.drop(n)];
     }
 
+    /** Splits this $coll into a prefix/suffix pair according to a predicate.
+     *
+     *  Note: `c span p`  is equivalent to (but possibly more efficient than)
+     *  `(c takeWhile p, c dropWhile p)`, provided the evaluation of the
+     *  predicate `p` does not cause any side-effects.
+     *  $orderDependent
+     *
+     *  @param p the test predicate
+     *  @return  a pair consisting of the longest prefix of this $coll whose
+     *           elements all satisfy `p`, and the rest of this $coll.
+     */
+    span(p: (item: T) => boolean): [C, C] {
+        return [this.takeWhile(p), this.dropWhile(p)];
+    }
 
 }
