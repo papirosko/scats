@@ -1,6 +1,5 @@
-import {none, option, Option, some} from "./option";
+import {none, Option, some} from "./option";
 import {Mappable} from "./mappable";
-import instantiate = WebAssembly.instantiate;
 
 export function idFunction<T>(x: T): T {
     return x;

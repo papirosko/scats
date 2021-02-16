@@ -1,7 +1,6 @@
 import {none, option, Option, some} from "./option";
 import {HashMap} from "./hashmap";
 import {Collection} from "./collection";
-import {Mappable} from "./mappable";
 
 export abstract class ArrayIterable<T> {
 

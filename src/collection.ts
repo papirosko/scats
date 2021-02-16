@@ -1,6 +1,4 @@
-import {none, Option, option, some} from "./option";
 import {HashMap} from "./hashmap";
-import {idFunction} from "./util";
 import {HashSet} from "./hashset";
 import {ArrayIterable} from "./array-iterable";
 

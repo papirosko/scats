@@ -1,4 +1,4 @@
-import {failure, success, Try, TryLike} from "./try";
+import {failure, success, Try} from "./try";
 import {none, some} from "./option";
 import {left, right} from "./either";
 
@@ -16,9 +16,9 @@ describe('Try', () => {
 
     test('store the response', () => {
 
-        expect(Try(() => 1 / 1)).toEqual(success(1));
-        expect(Try(() => 1 / 1).toOption).toEqual(some(1));
-        expect(Try(() => 1 / 1).toEither).toEqual(right(1));
+        expect(Try(() => 1)).toEqual(success(1));
+        expect(Try(() => 1).toOption).toEqual(some(1));
+        expect(Try(() => 1).toEither).toEqual(right(1));
 
     });
 
@@ -126,49 +126,49 @@ describe('Try', () => {
     test('fold', () => {
 
         expect(Try(successAware).fold(
-            e => 1,
-            result => 2
+            () => 1,
+            () => 2
         )).toEqual(2);
 
         expect(Try(successAware).fold(
-            e => 1,
-            result => {
+            () => 1,
+            () => {
                 throw new Error('1');
             }
         )).toEqual(1);
 
         expect(Try(errorAware).fold(
-            e => 1,
-            result => 2
+            () => 1,
+            () => 2
         )).toEqual(1);
     });
 
 
     test('recover', () => {
-        expect(Try(successAware).recover(x => '1')).toEqual(success('success'));
-        expect(Try(errorAware).recover(x => '1')).toEqual(success('1'));
-        expect(Try(errorAware).recover(x => {
+        expect(Try(successAware).recover(() => '1')).toEqual(success('success'));
+        expect(Try(errorAware).recover(() => '1')).toEqual(success('1'));
+        expect(Try(errorAware).recover(() => {
             throw new Error('fallback_error');
         })).toEqual(failure(new Error('fallback_error')));
     });
 
 
     test('recoverWith', () => {
-        expect(Try(successAware).recoverWith(x => success('1'))).toEqual(success('success'));
-        expect(Try(errorAware).recoverWith(x => success('1'))).toEqual(success('1'));
-        expect(Try(errorAware).recoverWith(x => failure(new Error('2')))).toEqual(failure(new Error('2')));
-        expect(Try(errorAware).recoverWith(x => {
+        expect(Try(successAware).recoverWith(() => success('1'))).toEqual(success('success'));
+        expect(Try(errorAware).recoverWith(() => success('1'))).toEqual(success('1'));
+        expect(Try(errorAware).recoverWith(() => failure(new Error('2')))).toEqual(failure(new Error('2')));
+        expect(Try(errorAware).recoverWith(() => {
             throw new Error('fallback_error');
         })).toEqual(failure(new Error('fallback_error')));
     });
 
     test('transform', () => {
-        expect(Try(successAware).transform(x => success('1'), e => failure(e))).toEqual(success('1'));
-        expect(Try(errorAware).transform(x => success('1'), e => success('2'))).toEqual(success('2'));
-        expect(Try(errorAware).transform(x => failure(new Error('1')), e => failure(new Error('2')))).toEqual(failure(new Error('2')));
-        expect(Try(errorAware).transform(x => {
+        expect(Try(successAware).transform(() => success('1'), e => failure(e))).toEqual(success('1'));
+        expect(Try(errorAware).transform(() => success('1'), () => success('2'))).toEqual(success('2'));
+        expect(Try(errorAware).transform(() => failure(new Error('1')), () => failure(new Error('2')))).toEqual(failure(new Error('2')));
+        expect(Try(errorAware).transform(() => {
             throw new Error('fallback_error1');
-        }, e => {
+        }, () => {
             throw new Error('fallback_error2');
         })).toEqual(failure(new Error('fallback_error2')));
     });

@@ -28,7 +28,7 @@ describe('Hashmap', () => {
 
     test('foreach', () => {
         let sum = 0;
-        HashMap.of(['1', 1], ['2', 3]).foreach(([k, v]) => {
+        HashMap.of(['1', 1], ['2', 3]).foreach(([_, v]) => {
             sum = sum + v;
         });
         expect(sum).toEqual(4);

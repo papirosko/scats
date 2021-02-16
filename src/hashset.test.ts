@@ -1,5 +1,4 @@
 import {HashSet} from "./hashset";
-import {Collection} from "./collection";
 import {idFunction} from "./util";
 import {none, some} from "./option";
 

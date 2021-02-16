@@ -1,5 +1,5 @@
-import {Right, Left, right, left, Either} from './either';
-import {some, none, Option} from './option';
+import {Either, left, Left, Right, right} from './either';
+import {none, some} from './option';
 import {failure, success, Try} from "./try";
 import {Collection, Nil} from "./collection";
 import {forComprehension, step} from "./util";
