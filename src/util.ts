@@ -67,34 +67,24 @@ export function forComprehension<C extends Mappable<any>>(...steps: Step<C>[]): 
     return {
         yield: function(final: (state: any) => any): C {
 
-            const acc: any = {};
-            function processStep(stepIdx: number, result: C, acc: any): C {
-                return result.flatMap(x => {
-                    steps[stepIdx - 1].name.foreach(name => acc[name] = x);
-                    const currentStep = steps[stepIdx];
-                    let nextResult = currentStep.invokeStep(acc);
-                    if (stepIdx < steps.length - 1) {
-                        return processStep(stepIdx + 1, nextResult, acc);
-                    } else {
-                        return nextResult.map(x => {
-                            currentStep.name.foreach(name => acc[name] = x);
-                            return final(acc);
-                        }) as C
-                    }
-                }) as C
+            function processStep(stepIdx: number, acc: any): C {
+                const result = steps[stepIdx].invokeStep(acc);
+
+                if (stepIdx < steps.length - 1) {
+                    return result.flatMap(x => {
+                        steps[stepIdx].name.foreach(name => acc[name] = x);
+                        return processStep(stepIdx + 1, acc)
+                    }) as C;
+                } else {
+                    return result.map(x => {
+                        steps[stepIdx].name.foreach(name => acc[name] = x);
+                        return final(acc);
+                    }) as C
+                }
+
             }
 
-            let result: C = steps[0].invokeStep(acc);
-            if (steps.length > 1) {
-                return processStep(1, result, acc);
-            } else {
-                return result.map(x => {
-                    steps[steps.length - 1].name.foreach(n => acc[n] = x);
-                    return final(acc);
-                }) as C;
-            }
-
-
+            return processStep(0, {});
         }
     }
 
