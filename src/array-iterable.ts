@@ -335,4 +335,10 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return [this.takeWhile(p), this.dropWhile(p)];
     }
 
+
+    /** The rest of the collection without its first element. */
+    get tail() {
+        if (this.isEmpty) throw new Error('empty.tail');
+        return this.drop(1);
+    }
 }

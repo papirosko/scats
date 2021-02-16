@@ -73,13 +73,11 @@ describe('Collection', () => {
     });
 
     test('drop', () => {
-
         expect(Collection.empty.drop(1).toArray).toEqual([]);
         expect(Collection.of(1, 2).drop(0)).toEqual(Collection.of(1, 2));
         expect(Collection.of(1, 2).drop(1)).toEqual(Collection.of(2));
         expect(Collection.of(1, 2).drop(2)).toEqual(Nil);
         expect(Collection.of(1, 2).drop(3)).toEqual(Nil);
-
     });
 
     test('dropRight', () => {
@@ -96,6 +94,12 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 2)).toEqual(Collection.of(3));
         expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 0)).toEqual(Collection.of(1, 2, 3));
         expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(Collection.empty);
+    });
+
+    test('tail', () => {
+        expect(() => Collection.empty.tail).toThrow(Error);
+        expect(Collection.of(1).tail).toEqual(Nil);
+        expect(Collection.of(1, 2).tail).toEqual(Collection.of(2));
     });
 
 
