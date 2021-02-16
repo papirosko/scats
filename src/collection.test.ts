@@ -1,4 +1,4 @@
-import {Collection} from "./collection";
+import {Collection, Nil} from "./collection";
 import {none, some} from "./option";
 import {forComprehension, idFunction, step} from "./util";
 import {HashMap} from "./hashmap";
@@ -43,27 +43,61 @@ describe('Collection', () => {
 
     });
 
-    test('should take', () => {
+    test('take', () => {
 
-        expect(Collection.empty.take(1).toArray).toEqual([]);
-        expect(Collection.of<any>(1, 2).take(0).toArray).toEqual([]);
-        expect(Collection.of<any>(1, 2).take(1).toArray).toEqual([1]);
-        expect(Collection.of<any>(1, 2).take(2).toArray).toEqual([1, 2]);
-        expect(Collection.of<any>(1, 2).take(3).toArray).toEqual([1, 2]);
+        expect(Nil.take(1)).toEqual(Nil);
+        expect(Collection.of(1, 2).take(0)).toEqual(Collection.of());
+        expect(Collection.of(1, 2).take(1)).toEqual(Collection.of(1));
+        expect(Collection.of(1, 2).take(2)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(1, 2).take(3)).toEqual(Collection.of(1, 2));
 
     });
 
-    test('should drop', () => {
+    test('takeRight', () => {
+
+        expect(Nil.takeRight(1)).toEqual(Nil);
+        expect(Collection.of(1, 2).takeRight(0)).toEqual(Nil);
+        expect(Collection.of(1, 2).takeRight(1)).toEqual(Collection.of(2));
+        expect(Collection.of(1, 2).takeRight(2)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(1, 2).takeRight(3)).toEqual(Collection.of(1, 2));
+
+    });
+
+    test('takeWhile', () => {
+        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 2)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 0)).toEqual(Collection.empty);
+        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 4)).toEqual(Collection.of(1, 2, 3));
+    });
+
+    test('drop', () => {
 
         expect(Collection.empty.drop(1).toArray).toEqual([]);
-        expect(Collection.of<any>(1, 2).drop(0).toArray).toEqual([1, 2]);
-        expect(Collection.of<any>(1, 2).drop(1).toArray).toEqual([2]);
-        expect(Collection.of<any>(1, 2).drop(2).toArray).toEqual([]);
-        expect(Collection.of<any>(1, 2).drop(3).toArray).toEqual([]);
+        expect(Collection.of(1, 2).drop(0)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(1, 2).drop(1)).toEqual(Collection.of(2));
+        expect(Collection.of(1, 2).drop(2)).toEqual(Nil);
+        expect(Collection.of(1, 2).drop(3)).toEqual(Nil);
 
     });
 
-    test('should headOption and head', () => {
+    test('dropRight', () => {
+
+        expect(Nil.dropRight(1)).toEqual(Nil);
+        expect(Collection.of(1, 2).dropRight(0)).toEqual(Collection.of(1, 2));
+        expect(Collection.of(1, 2).dropRight(1)).toEqual(Collection.of(1));
+        expect(Collection.of(1, 2).dropRight(2)).toEqual(Nil);
+        expect(Collection.of(1, 2).dropRight(3)).toEqual(Nil);
+
+    });
+
+    test('dropWhile', () => {
+        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 2)).toEqual(Collection.of(3));
+        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 0)).toEqual(Collection.of(1, 2, 3));
+        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(Collection.empty);
+    });
+
+
+
+    test('headOption, head', () => {
 
         expect(Collection.empty.headOption).toEqual(none);
         expect(Collection.of(1, 2).headOption).toEqual(some(1));
@@ -73,7 +107,7 @@ describe('Collection', () => {
 
     });
 
-    test('should lastOption and last', () => {
+    test('lastOption, last', () => {
 
         expect(Collection.empty.lastOption).toEqual(none);
         expect(Collection.of(1, 2).lastOption).toEqual(some(2));
@@ -145,18 +179,6 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3).slice(0, 2)).toEqual(Collection.of(1, 2));
         expect(Collection.of(1, 2, 3).slice(0, 3)).toEqual(Collection.of(1, 2, 3));
         expect(Collection.of(1, 2, 3).slice(5, 7)).toEqual(Collection.empty);
-    });
-
-    test('should support takeWhile', () => {
-        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 2)).toEqual(Collection.of(1, 2));
-        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 0)).toEqual(Collection.empty);
-        expect(Collection.of(1, 2, 3).takeWhile(_ => _ <= 4)).toEqual(Collection.of(1, 2, 3));
-    });
-
-    test('should support dropWhile', () => {
-        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 2)).toEqual(Collection.of(3));
-        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 0)).toEqual(Collection.of(1, 2, 3));
-        expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(Collection.empty);
     });
 
     test('foldLeft', () => {

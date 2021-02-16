@@ -43,48 +43,6 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         return new Collection<T>(this.items.filter(i => !p(i)));
     }
 
-    take(n: number): Collection<T> {
-        return this.items.length > n ? new Collection<T>(this.items.slice(0, n)) : this;
-    }
-
-    takeWhile(p: (item: T) => boolean): Collection<T> {
-        let res = true
-        let i = 0;
-        for (; res && i < this.items.length; i++) {
-            res = p(this.items[i]);
-        }
-
-        if (res) {
-            return this;
-        } else {
-            return this.take(i - 1);
-        }
-    }
-
-    drop(n: number): Collection<T> {
-        if (n >= this.items.length) {
-            return Collection.empty;
-        } else if (n === 0) {
-            return this;
-        } else {
-            return new Collection<T>(this.items.slice(n , this.items.length));
-        }
-    }
-
-    dropWhile(p: (item: T) => boolean): Collection<T> {
-        let res = true
-        let i = 0;
-        for (; res && i < this.items.length; i++) {
-            res = p(this.items[i]);
-        }
-
-        if (res) {
-            return Collection.empty;
-        } else {
-            return this.drop(i - 1);
-        }
-    }
-
     slice(from: number, until: number): Collection<T> {
         return new Collection<T>(this.items.slice(from, until));
     }
@@ -150,31 +108,6 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
 
 
 
-    sliding(length: number, step: number = 1): Collection<Collection<T>> {
-        if (this.isEmpty) {
-            return Collection.empty;
-        } else if (this.size <= length) {
-            return Collection.of(this);
-        } else {
-            const result: Array<Collection<T>> = [];
-            let left = 0;
-            let done = false;
-            let right = length;
-            while (!done) {
-                done = right >= this.size;
-                result.push(new Collection(this.items.slice(left, right)));
-                left += step;
-                right = left + length;
-            }
-
-            return new Collection(result);
-        }
-
-    }
-
-    grouped(length: number): Collection<Collection<T>> {
-        return this.sliding(length, length);
-    }
 
     appended(item: T): Collection<T> {
         return new Collection(this.items.concat([item]));

@@ -6,13 +6,13 @@ import {forComprehension, step} from "./util";
 
 describe('Either', () => {
 
-    test('should construct', () => {
+    test('construct', () => {
         expect(right('123')).toEqual(new Right('123'));
         expect(left('123')).toEqual(new Left('123'));
     });
 
 
-    test('should equal', () => {
+    test('equal', () => {
         expect(right('123')).toEqual(right('123'));
         expect(left('123')).toEqual(left('123'));
     });
@@ -63,16 +63,28 @@ describe('Either', () => {
         right(12).foreach(x => r = x);
         expect(r).toEqual(12);
 
+        let r1 = 0;
+        right(12).left.foreach(x => r = x);
+        expect(r1).toEqual(0);
+
         let l = 0;
         left(12).foreach(x => l = x);
         expect(l).toEqual(0);
+
+        let l1 = 0;
+        left(1).left.foreach(x => l1 = x);
+        expect(l1).toEqual(1);
     });
 
     test('getOrElse, getOrElseValue', () => {
         expect(right(12).getOrElse(() => 1)).toEqual(12);
         expect(right(12).getOrElseValue(1)).toEqual(12);
+        expect(right(12).left.getOrElse(() => 1)).toEqual(1);
+        expect(right(12).left.getOrElseValue(1)).toEqual(1);
         expect(left(12).getOrElse(() => 1)).toEqual(1);
         expect(left(12).getOrElseValue(1)).toEqual(1);
+        expect(left(12).left.getOrElse(() => 1)).toEqual(12);
+        expect(left(12).left.getOrElseValue(1)).toEqual(12);
     });
 
     test('orElse, orElseValue', () => {
@@ -91,26 +103,38 @@ describe('Either', () => {
         expect(left(1).contains(2)).toBeFalsy();
     });
 
-    test('contains', () => {
+    test('forall', () => {
         expect(right(12).forall(_ => _ > 10)).toBeTruthy();
+        expect(right(12).left.forall(_ => _ > 10)).toBeTruthy();
         expect(right(7).forall(_ => _ > 10)).toBeFalsy();
+        expect(right(7).left.forall(_ => _ > 10)).toBeTruthy();
         expect(left(12).forall(_ => false)).toBeTruthy();
+        expect(left(12).left.forall(_ => _ > 10)).toBeTruthy();
+        expect(left(12).left.forall(_ => _ < 10)).toBeFalsy();
     });
 
     test('exists', () => {
         expect(right(12).exists(_ => _ > 10)).toBeTruthy();
+        expect(right(12).left.exists(_ => _ > 10)).toBeFalsy();
         expect(right(7).exists(_ => _ > 10)).toBeFalsy();
+        expect(right(7).left.exists(_ => _ > 10)).toBeFalsy();
         expect(left(12).exists(_ => true)).toBeFalsy();
+        expect(left(12).left.exists(_ => _ > 10)).toBeTruthy();
+        expect(left(12).left.exists(_ => _ < 10)).toBeFalsy();
     });
 
     test('flatMap', () => {
         expect(right(12).flatMap(_ => right('flower'))).toEqual(right('flower'));
+        expect(right(12).left.flatMap<any, any>(_ => right('flower'))).toEqual(right(12));
         expect(left(12).flatMap(_ => right('flower'))).toEqual(left(12));
+        expect(left(12).left.flatMap(_ => right('flower'))).toEqual(right('flower'));
     });
 
     test('map', () => {
         expect(right(12).map(_ => 'flower')).toEqual(right('flower'));
+        expect(right(12).left.map(_ => 'flower')).toEqual(right(12));
         expect(left(12).map(_ => 'flower')).toEqual(left(12));
+        expect(left(12).left.map(_ => 'flower')).toEqual(left('flower'));
     });
 
     test('filterOrElse, filterOrElseValue', () => {
@@ -123,14 +147,25 @@ describe('Either', () => {
         expect(left(7).filterOrElseValue(_ => false, -1)).toEqual(left(7));
     });
 
+    test('left.filterToOption', () => {
+        expect(right(12).left.filterToOption(_ => _ > 10)).toEqual(none);
+        expect(right(7).left.filterToOption(_ => _ > 10)).toEqual(none);
+        expect(left(12).left.filterToOption(_ => _ > 10)).toEqual(some(left(12)));
+        expect(left(7).left.filterToOption(_ => _ > 10)).toEqual(none);
+    });
+
     test('toCollection', () => {
         expect(right('123').toCollection).toEqual(Collection.of('123'));
+        expect(right('123').left.toCollection).toEqual(Nil);
         expect(left('123').toCollection).toEqual(Nil);
+        expect(left('123').left.toCollection).toEqual(Collection.of('123'));
     });
 
     test('toOption', () => {
         expect(right(12).toOption).toEqual(some(12));
+        expect(right(12).left.toOption).toEqual(none);
         expect(left(12).toOption).toEqual(none);
+        expect(left(12).left.toOption).toEqual(some(12));
     });
 
     test('toTry', () => {

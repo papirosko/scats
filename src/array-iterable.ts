@@ -199,4 +199,101 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return [this.fromArray(first), this.fromArray(second)];
     }
 
+    take(n: number): C {
+        const items = this.toArray;
+        return items.length > n ? this.fromArray(items.slice(0, n)) : this as unknown as C;
+    }
+
+    takeRight(n: number): C {
+        const array = this.toArray;
+        return array.length > n ? this.fromArray(array.slice(array.length - n, array.length)) : this as unknown as C;
+    }
+
+    takeWhile(p: (item: T) => boolean): C {
+        const array = this.toArray;
+        let res = true
+        let i = 0;
+        for (; res && i < array.length; i++) {
+            res = p(array[i]);
+        }
+
+        if (res) {
+            return this as unknown as C;
+        } else {
+            return this.take(i - 1);
+        }
+    }
+
+    drop(n: number): C {
+        const array = this.toArray;
+        if (n >= array.length) {
+            return this.fromArray([]);
+        } else if (n === 0) {
+            return this as unknown as C;
+        } else {
+            return this.fromArray(array.slice(n , array.length));
+        }
+    }
+
+    dropRight(n: number): C {
+        const array = this.toArray;
+        if (n >= array.length) {
+            return this.fromArray([]);
+        } else if (n === 0) {
+            return this as unknown as C;
+        } else {
+            return this.fromArray(array.slice(0 , array.length - n));
+        }
+
+    }
+
+
+    dropWhile(p: (item: T) => boolean): C {
+        const array = this.toArray;
+        let res = true
+        let i = 0;
+        for (; res && i < array.length; i++) {
+            res = p(array[i]);
+        }
+
+        if (res) {
+            return this.fromArray([]);
+        } else {
+            return this.drop(i - 1);
+        }
+    }
+
+
+    sliding(length: number, step: number = 1): Collection<C> {
+        if (this.isEmpty) {
+            return Collection.empty;
+        } else {
+            const itemsSize = this.size;
+            if (itemsSize <= length) {
+                return Collection.of(this as unknown as C);
+            } else {
+                const result: Array<C> = [];
+                let left = 0;
+                let done = false;
+                let right = length;
+                const items = this.toArray;
+                while (!done) {
+                    done = right >= itemsSize;
+                    result.push(this.fromArray(items.slice(left, right)));
+                    left += step;
+                    right = left + length;
+                }
+
+                return new Collection(result);
+            }
+        }
+
+    }
+
+    grouped(length: number): Collection<C> {
+        return this.sliding(length, length);
+    }
+
+
+
 }

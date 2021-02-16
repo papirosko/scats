@@ -1,7 +1,7 @@
 import {HashSet} from "./hashset";
 import {idFunction} from "./util";
 import {none, some} from "./option";
-import {Collection} from "./collection";
+import {Collection, Nil} from "./collection";
 
 describe('HashSet', () => {
 
@@ -168,6 +168,58 @@ describe('HashSet', () => {
     test('partition', () => {
         const actual = HashSet.of(1, 2, 3, 4).partition(i => i % 2 === 0);
         expect(actual).toEqual([HashSet.of(2, 4), HashSet.of(1, 3)]);
+    });
+
+    test('take', () => {
+
+        expect(HashSet.empty.take(1)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).take(0)).toEqual(HashSet.of());
+        expect(HashSet.of(1, 2).take(1)).toEqual(HashSet.of(1));
+        expect(HashSet.of(1, 2).take(2)).toEqual(HashSet.of(1, 2));
+        expect(HashSet.of(1, 2).take(3)).toEqual(HashSet.of(1, 2));
+
+    });
+
+    test('takeRight', () => {
+
+        expect(HashSet.empty.takeRight(1)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).takeRight(0)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).takeRight(1)).toEqual(HashSet.of(2));
+        expect(HashSet.of(1, 2).takeRight(2)).toEqual(HashSet.of(1, 2));
+        expect(HashSet.of(1, 2).takeRight(3)).toEqual(HashSet.of(1, 2));
+
+    });
+
+    test('takeWhile', () => {
+        expect(HashSet.of(1, 2, 3).takeWhile(_ => _ <= 2)).toEqual(HashSet.of(1, 2));
+        expect(HashSet.of(1, 2, 3).takeWhile(_ => _ <= 0)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2, 3).takeWhile(_ => _ <= 4)).toEqual(HashSet.of(1, 2, 3));
+    });
+
+    test('drop', () => {
+
+        expect(HashSet.empty.drop(1)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).drop(0)).toEqual(HashSet.of(1, 2));
+        expect(HashSet.of(1, 2).drop(1)).toEqual(HashSet.of(2));
+        expect(HashSet.of(1, 2).drop(2)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).drop(3)).toEqual(HashSet.empty);
+
+    });
+
+    test('dropRight', () => {
+
+        expect(HashSet.empty.dropRight(1)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).dropRight(0)).toEqual(HashSet.of(1, 2));
+        expect(HashSet.of(1, 2).dropRight(1)).toEqual(HashSet.of(1));
+        expect(HashSet.of(1, 2).dropRight(2)).toEqual(HashSet.empty);
+        expect(HashSet.of(1, 2).dropRight(3)).toEqual(HashSet.empty);
+
+    });
+
+    test('dropWhile', () => {
+        expect(HashSet.of(1, 2, 3).dropWhile(_ => _ <= 2)).toEqual(HashSet.of(3));
+        expect(HashSet.of(1, 2, 3).dropWhile(_ => _ <= 0)).toEqual(HashSet.of(1, 2, 3));
+        expect(HashSet.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(HashSet.empty);
     });
 
 

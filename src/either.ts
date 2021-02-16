@@ -433,22 +433,35 @@ export module Either {
         foreach<U>(f: (value: A) => U): void {
             this.e.match({
                 left: l => f(l),
-                right: () => {
-                }
+                right: () => {}
             });
         }
 
         /** Returns the value from this `Left` or the given argument if this is a `Right`.
          *
          *  ```
-         *  Left(12).left.getOrElse(17)  // 12
-         *  Right(12).left.getOrElse(17) // 17
+         *  left(12).left.getOrElse(17)  // 12
+         *  right(12).left.getOrElse(17) // 17
          *  ```
          */
         getOrElse(or: () => A): A {
             return this.e.match({
                 left: a => a,
                 right: or
+            })
+        }
+
+        /** Returns the value from this `Left` or the given argument if this is a `Right`.
+         *
+         *  ```
+         *  left(12).left.getOrElseValue(17)  // 12
+         *  right(12).left.getOrElseValue(17) // 17
+         *  ```
+         */
+        getOrElseValue(or: A): A {
+            return this.e.match({
+                left: a => a,
+                right: () => or
             })
         }
 

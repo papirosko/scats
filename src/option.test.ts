@@ -181,7 +181,31 @@ describe('Option', () => {
         expect(none.headOption).toEqual(none);
         expect(() => none.last).toThrow(Error);
         expect(none.lastOption).toEqual(none);
-    })
+    });
+
+    test('take, takeRight, drop, dropRight', () => {
+        expect(none.take(0)).toEqual(none);
+        expect(none.drop(0)).toEqual(none);
+        expect(some(1).take(0)).toEqual(none);
+        expect(some(1).take(1)).toEqual(some(1));
+        expect(some(1).takeRight(0)).toEqual(none);
+        expect(some(1).takeRight(1)).toEqual(some(1));
+        expect(some(1).takeWhile(x => x > 1)).toEqual(none);
+        expect(some(1).takeWhile(x => x <= 1)).toEqual(some(1));
+        expect(some(1).drop(0)).toEqual(some(1));
+        expect(some(1).drop(1)).toEqual(none);
+        expect(some(1).dropRight(0)).toEqual(some(1));
+        expect(some(1).dropRight(1)).toEqual(none);
+        expect(some(1).dropWhile(x => x > 1)).toEqual(some(1));
+        expect(some(1).dropWhile(x => x <= 1)).toEqual(none);
+    });
+
+    test('partition', () => {
+        expect(none.partition(i => i % 2 === 0)).toEqual([none, none]);
+        expect(some(1).partition(i => i % 2 === 0)).toEqual([none, some(1)]);
+        expect(some(2).partition(i => i % 2 === 0)).toEqual([some(2), none]);
+    });
+
 
 });
 

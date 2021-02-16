@@ -181,8 +181,60 @@ describe('Hashmap', () => {
     });
 
     test('partition', () => {
-        const actual = HashMap.of(['1', 1], ['2', 2]).partition(([k, i]) => i % 2 === 0);
+        const actual = HashMap.of(['1', 1], ['2', 2]).partition(([_, i]) => i % 2 === 0);
         expect(actual).toEqual([HashMap.of(['2', 2]), HashMap.of(['1', 1])]);
+    });
+
+    test('take', () => {
+
+        expect(HashMap.empty.take(1)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).take(0)).toEqual(HashMap.of());
+        expect(HashMap.of(['1', 1], ['2', 2]).take(1)).toEqual(HashMap.of(['1', 1]));
+        expect(HashMap.of(['1', 1], ['2', 2]).take(2)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).take(3)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+
+    });
+
+    test('takeRight', () => {
+
+        expect(HashMap.empty.takeRight(1)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).takeRight(0)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).takeRight(1)).toEqual(HashMap.of(['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).takeRight(2)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).takeRight(3)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+
+    });
+
+    test('takeWhile', () => {
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).takeWhile(([_, v]) => v <= 2)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).takeWhile(([_, v]) => v <= 0)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).takeWhile(([_, v]) => v <= 4)).toEqual(HashMap.of(['1', 1], ['2', 2], ['3', 3]));
+    });
+
+    test('drop', () => {
+
+        expect(HashMap.empty.drop(1)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).drop(0)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).drop(1)).toEqual(HashMap.of(['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).drop(2)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).drop(3)).toEqual(HashMap.empty);
+
+    });
+
+    test('dropRight', () => {
+
+        expect(HashMap.empty.dropRight(1)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).dropRight(0)).toEqual(HashMap.of(['1', 1], ['2', 2]));
+        expect(HashMap.of(['1', 1], ['2', 2]).dropRight(1)).toEqual(HashMap.of(['1', 1]));
+        expect(HashMap.of(['1', 1], ['2', 2]).dropRight(2)).toEqual(HashMap.empty);
+        expect(HashMap.of(['1', 1], ['2', 2]).dropRight(3)).toEqual(HashMap.empty);
+
+    });
+
+    test('dropWhile', () => {
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).dropWhile(([_, v]) => v <= 2)).toEqual(HashMap.of(['3', 3]));
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).dropWhile(([_, v]) => v <= 0)).toEqual(HashMap.of(['1', 1], ['2', 2], ['3', 3]));
+        expect(HashMap.of(['1', 1], ['2', 2], ['3', 3]).dropWhile(([_, v]) => v <= 4)).toEqual(HashMap.empty);
     });
 
 
