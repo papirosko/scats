@@ -359,6 +359,11 @@ describe('Collection', () => {
         ).toMap(o => [o.id, o.name]).toMap).toEqual(new Map([[1, 'foo1'], [2, 'foo2']]));
     });
 
+    test('partition', () => {
+        const actual = Collection.of(1, 2, 3, 4).partition(i => i % 2 === 0);
+        expect(actual).toEqual([Collection.of(2, 4), Collection.of(1, 3)]);
+    });
+
     test('forComprehension', () => {
         const res = forComprehension(
             step('n', () => Collection.of(1,2,3))

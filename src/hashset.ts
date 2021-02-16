@@ -2,7 +2,11 @@ import {Collection} from "./collection";
 import {ArrayIterable} from "./array-iterable";
 import {HashMap} from "./hashmap";
 
-export class HashSet<T> extends ArrayIterable<T>{
+export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
+
+    protected fromArray(array: T[]): HashSet<T> {
+        return HashSet.of(...array);
+    }
 
     constructor(private readonly items: Set<T>) {
         super();
@@ -50,11 +54,11 @@ export class HashSet<T> extends ArrayIterable<T>{
         return this.items.size;
     }
 
-    concat(other: ArrayIterable<T>): HashSet<T> {
+    concat(other: ArrayIterable<T, any>): HashSet<T> {
         return this.appendedAll(other);
     }
 
-    union(other: ArrayIterable<T>): HashSet<T> {
+    union(other: ArrayIterable<T, any>): HashSet<T> {
         return this.concat(other);
     }
 
@@ -62,7 +66,7 @@ export class HashSet<T> extends ArrayIterable<T>{
         return HashSet.of(...this.toArray.concat([item]));
     }
 
-    appendedAll(other: ArrayIterable<T>): HashSet<T> {
+    appendedAll(other: ArrayIterable<T, any>): HashSet<T> {
         return HashSet.of(...this.toArray.concat(other.toArray));
     }
 

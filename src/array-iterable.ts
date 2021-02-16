@@ -2,9 +2,11 @@ import {none, option, Option, some} from "./option";
 import {HashMap} from "./hashmap";
 import {Collection} from "./collection";
 
-export abstract class ArrayIterable<T> {
+export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     abstract get toArray(): Array<T>;
+
+    protected abstract fromArray(array: T[]): C
 
     foreach<U>(job: (item: T) => U): void {
         this.toArray.forEach(x => job(x));
@@ -191,5 +193,10 @@ export abstract class ArrayIterable<T> {
         return this.isEmpty ? none : some(this.maxBy(toNumber));
     }
 
+    partition(p: (item: T) => boolean): [C, C] {
+        const first = this.toArray.filter(i => p(i));
+        const second = this.toArray.filter(i => !p(i));
+        return [this.fromArray(first), this.fromArray(second)];
+    }
 
 }

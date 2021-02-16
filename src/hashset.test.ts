@@ -1,6 +1,7 @@
 import {HashSet} from "./hashset";
 import {idFunction} from "./util";
 import {none, some} from "./option";
+import {Collection} from "./collection";
 
 describe('HashSet', () => {
 
@@ -162,6 +163,11 @@ describe('HashSet', () => {
             ({
                 sum: a.sum + b
             }))).toEqual({sum: 6});
+    });
+
+    test('partition', () => {
+        const actual = HashSet.of(1, 2, 3, 4).partition(i => i % 2 === 0);
+        expect(actual).toEqual([HashSet.of(2, 4), HashSet.of(1, 3)]);
     });
 
 

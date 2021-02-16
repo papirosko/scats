@@ -11,9 +11,17 @@ export interface OptionMatch<A, T> {
 }
 
 
-export abstract class Option<A> extends ArrayIterable<A> implements Mappable<A> {
+export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements Mappable<A> {
 
     abstract readonly get: A;
+
+    protected fromArray(array: A[]): Option<A> {
+        if (array.length <= 0) {
+            return none;
+        } else {
+            return some(array[0]);
+        }
+    }
 
     exists(p: (value: A) => boolean): boolean {
         if (this.isEmpty) {

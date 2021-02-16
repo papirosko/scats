@@ -2,7 +2,7 @@ import {HashMap} from "./hashmap";
 import {HashSet} from "./hashset";
 import {ArrayIterable} from "./array-iterable";
 
-export class Collection<T> extends ArrayIterable<T>{
+export class Collection<T> extends ArrayIterable<T, Collection<T>>{
 
 
     constructor(private readonly items: T[]) {
@@ -10,6 +10,12 @@ export class Collection<T> extends ArrayIterable<T>{
     }
 
     static empty = new Collection([]);
+
+    protected fromArray(array: T[]): Collection<T> {
+        return new Collection(array);
+    }
+
+
 
     static of<T>(...items: T[]): Collection<T> {
         return new Collection<T>(items);

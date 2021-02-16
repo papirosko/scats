@@ -180,4 +180,10 @@ describe('Hashmap', () => {
         expect(HashMap.of(['1', 1], ['2', 2]).toArray).toEqual([['1', 1], ['2', 2]]);
     });
 
+    test('partition', () => {
+        const actual = HashMap.of(['1', 1], ['2', 2]).partition(([k, i]) => i % 2 === 0);
+        expect(actual).toEqual([HashMap.of(['2', 2]), HashMap.of(['1', 1])]);
+    });
+
+
 });

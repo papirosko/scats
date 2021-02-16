@@ -3,8 +3,11 @@ import {Collection} from "./collection";
 import {HashSet} from "./hashset";
 import {ArrayIterable} from "./array-iterable";
 
-export class HashMap<K, V> extends ArrayIterable<[K, V]> {
+export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
 
+    protected fromArray(array: [K, V][]): HashMap<K, V> {
+        return HashMap.of(...array);
+    }
 
     constructor(private readonly map: Map<K, V>) {
         super();
