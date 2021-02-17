@@ -375,6 +375,17 @@ describe('Collection', () => {
         expect(Collection.of(1, 1, 2, 2, 3).distinct).toEqual(Collection.of(1, 2, 3));
     })
 
+    test('distinctBy', () => {
+        expect(Collection.of(
+            {name: 'Foo', age: 1},
+            {name: 'Foo', age: 2},
+            {name: 'Bar', age: 3},
+        ).distinctBy(x => x.name)).toEqual(Collection.of(
+            {name: 'Foo', age: 1},
+            {name: 'Bar', age: 3},
+        ));
+    })
+
     test('indexOf', () => {
         expect(Collection.of(1, 2, 3).indexOf(2)).toEqual(1);
     });

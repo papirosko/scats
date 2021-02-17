@@ -115,6 +115,19 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         return HashSet.of(...this.items).toCollection();
     }
 
+    distinctBy(key: (item: T) => string | number): Collection<T> {
+        const keys = new Set();
+        const res: T[] = [];
+        this.foreach(item => {
+            const currentKey = key(item);
+            if (!keys.has(currentKey)) {
+                keys.add(currentKey);
+                res.push(item);
+            }
+        });
+        return new Collection<T>(res);
+    }
+
     toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
         return HashMap.of(...this.map(mapper).toArray);
     }
