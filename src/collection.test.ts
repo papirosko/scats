@@ -499,4 +499,12 @@ describe('Collection', () => {
             .toEqual(Collection.of(['foo', 0], ['bar', 1]));
     });
 
+    test('inits, tails', () => {
+        expect(Collection.of(1,2,3).inits)
+            .toEqual(Collection.of(Collection.of(1,2,3), Collection.of(1,2), Collection.of(1), Nil));
+
+        expect(Collection.of(1,2,3).tails)
+            .toEqual(Collection.of(Collection.of(1,2,3), Collection.of(2,3), Collection.of(3), Nil));
+    });
+
 })

@@ -1,6 +1,6 @@
 import {none, option, Option, some} from "./option";
 import {HashMap} from "./hashmap";
-import {Collection} from "./collection";
+import {Collection, Nil} from "./collection";
 
 export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
@@ -469,6 +469,39 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return new Collection<[T, number]>(res);
     }
 
+    /** Iterates over the tails of this $coll. The first value will be this
+     *  $coll and the final one will be an empty $coll, with the intervening
+     *  values the results of successive applications of `tail`.
+     *
+     *  @return   an iterator over all the tails of this $coll
+     *  @example  `Collection.of(1,2,3).tails = Collection.of(Collection.of(1,2,3), Collection.of(2,3), Collection.of(3), Nil)`
+     */
+    get tails(): Collection<C> {
+        const array = this.toArray;
+        const res: C[] = [];
+        for (let i = 0; i <= array.length; i++) {
+            res.push(this.takeRight(array.length - i));
+        }
+        return new Collection<C>(res);
+    }
+
+    /** Iterates over the inits of this $coll. The first value will be this
+     *  $coll and the final one will be an empty $coll, with the intervening
+     *  values the results of successive applications of `init`.
+     *
+     *  $willForceEvaluation
+     *
+     *  @return  an iterator over all the inits of this $coll
+     *  @example  `Collection.of(1,2,3).inits = Collection.of(Collection.of(1,2,3), Collection.of(1,2), Collection.of(1), Nil)`
+     */
+    get inits(): Collection<C> {
+        const array = this.toArray;
+        const res: C[] = [];
+        for (let i = 0; i <= array.length; i++) {
+            res.push(this.take(array.length - i));
+        }
+        return new Collection<C>(res);
+    }
 
 }
 
