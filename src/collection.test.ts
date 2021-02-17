@@ -96,10 +96,15 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3).dropWhile(_ => _ <= 4)).toEqual(Collection.empty);
     });
 
-    test('tail', () => {
+    test('init, tail', () => {
         expect(() => Collection.empty.tail).toThrow(Error);
         expect(Collection.of(1).tail).toEqual(Nil);
         expect(Collection.of(1, 2).tail).toEqual(Collection.of(2));
+
+        expect(() => Collection.empty.init).toThrow(Error);
+        expect(Collection.of(1).init).toEqual(Nil);
+        expect(Collection.of(1,2,3).init).toEqual(Collection.of(1,2));
+
     });
 
 

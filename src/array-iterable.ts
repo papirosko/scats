@@ -336,6 +336,16 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
     }
 
 
+    /** The initial part of the collection without its last element.
+     * $willForceEvaluation
+     */
+    get init(): C {
+        if (this.isEmpty) throw new Error('empty.init')
+        return this.dropRight(1);
+    }
+
+
+
     /** The rest of the collection without its first element. */
     get tail() {
         if (this.isEmpty) throw new Error('empty.tail');
