@@ -341,4 +341,70 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         if (this.isEmpty) throw new Error('empty.tail');
         return this.drop(1);
     }
+
+
+    /**
+     * Partitions this $coll into a map of ${coll}s according to a discriminator function `key`.
+     * Each element in a group is transformed into a value of type `B` using the `value` function.
+     *
+     *
+     * ```
+     * class User {
+     *   constructor(readonly name: string, readonly age: number)
+     * }
+     *
+     * function namesByAge(users: Collection<User>): Map<number, Collection<string>> {
+     *   users.groupMap(_ => _.age)(_ => _.name)
+     * }
+     * ```
+     *
+     *
+     * @param key the discriminator function.
+     * @param value the element transformation function
+     * @tparam K the type of keys returned by the discriminator function
+     * @tparam B the type of values returned by the transformation function
+     */
+    groupMap<K, B>(key: (item: T) => K): (value: (_: T) => B) => HashMap<K, Collection<B>> {
+        return (value: (i: T) => B) => {
+            return this.foldLeft<HashMap<K, Collection<B>>>(HashMap.empty)((acc, next) => {
+                const nextKey = key(next);
+                const existingColl = acc.getOrElse(nextKey, () => Collection.empty);
+                const updatedColl = existingColl.appended(value(next));
+                return acc.updated(nextKey, updatedColl);
+            });
+
+        }
+    }
+
+
+
+
+    /**
+     * Partitions this $coll into a map according to a discriminator function `key`. All the values that
+     * have the same discriminator are then transformed by the `f` function and then reduced into a
+     * single value with the `reduce` function.
+     *
+     * It is equivalent to `groupBy(key).mapValues(_.map(f).reduce(reduce))`, but more efficient.
+     *
+     * ```
+     *   occurrences[A](as: Collection<A>): Map<A, number> =
+     *     as.groupMapReduce<number, number>(identity)(_ => 1)((a, b) => a + b)
+     * ```
+     *
+     * $willForceEvaluation
+     */
+    groupMapReduce<K, B>(key: (_: T) => K): GroupMapReduce2<T, K, B> {
+        return (value: (i: T) => B) => {
+            return (reduce: (v1: B, v2: B) => B) => {
+                return this.foldLeft<HashMap<K, B>>(HashMap.empty)((acc, next) => {
+                    const nextKey = key(next);
+                    const nextValue = value(next);
+                    return acc.updated(nextKey, acc.get(nextKey).map(e => reduce(e, nextValue)).getOrElseValue(nextValue));
+                });
+            }
+        }
+    }
 }
+export type GroupMapReduce3<K, B> = (reduce: (v1: B, v2: B) => B) => HashMap<K, B>;
+export type GroupMapReduce2<T, K, B> = (f: (_: T) => B) => GroupMapReduce3<K, B>;
+

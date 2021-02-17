@@ -1,6 +1,6 @@
 import {Collection, Nil} from "./collection";
 import {none, some} from "./option";
-import {forComprehension, idFunction, step} from "./util";
+import {forComprehension, identity, step} from "./util";
 import {HashMap} from "./hashmap";
 import {HashSet} from "./hashset";
 
@@ -37,8 +37,8 @@ describe('Collection', () => {
     });
 
     test('sum', () => {
-        expect(Collection.empty.sum(idFunction)).toEqual(0);
-        expect(Collection.of<any>(1, 2).sum(idFunction)).toEqual(3);
+        expect(Collection.empty.sum(identity)).toEqual(0);
+        expect(Collection.of<any>(1, 2).sum(identity)).toEqual(3);
     });
 
     test('take', () => {
@@ -231,13 +231,13 @@ describe('Collection', () => {
 
     test('reduce, reduceLeft, reduceRight', () => {
 
-        expect(() => Collection.empty.reduce(idFunction)).toThrow(Error);
-        expect(() => Collection.empty.reduceLeft(idFunction)).toThrow(Error);
-        expect(() => Collection.empty.reduceRight(idFunction)).toThrow(Error);
+        expect(() => Collection.empty.reduce(identity)).toThrow(Error);
+        expect(() => Collection.empty.reduceLeft(identity)).toThrow(Error);
+        expect(() => Collection.empty.reduceRight(identity)).toThrow(Error);
 
-        expect(Collection.empty.reduceOption(idFunction)).toEqual(none);
-        expect(Collection.empty.reduceLeftOption(idFunction)).toEqual(none);
-        expect(Collection.empty.reduceRightOption(idFunction)).toEqual(none);
+        expect(Collection.empty.reduceOption(identity)).toEqual(none);
+        expect(Collection.empty.reduceLeftOption(identity)).toEqual(none);
+        expect(Collection.empty.reduceRightOption(identity)).toEqual(none);
 
         expect(Collection.of(
             {amount: 1},
@@ -290,11 +290,11 @@ describe('Collection', () => {
 
 
     test('minBy, minByOption, maxBy, maxByOption', () => {
-        expect(() => Collection.empty.minBy(idFunction)).toThrow(Error);
-        expect(() => Collection.empty.maxBy(idFunction)).toThrow(Error);
+        expect(() => Collection.empty.minBy(identity)).toThrow(Error);
+        expect(() => Collection.empty.maxBy(identity)).toThrow(Error);
 
-        expect(Collection.empty.minByOption(idFunction)).toEqual(none);
-        expect(Collection.empty.maxByOption(idFunction)).toEqual(none);
+        expect(Collection.empty.minByOption(identity)).toEqual(none);
+        expect(Collection.empty.maxByOption(identity)).toEqual(none);
 
         expect(Collection.of(
             {amount: 4},
@@ -444,5 +444,33 @@ describe('Collection', () => {
         );
 
     });
+
+
+    test('groupMap', () => {
+        expect(Collection.of(
+            {name: 'Alice', age: 25},
+            {name: 'Bob', age: 29},
+            {name: 'John', age: 29},
+        ).groupMap(_ => _.age)(_ => _.name)).toEqual(HashMap.of(
+            [25, Collection.of('Alice')],
+            [29, Collection.of('Bob', 'John')]
+        ));
+    });
+
+    test('groupMapReduce', () => {
+        expect(Collection.of(
+            {name: 'Alice', age: 25},
+            {name: 'Bob', age: 29},
+            {name: 'John', age: 29},
+        ).groupMapReduce<number, string>(_ => _.age)(_ => _.name)((a, b) => a + b)).toEqual(HashMap.of(
+            [25, 'Alice'],
+            [29, 'BobJohn']
+        ));
+
+        expect((Collection.of(1, 2, 2, 3, 3, 3))
+            .groupMapReduce<number, number>(identity)(_ => 1)((a, b) => a + b))
+            .toEqual(HashMap.of([1, 1], [2, 2], [3, 3]));
+    });
+
 
 });

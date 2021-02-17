@@ -1,6 +1,6 @@
 import {none, Option, some} from "./option";
 import {Either, left, right} from "./either";
-import {idFunction} from "./util";
+import {identity} from "./util";
 import {Mappable} from "./mappable";
 
 export interface TryMatch<T, R> {
@@ -201,7 +201,7 @@ export class Failure extends TryLike<any> {
     }
 
     recoverWith(f: (e: Error) => TryLike<any>): TryLike<any> {
-        return this.transform(idFunction, f);
+        return this.transform(identity, f);
     }
 
     transform<U>(s: (value: any) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U> {

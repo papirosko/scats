@@ -2,7 +2,7 @@ import {Collection} from "./collection";
 import {HashMap} from "./hashmap";
 import {none, some} from "./option";
 import {HashSet} from "./hashset";
-import {idFunction} from "./util";
+import {identity} from "./util";
 
 describe('Hashmap', () => {
 

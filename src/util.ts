@@ -1,7 +1,7 @@
 import {none, Option, some} from "./option";
 import {Mappable} from "./mappable";
 
-export function idFunction<T>(x: T): T {
+export function identity<T>(x: T): T {
     return x;
 }
 

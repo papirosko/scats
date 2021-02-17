@@ -1,5 +1,5 @@
 import {HashSet} from "./hashset";
-import {idFunction} from "./util";
+import {identity} from "./util";
 import {none, some} from "./option";
 import {Collection, Nil} from "./collection";
 
@@ -78,11 +78,11 @@ describe('HashSet', () => {
     });
 
     test('minBy, minByOption, maxBy, maxByOption', () => {
-        expect(() => HashSet.empty.minBy(idFunction)).toThrow(Error);
-        expect(() => HashSet.empty.maxBy(idFunction)).toThrow(Error);
+        expect(() => HashSet.empty.minBy(identity)).toThrow(Error);
+        expect(() => HashSet.empty.maxBy(identity)).toThrow(Error);
 
-        expect(HashSet.empty.minByOption(idFunction)).toEqual(none);
-        expect(HashSet.empty.maxByOption(idFunction)).toEqual(none);
+        expect(HashSet.empty.minByOption(identity)).toEqual(none);
+        expect(HashSet.empty.maxByOption(identity)).toEqual(none);
 
         expect(HashSet.of(
             {amount: 4},
@@ -116,11 +116,11 @@ describe('HashSet', () => {
 
     test('reduce, reduceLeft', () => {
 
-        expect(() => HashSet.empty.reduce(idFunction)).toThrow(Error);
-        expect(() => HashSet.empty.reduceLeft(idFunction)).toThrow(Error);
+        expect(() => HashSet.empty.reduce(identity)).toThrow(Error);
+        expect(() => HashSet.empty.reduceLeft(identity)).toThrow(Error);
 
-        expect(HashSet.empty.reduceOption(idFunction)).toEqual(none);
-        expect(HashSet.empty.reduceLeftOption(idFunction)).toEqual(none);
+        expect(HashSet.empty.reduceOption(identity)).toEqual(none);
+        expect(HashSet.empty.reduceLeftOption(identity)).toEqual(none);
 
         expect(HashSet.of(
             {amount: 1},
@@ -223,8 +223,8 @@ describe('HashSet', () => {
     });
 
     test('sum', () => {
-        expect(HashSet.empty.sum(idFunction)).toEqual(0);
-        expect(HashSet.of(1, 2, 2).sum(idFunction)).toEqual(3);
+        expect(HashSet.empty.sum(identity)).toEqual(0);
+        expect(HashSet.of(1, 2, 2).sum(identity)).toEqual(3);
     });
 
 });
