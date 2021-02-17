@@ -57,7 +57,7 @@ describe('forComprehension', () => {
 
         expect(forComprehension(
             step('num1', () => toNum('1')),
-            step('num2', () => toNum('s2').transform(x => success(x), () => failure(new Error('failed to convert')))),
+            step('num2', () => toNum('s2').transform<number>(x => success(x), () => failure(new Error('failed to convert')))),
             step('num3', () => toNum('3')),
         ).yield(({num1, num2, num3}) => num1 + num2 + num3)).toEqual(failure(new Error('failed to convert')));
     });

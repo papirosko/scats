@@ -163,7 +163,7 @@ describe('Try', () => {
     });
 
     test('transform', () => {
-        expect(Try(successAware).transform(() => success('1'), e => failure(e))).toEqual(success('1'));
+        expect(Try(successAware).transform<string>(() => success('1'), e => failure(e))).toEqual(success('1'));
         expect(Try(errorAware).transform(() => success('1'), () => success('2'))).toEqual(success('2'));
         expect(Try(errorAware).transform(() => failure(new Error('1')), () => failure(new Error('2')))).toEqual(failure(new Error('2')));
         expect(Try(errorAware).transform(() => {

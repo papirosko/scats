@@ -1,6 +1,6 @@
 import {none, option, Option, some} from "./option";
 import {HashMap} from "./hashmap";
-import {Collection, Nil} from "./collection";
+import {Collection} from "./collection";
 
 export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 

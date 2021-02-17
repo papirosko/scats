@@ -137,7 +137,7 @@ export class Failure extends TryLike<any> {
         super();
     }
 
-    get toOption(): Option<never> {
+    get toOption(): Option<any> {
         return none;
     }
 

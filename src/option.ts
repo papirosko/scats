@@ -167,7 +167,7 @@ export class None<A> extends Option<A> {
 
 }
 
-export function option<A>(value?: A | null): Option<A> {
+export function option<A>(value: A | null | undefined): Option<A> {
     return value === null || typeof value === 'undefined' ? none : some(value);
 }
 
