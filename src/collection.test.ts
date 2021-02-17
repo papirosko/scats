@@ -484,4 +484,19 @@ describe('Collection', () => {
             .toEqual(Collection.of(10, 9, 7, 4, 0));
     });
 
+
+    test('zip, zipAll', () => {
+        expect(Collection.of(1, 2).zip(Collection.of(3, 4, 5)))
+            .toEqual(Collection.of([1, 3], [2, 4]));
+        expect(Collection.of(1, 2).zipAll(Collection.of(3, 4, 5), 7, 8))
+            .toEqual(Collection.of([1, 3], [2, 4], [7, 5]));
+        expect(Collection.of(1, 2, 3).zipAll(Collection.of(4, 5), 7, 8))
+            .toEqual(Collection.of([1, 4], [2, 5], [3, 8]));
+    });
+
+    test('zipWithIndex', () => {
+        expect(Collection.of('foo', 'bar').zipWithIndex)
+            .toEqual(Collection.of(['foo', 0], ['bar', 1]));
+    });
+
 })

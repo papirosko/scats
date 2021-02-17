@@ -460,6 +460,15 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         }
     }
 
+    get zipWithIndex(): Collection<[T, number]> {
+        const res: [T, number][] = [];
+        const array = this.toArray;
+        for (let i = 0; i < array.length; i++) {
+            res.push([array[i], i]);
+        }
+        return new Collection<[T, number]>(res);
+    }
+
 
 }
 

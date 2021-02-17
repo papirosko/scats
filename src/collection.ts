@@ -122,6 +122,48 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
     indexOf(item: T): number {
         return this.items.indexOf(item);
     }
+
+    /** Returns a $coll formed from this $coll and another iterable collection
+     *  by combining corresponding elements in pairs.
+     *  If one of the two collections is longer than the other, its remaining elements are ignored.
+     *
+     *  @param   that  The iterable providing the second half of each result pair
+     *  @tparam  B     the type of the second half of the returned pairs
+     *  @return        a new $coll containing pairs consisting of corresponding elements of this $coll and `that`.
+     *                 The length of the returned collection is the minimum of the lengths of this $coll and `that`.
+     */
+    zip<B>(that: Collection<B>): Collection<[T, B]> {
+        const res: [T, B][] = [];
+        for (let i = 0; i < Math.min(this.size, that.size); i++) {
+            res.push([this.items[i], that.items[i]]);
+        }
+        return new Collection<[T, B]>(res);
+    }
+
+    /** Returns a $coll formed from this $coll and another iterable collection
+     *  by combining corresponding elements in pairs.
+     *  If one of the two collections is shorter than the other,
+     *  placeholder elements are used to extend the shorter collection to the length of the longer.
+     *
+     *  @param that     the iterable providing the second half of each result pair
+     *  @param thisElem the element to be used to fill up the result if this $coll is shorter than `that`.
+     *  @param thatElem the element to be used to fill up the result if `that` is shorter than this $coll.
+     *  @return        a new collection of type `That` containing pairs consisting of
+     *                 corresponding elements of this $coll and `that`. The length
+     *                 of the returned collection is the maximum of the lengths of this $coll and `that`.
+     *                 If this $coll is shorter than `that`, `thisElem` values are used to pad the result.
+     *                 If `that` is shorter than this $coll, `thatElem` values are used to pad the result.
+     */
+    zipAll<B>(that: Collection<B>, thisElem: T, thatElem: B): Collection<[T, B]> {
+        const res: [T, B][] = [];
+        for (let i = 0; i < Math.max(this.size, that.size); i++) {
+            res.push([
+                i < this.items.length ? this.items[i] : thisElem,
+                i < that.items.length ? that.items[i] : thatElem]);
+        }
+        return new Collection<[T, B]>(res);
+    }
+
 }
 
 
