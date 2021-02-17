@@ -473,4 +473,15 @@ describe('Collection', () => {
     });
 
 
-});
+    test('scan, scanLeft, scanRight', () => {
+        expect(Collection.of(1, 2, 3, 4).scan(0)((a, b) => a + b))
+            .toEqual(Collection.of(0, 1, 3, 6, 10));
+
+        expect(Collection.of(1, 2, 3, 4).scanLeft(0)((a, b) => a + b))
+            .toEqual(Collection.of(0, 1, 3, 6, 10));
+
+        expect(Collection.of(1, 2, 3, 4).scanRight(0)((a, b) => a + b))
+            .toEqual(Collection.of(10, 9, 7, 4, 0));
+    });
+
+})

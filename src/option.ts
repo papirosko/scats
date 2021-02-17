@@ -176,4 +176,4 @@ export function some<A>(value: A): Some<A> {
     return new Some<A>(value);
 }
 
-export const none: Option<never> = new None<never>();
+export const none: Option<any> = new None<any>();

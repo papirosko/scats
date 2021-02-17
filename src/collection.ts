@@ -9,7 +9,7 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         super();
     }
 
-    static empty = new Collection([]);
+    static empty = new Collection<any>([]);
 
     protected fromArray(array: T[]): Collection<T> {
         if (!array || array.length <= 0) {

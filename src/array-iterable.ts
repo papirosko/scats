@@ -404,7 +404,66 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
             }
         }
     }
+
+
+    /** Computes a prefix scan of the elements of the collection.
+     *
+     *  Note: The neutral element `z` may be applied more than once.
+     *
+     *  @tparam B         element type of the resulting collection
+     *  @param z          neutral element for the operator `op`
+     *  @param op         the associative operator for the scan
+     *
+     *  @return           a new $coll containing the prefix scan of the elements in this $coll
+     */
+    scan(z: T): (op: (acc: T, next: T) => T) => C {
+        return this.scanLeft(z);
+    }
+
+    scanLeft(z: T): (op: (acc: T, next: T) => T) => C {
+        return (op: (acc: T, next: T) => T) => {
+            const res: T[] = [z];
+            let acc: T = z;
+            this.toArray.forEach(i => {
+                acc = op(acc, i);
+                res.push(acc);
+            });
+            return this.fromArray(res);
+        }
+    }
+
+    /** Produces a collection containing cumulative results of applying the operator going right to left.
+     *  The head of the collection is the last cumulative result.
+     *  $willNotTerminateInf
+     *  $orderDependent
+     *  $willForceEvaluation
+     *
+     *  Example:
+     *  ```
+     *    Collection.of(1, 2, 3, 4).scanRight(0)((a, b) => a + b) == Collection.of(10, 9, 7, 4, 0)
+     *  ```
+     *
+     *  @tparam B      the type of the elements in the resulting collection
+     *  @param z       the initial value
+     *  @param op      the binary operator applied to the intermediate result and the element
+     *  @return        collection with intermediate results
+     */
+    scanRight(z: T): (op: (acc: T, next: T) => T) => C {
+        return (op: (acc: T, next: T) => T) => {
+            const res: T[] = [z];
+            let acc: T = z;
+            this.toArray.reverse().forEach(i => {
+                acc = op(acc, i);
+                res.push(acc);
+            });
+            return this.fromArray(res.reverse());
+        }
+    }
+
+
 }
+
+
 export type GroupMapReduce3<K, B> = (reduce: (v1: B, v2: B) => B) => HashMap<K, B>;
 export type GroupMapReduce2<T, K, B> = (f: (_: T) => B) => GroupMapReduce3<K, B>;
 
