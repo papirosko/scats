@@ -141,4 +141,43 @@ forComprehension(
     step('j', () => Collection.of(2, 1)).if(({i, j}) => i + j === 3)
 ).yield(({i, j}) => [i, j]); // Collection.of([1, 2], [2, 1])
 
+// with promises
+
+function toNumPromise(x: string): Promise<TryLike<number>> {
+    return Promise.resolve(Try(() => {
+        const res = parseInt(x);
+        if (isNaN(res)) {
+            throw new Error(`${x} is not a number`);
+        } else {
+            return res;
+        }
+    }));
+}
+
+
+await forComprehension.promise(
+    task('num1', () => toNumPromise('1')),
+    task('num2', () => toNumPromise('2')),
+    task('num3', () => toNumPromise('3')),
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // success(6)
+
+
+await forComprehension.promise(
+    task('num1', () => toNumPromise('1')),
+    task('num2', () => toNumPromise('s2')),
+    task('num3', () => toNumPromise('3')),
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // failure(new Error('s2 is not a number')
+
+await forComprehension.promise(
+    task('num1', () => toNumPromise('1')),
+    task('num2', () => toNumPromise('2')).if(({num2}) => num2 > 10),
+    task('num3', () => toNumPromise('3')),
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // failure(new Error("Predicate does not hold for '2'")
+
+await forComprehension.promise(
+    task('num1', () => toNumPromise('1')),
+    task('num2', () => { throw new Error('Error in task'); }),
+    task('num3', () => toNumPromise('3')),
+).yield(({num1, num2, num3}) => num1 + num2 + num3); // throws Error('Error in task')
+
 ```
