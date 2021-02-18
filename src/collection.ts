@@ -190,6 +190,34 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return new Collection<[T, B]>(res);
     }
 
+
+    /**
+     * Maps each element of current collection to promise. Next element will be mapped once the current is resolved.
+     *
+     * This allows sequential processing of big amount of tasks in chunks:
+     * ```
+     * function processItem(i: number) {
+     *       return Promise.resolve(i.toString(10));
+     * }
+     *
+     * const res: Collection<string> = (await Collection.fill<number>(100)(identity)
+     *    .grouped(10)
+     *    .mapPromise(async chunk =>
+     *       new Collection(await Promise.all(chunk.map(i => processItem(i)).toArray))
+     *    )).flatten<string>()
+     * ```
+     * @param f
+     */
+    async mapPromise<B>(f: (v: T) => Promise<B>): Promise<Collection<B>> {
+        const array = this.toArray;
+        const res: B[] = [];
+        for (let i = 0; i < array.length; i++) {
+            res.push(await f(array[i]));
+        }
+        return new Collection<B>(res);
+    }
+
+
 }
 
 

@@ -531,4 +531,20 @@ describe('Collection', () => {
             .toEqual(Collection.of(Collection.of(1,2,3), Collection.of(2,3), Collection.of(3), Nil));
     });
 
+
+    test('mapPromise', async () => {
+        await expect(Collection.of(1, 2).mapPromise(x => Promise.resolve(x))).resolves.toEqual(Collection.of(1, 2));
+
+        function processItem(i: number) {
+            return Promise.resolve(i.toString(10));
+        }
+
+        const res: Collection<string> = (await Collection.fill<number>(100)(identity)
+            .grouped(10)
+            .mapPromise(async chunk =>
+                new Collection(await Promise.all(chunk.map(i => processItem(i)).toArray))
+            )).flatten<string>();
+        expect(res).toEqual(Collection.fill<string>(100)(x => x.toString(10)));
+    });
+
 })
