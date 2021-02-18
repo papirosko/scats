@@ -29,10 +29,18 @@ describe('Collection', () => {
 
     });
 
-    test('should flatMap', () => {
+    test('flatMap', () => {
 
         expect(Collection.of<any>(1, 2).flatMap(n => Collection.fill(n)(() => n)).toArray)
             .toEqual([1, 2, 2]);
+
+    });
+
+    test('flatMapPromise', async () => {
+
+        await expect(Collection.of<any>(1, 2).flatMapPromise(n =>
+            Promise.resolve(Collection.fill(n)(() => n))
+        )).resolves.toEqual(Collection.of(1, 2, 2));
 
     });
 

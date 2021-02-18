@@ -1,8 +1,12 @@
 import {HashMap} from "./hashmap";
 import {HashSet} from "./hashset";
 import {ArrayIterable} from "./array-iterable";
+import {Mappable} from "./mappable";
+import {Filterable} from "./util";
 
-export class Collection<T> extends ArrayIterable<T, Collection<T>>{
+export class Collection<T> extends ArrayIterable<T, Collection<T>>
+    implements Mappable<T>,
+               Filterable<T, Collection<T>> {
 
 
     constructor(private readonly items: T[]) {
@@ -48,6 +52,15 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>{
         this.items.forEach(i => {
             res = res.concat(f(i).items);
         });
+        return new Collection<B>(res);
+    }
+
+    async flatMapPromise<B>(f: (item: T) => Promise<Collection<B>>): Promise<Collection<B>> {
+        let res: B[] = [];
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            res = res.concat((await f(item)).items);
+        }
         return new Collection<B>(res);
     }
 

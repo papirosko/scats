@@ -51,6 +51,15 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         return this.isEmpty ? none : p(this.get);
     }
 
+    flatMapPromise<B>(f: (item: A) => Promise<Mappable<B>>): Promise<Mappable<B>> {
+        if (this.isEmpty) {
+            return Promise.resolve(none);
+        } else {
+            return f(this.get);
+        }
+    }
+
+
     foldValue<B>(ifEmpty: () => B): (f: (_: A) => B) => B {
         if (this.isEmpty) {
             return function() { return ifEmpty() };

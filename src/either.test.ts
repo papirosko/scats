@@ -130,6 +130,17 @@ describe('Either', () => {
         expect(left(12).left.flatMap(_ => right('flower'))).toEqual(right('flower'));
     });
 
+    test('flatMapPromise', async () => {
+        await expect(right(12).flatMapPromise(_ => Promise.resolve(right('flower'))))
+            .resolves.toEqual(right('flower'));
+        await expect(right(12).left.flatMapPromise<any, any>(_ => Promise.resolve(right('flower'))))
+            .resolves.toEqual(right(12));
+        await expect(left(12).flatMapPromise(_ => Promise.resolve(right('flower'))))
+            .resolves.toEqual(left(12));
+        await expect(left(12).left.flatMapPromise(_ => Promise.resolve(right('flower'))))
+            .resolves.toEqual(right('flower'));
+    });
+
     test('map', () => {
         expect(right(12).map(_ => 'flower')).toEqual(right('flower'));
         expect(right(12).left.map(_ => 'flower')).toEqual(right(12));

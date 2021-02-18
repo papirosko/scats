@@ -282,6 +282,12 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
         });
     }
 
+    flatMapPromise<B>(f: (item: RIGHT) => Promise<Mappable<B>>): Promise<Mappable<B>> {
+        return this.match({
+            right: v => f(v),
+            left: (e) => Promise.resolve(left(e))
+        });
+    }
 
     /** The given function is applied if this is a `Right`.
      *
@@ -421,6 +427,22 @@ export module Either {
 
         constructor(private readonly e: Either<A, B>) {
         }
+
+
+        flatMapPromise<A1, B1 extends B>(f: (item: A) => Promise<Either<A1, B1>>): Promise<Either<A1, B1>> {
+            return this.e.match<Promise<Either<A1, B1>>>({
+                left: v => f(v) as Promise<Either<A1, B1>>,
+                right: (e) => Promise.resolve(right(e) as unknown as Either<A1, B1>)
+            }) as Promise<Either<A1, B1>>;
+        }
+
+        // flatMap<A1, B1 extends B>(f: (value: A) => Either<A1, B1>): Either<A1, B1> {
+        //     return this.e.match<Either<A1, B1>>({
+        //         left: (a) => f(a),
+        //         right: r => right(r) as unknown as Either<A1, B1>
+        //     });
+        // }
+
 
         /** Executes the given side-effecting function if this is a `Left`.
          *

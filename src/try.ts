@@ -10,7 +10,6 @@ export interface TryMatch<T, R> {
 
 
 export abstract class TryLike<T> implements Mappable<T>{
-
     abstract readonly toOption: Option<T>;
     abstract readonly toEither: Either<Error, T>;
     abstract map<B>(f: (x: T) => B): TryLike<B>;
@@ -30,6 +29,15 @@ export abstract class TryLike<T> implements Mappable<T>{
     abstract recover(f: (e: Error) => any): TryLike<any>;
     abstract recoverWith(f: (e: Error) => TryLike<any>): TryLike<any>;
     abstract transform<U>(s: (value: T) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U>;
+
+    flatMapPromise<B>(f: (item: T) => Promise<Mappable<B>>): Promise<Mappable<B>> {
+        return this.match({
+            success: r => f(r),
+            failure: e => Promise.resolve(this as unknown as Mappable<B>)
+        });
+    }
+
+
 }
 
 
