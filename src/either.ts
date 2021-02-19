@@ -278,14 +278,14 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     flatMap<RIGHT1>(f: (value: RIGHT) => Either<LEFT, RIGHT1>): Either<LEFT, RIGHT1> {
         return this.match({
             right: v => f(v),
-            left: (e) => left(e)
+            left: () => this as unknown as Either<LEFT, RIGHT1>
         });
     }
 
-    flatMapPromise<B>(f: (item: RIGHT) => Promise<Mappable<B>>): Promise<Mappable<B>> {
+    flatMapPromise<RIGHT1>(f: (item: RIGHT) => Promise<Either<LEFT, RIGHT1>>): Promise<Either<LEFT, RIGHT1>> {
         return this.match({
             right: v => f(v),
-            left: (e) => Promise.resolve(left(e))
+            left: () => Promise.resolve(this as unknown as Either<LEFT, RIGHT1>)
         });
     }
 
@@ -299,9 +299,17 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     map<RIGHT1>(f: (value: RIGHT) => RIGHT1): Either<LEFT, RIGHT1> {
         return this.match<Either<LEFT, RIGHT1>>({
             right: v => right(f(v)),
-            left: e => left(e)
+            left: () => this as unknown as Either<LEFT, RIGHT1>
         });
     }
+
+    async mapPromise<RIGHT1>(f: (v: RIGHT) => Promise<RIGHT1>): Promise<Either<LEFT, RIGHT1>> {
+        return this.match({
+            right: async v => right(await f(v)) as Either<LEFT, RIGHT1>,
+            left: () => Promise.resolve(this as unknown as Either<LEFT, RIGHT1>)
+        });
+    }
+
 
     /** Returns `Right` with the existing value of `Right` if this is a `Right`
      *  and the given predicate `p` holds for the right value,
@@ -429,20 +437,19 @@ export module Either {
         }
 
 
-        flatMapPromise<A1, B1 extends B>(f: (item: A) => Promise<Either<A1, B1>>): Promise<Either<A1, B1>> {
+        mapPromise<A1, B1 extends B>(f: (item: A) => Promise<A1>): Promise<Either<A1, B1>> {
             return this.e.match<Promise<Either<A1, B1>>>({
-                left: v => f(v) as Promise<Either<A1, B1>>,
-                right: (e) => Promise.resolve(right(e) as unknown as Either<A1, B1>)
+                left: async v => left(await f(v)),
+                right: () => Promise.resolve(this.e as unknown as Either<A1, B1>)
             }) as Promise<Either<A1, B1>>;
         }
 
-        // flatMap<A1, B1 extends B>(f: (value: A) => Either<A1, B1>): Either<A1, B1> {
-        //     return this.e.match<Either<A1, B1>>({
-        //         left: (a) => f(a),
-        //         right: r => right(r) as unknown as Either<A1, B1>
-        //     });
-        // }
-
+        flatMapPromise<A1, B1 extends B>(f: (item: A) => Promise<Either<A1, B1>>): Promise<Either<A1, B1>> {
+            return this.e.match<Promise<Either<A1, B1>>>({
+                left: v => f(v),
+                right: () => Promise.resolve(this.e as unknown as Either<A1, B1>)
+            }) as Promise<Either<A1, B1>>;
+        }
 
         /** Executes the given side-effecting function if this is a `Left`.
          *
@@ -532,7 +539,7 @@ export module Either {
         flatMap<A1, B1 extends B>(f: (value: A) => Either<A1, B1>): Either<A1, B1> {
             return this.e.match<Either<A1, B1>>({
                 left: (a) => f(a),
-                right: r => right(r) as unknown as Either<A1, B1>
+                right: () => this.e as unknown as Either<A1, B1>
             });
         }
 
@@ -546,7 +553,7 @@ export module Either {
         map<A1>(f: (value: A) => A1): Either<A1, B> {
             return this.e.match<Either<A1, B>>({
                 left: a => left(f(a)),
-                right: e => right(e)
+                right: () => this.e as unknown as Either<A1, B>
             });
         }
 

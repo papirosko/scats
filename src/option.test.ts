@@ -207,6 +207,12 @@ describe('Option', () => {
     });
 
 
+    test('mapPromise', async () => {
+        await expect(option(1).mapPromise(x => Promise.resolve(x))).resolves.toEqual(some(1));
+        await expect(option(null).mapPromise(x => Promise.resolve(x))).resolves.toEqual(none);
+        await expect(option(undefined).mapPromise(x => Promise.resolve(x))).resolves.toEqual(none);
+    });
+
 });
 
 

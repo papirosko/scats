@@ -30,10 +30,18 @@ export abstract class TryLike<T> implements Mappable<T>{
     abstract recoverWith(f: (e: Error) => TryLike<any>): TryLike<any>;
     abstract transform<U>(s: (value: T) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U>;
 
-    flatMapPromise<B>(f: (item: T) => Promise<Mappable<B>>): Promise<Mappable<B>> {
+    async mapPromise<B>(f: (v: T) => Promise<B>): Promise<TryLike<B>> {
+        return this.match({
+            success: r => Try.promise(() => f(r)),
+            failure: () => Promise.resolve(this as unknown as TryLike<B>)
+        });
+    }
+
+
+    flatMapPromise<B>(f: (item: T) => Promise<TryLike<B>>): Promise<TryLike<B>> {
         return this.match({
             success: r => f(r),
-            failure: e => Promise.resolve(this as unknown as Mappable<B>)
+            failure: () => Promise.resolve(this as unknown as TryLike<B>)
         });
     }
 

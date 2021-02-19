@@ -1,5 +1,5 @@
 import {failure, success, Try} from "./try";
-import {none, some} from "./option";
+import {none, option, some} from "./option";
 import {left, right} from "./either";
 
 describe('Try', () => {
@@ -172,6 +172,12 @@ describe('Try', () => {
             throw new Error('fallback_error2');
         })).toEqual(failure(new Error('fallback_error2')));
     });
+
+    test('mapPromise', async () => {
+        await expect(Try(successAware).mapPromise(x => Promise.resolve(x))).resolves.toEqual(success('success'));
+        await expect(Try(errorAware).mapPromise(x => Promise.resolve(x))).resolves.toEqual(failure(new Error('error')));
+    });
+
 
 });
 

@@ -22,7 +22,7 @@ describe('Collection', () => {
         expect(Collection.of(1, 2, 3, 4).filterNot(x => x > 2).toArray).toEqual([1, 2]);
     });
 
-    test('should flatten', () => {
+    test('flatten', () => {
 
         expect(Collection.of<any>(1, Collection.of(2, 3), 4).flatten().toArray)
             .toEqual([1, 2, 3, 4])
@@ -36,11 +36,38 @@ describe('Collection', () => {
 
     });
 
+    test('mapPromise', async () => {
+        await expect(Collection.of(1, 2).mapPromise(x => Promise.resolve(x))).resolves.toEqual(Collection.of(1, 2));
+
+        function processItem(i: number) {
+            return Promise.resolve(i.toString(10));
+        }
+
+        const res: Collection<string> = (await Collection.fill<number>(100)(identity)
+            .grouped(10)
+            .mapPromise(async chunk =>
+                new Collection(await Promise.all(chunk.map(i => processItem(i)).toArray))
+            )).flatten<string>();
+        expect(res).toEqual(Collection.fill<string>(100)(x => x.toString(10)));
+    });
+
+
     test('flatMapPromise', async () => {
 
         await expect(Collection.of<any>(1, 2).flatMapPromise(n =>
             Promise.resolve(Collection.fill(n)(() => n))
         )).resolves.toEqual(Collection.of(1, 2, 2));
+
+        function processItem(i: number) {
+            return Promise.resolve(i.toString(10));
+        }
+
+        const res: Collection<string> = (await Collection.fill<number>(100)(identity)
+            .grouped(10)
+            .flatMapPromise(async chunk =>
+                new Collection(await Promise.all(chunk.map(i => processItem(i)).toArray))
+            ));
+        expect(res).toEqual(Collection.fill<string>(100)(x => x.toString(10)));
 
     });
 
@@ -532,19 +559,5 @@ describe('Collection', () => {
     });
 
 
-    test('mapPromise', async () => {
-        await expect(Collection.of(1, 2).mapPromise(x => Promise.resolve(x))).resolves.toEqual(Collection.of(1, 2));
-
-        function processItem(i: number) {
-            return Promise.resolve(i.toString(10));
-        }
-
-        const res: Collection<string> = (await Collection.fill<number>(100)(identity)
-            .grouped(10)
-            .mapPromise(async chunk =>
-                new Collection(await Promise.all(chunk.map(i => processItem(i)).toArray))
-            )).flatten<string>();
-        expect(res).toEqual(Collection.fill<string>(100)(x => x.toString(10)));
-    });
 
 })

@@ -148,6 +148,14 @@ describe('Either', () => {
         expect(left(12).left.map(_ => 'flower')).toEqual(left('flower'));
     });
 
+    test('mapPromise', async () => {
+        await expect(right(12).mapPromise(x => Promise.resolve(x + 1))).resolves.toEqual(right(13));
+        await expect(right(12).left.mapPromise(x => Promise.resolve(x + 1))).resolves.toEqual(right(12));
+        await expect(left(12).mapPromise(x => Promise.resolve(x + 1))).resolves.toEqual(left(12));
+        await expect(left(12).left.mapPromise(x => Promise.resolve(x + 1))).resolves.toEqual(left(13));
+    });
+
+
     test('filterOrElse, filterOrElseValue', () => {
         expect(right(12).filterOrElse(_ => _ > 10, () => -1)).toEqual(right(12));
         expect(right(7).filterOrElse(_ => _ > 10, () => -1)).toEqual(left(-1));

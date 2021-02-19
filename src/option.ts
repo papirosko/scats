@@ -47,9 +47,24 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         }
     }
 
+    map<B>(f: (item: A) => B): Option<B> {
+        return this.isEmpty ? none : option(f(this.get));
+    }
+
+
     flatMap<B>(p: (value: A) => Option<B>): Option<B> {
         return this.isEmpty ? none : p(this.get);
     }
+
+    async mapPromise<B>(f: (v: A) => Promise<B>): Promise<Mappable<B>> {
+        if (this.isEmpty) {
+            return Promise.resolve(none);
+        } else {
+            return option(await f(this.get));
+        }
+    }
+
+
 
     flatMapPromise<B>(f: (item: A) => Promise<Mappable<B>>): Promise<Mappable<B>> {
         if (this.isEmpty) {
@@ -93,10 +108,6 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
 
     get isDefined(): boolean {
         return !this.isEmpty;
-    }
-
-    map<B>(f: (item: A) => B): Option<B> {
-        return this.isEmpty ? none : option<B>(f(this.get));
     }
 
     orElse(alternative: () => Option<A>): Option<A> {
