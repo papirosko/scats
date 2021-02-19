@@ -19,7 +19,13 @@
     "typescript",
     "either",
     "option",
-    "try"
+    "try",
+    "collection",
+    "map",
+    "flatMap",
+    "promise",
+    "set",
+    "hashmap"
   ],
   "author": "",
   "license": "ISC",
