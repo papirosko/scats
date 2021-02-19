@@ -102,6 +102,15 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         return this.isEmpty ? other : this.get;
     };
 
+    getOrElseThrow(error: () => Error): A {
+        if (this.isEmpty) {
+            throw error();
+        } else {
+            return this.get;
+        }
+    };
+
+
     contains<A1 extends A>(x: A1): boolean {
         return this.isEmpty ? false : x === this.get;
     }
