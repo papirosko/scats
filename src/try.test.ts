@@ -174,8 +174,14 @@ describe('Try', () => {
     });
 
     test('mapPromise', async () => {
-        await expect(Try(successAware).mapPromise(x => Promise.resolve(x))).resolves.toEqual(success('success'));
-        await expect(Try(errorAware).mapPromise(x => Promise.resolve(x))).resolves.toEqual(failure(new Error('error')));
+        await expect(Try(successAware).mapPromise(x => Promise.resolve(x))).resolves
+            .toEqual(success('success'));
+        await expect(Try(errorAware).mapPromise(x => Promise.resolve(x))).resolves
+            .toEqual(failure(new Error('error')));
+        await expect(Try(successAware).mapPromise(x => { throw new Error('in .map'); })).resolves
+            .toEqual(failure(new Error('in .map')));
+        await expect(Try(() => { throw new Error('123'); }).mapPromise(x => Promise.resolve(x))).resolves
+            .toEqual(failure(new Error('123')));
     });
 
 
@@ -186,8 +192,12 @@ describe('Try.promise', () => {
 
     test('work with promises promise', async () => {
 
-        expect(await Try.promise(() => Promise.resolve(1))).toEqual(success(1));
-        expect(await Try.promise(() => Promise.reject(new Error('123')))).toEqual(failure(new Error('123')));
+        await expect(Try.promise(() => Promise.resolve(1))).resolves
+            .toEqual(success(1));
+        await expect(Try.promise(() => Promise.reject(new Error('123')))).resolves
+            .toEqual(failure(new Error('123')));
+        await expect(Try.promise(() => { throw new Error('123'); })).resolves
+            .toEqual(failure(new Error('123')));
 
     });
 
