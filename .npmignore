@@ -1,4 +1,5 @@
 .idea
+.eslintrc.js
 test
 jest.config.js
 package-lock.json
