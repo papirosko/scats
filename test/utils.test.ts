@@ -1,8 +1,4 @@
-import {forComprehension, step, task} from "./util";
-import {failure, success, Try, TryLike} from "./try";
-import {Either, left, right} from "./either";
-import {none, some} from "./option";
-
+import {Either, failure, forComprehension, left, none, right, some, step, success, task, Try, TryLike} from '../src';
 
 
 const profileOriginal = {
@@ -27,7 +23,7 @@ describe('forComprehension', () => {
             return right(obj as Profile);
         }
 
-    }
+    };
 
     test('forComprehension', () => {
         function toNum(x: string) {
@@ -136,7 +132,7 @@ describe('forComprehension.promise', () => {
             return Promise.resolve(right(obj as Profile));
         }
 
-    }
+    };
 
 
     test('forComprehension', async () => {
@@ -254,7 +250,7 @@ describe('forComprehension.promise', () => {
         ).yield(({profile}) => profile)).rejects.toThrowError('promise');
 
         await expect(forComprehension.promise(
-            task('profileJson', () => { throw new Error('promise')}),
+            task('profileJson', () => { throw new Error('promise');}),
             task('profile', ({profileJson}) => profileValidator(profileJson).then(x => x.toTry(e => new Error(e))))
         ).yield(({profile}) => profile)).rejects.toThrowError('promise');
 
@@ -265,12 +261,12 @@ describe('forComprehension.promise', () => {
 
         await expect(forComprehension.promise(
             task('profileJson', () => Promise.resolve(Try(() => JSON.parse(goodRequest)))),
-            task('profile', ({profileJson}) => Promise.reject(new Error('promise')))
+            task('profile', () => Promise.reject(new Error('promise')))
         ).yield(({profile}) => profile)).rejects.toThrowError('promise');
 
         await expect(forComprehension.promise(
             task('profileJson', () => Promise.resolve(Try(() => JSON.parse(goodRequest)))),
-            task('profile', ({profileJson}) => { throw new Error('promise') })
+            task('profile', () => { throw new Error('promise'); })
         ).yield(({profile}) => profile)).rejects.toThrowError('promise');
 
     });
@@ -281,7 +277,7 @@ describe('forComprehension.promise', () => {
         await expect(forComprehension.promise(
             task('profileJson', () => Promise.resolve(Try(() => JSON.parse(goodRequest)).toOption)),
             task('profile', async ({profileJson}) => (await profileValidator(profileJson)).toOption)
-        ).yield(({profile}) => { throw new Error('promise')})).rejects.toThrowError('promise');
+        ).yield(() => { throw new Error('promise');})).rejects.toThrowError('promise');
 
 
     });

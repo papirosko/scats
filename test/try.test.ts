@@ -1,17 +1,15 @@
-import {failure, success, Try} from "./try";
-import {none, option, some} from "./option";
-import {left, right} from "./either";
+import {failure, left, none, right, some, success, Try} from '../src';
 
 describe('Try', () => {
 
     const successAware: () => any = () => {
         return 'success';
-    }
+    };
 
 
     const errorAware: () => any = () => {
         throw new Error('error');
-    }
+    };
 
 
     test('store the response', () => {
@@ -39,8 +37,8 @@ describe('Try', () => {
 
 
     test('map', () => {
-        expect(Try(successAware).map(_ => 123)).toEqual(success(123));
-        expect(Try(errorAware).map(_ => 123)).toEqual(failure(new Error('error')));
+        expect(Try(successAware).map(() => 123)).toEqual(success(123));
+        expect(Try(errorAware).map(() => 123)).toEqual(failure(new Error('error')));
     });
 
 
@@ -178,7 +176,7 @@ describe('Try', () => {
             .toEqual(success('success'));
         await expect(Try(errorAware).mapPromise(x => Promise.resolve(x))).resolves
             .toEqual(failure(new Error('error')));
-        await expect(Try(successAware).mapPromise(x => { throw new Error('in .map'); })).resolves
+        await expect(Try(successAware).mapPromise(() => { throw new Error('in .map'); })).resolves
             .toEqual(failure(new Error('in .map')));
         await expect(Try(() => { throw new Error('123'); }).mapPromise(x => Promise.resolve(x))).resolves
             .toEqual(failure(new Error('123')));

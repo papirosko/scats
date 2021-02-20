@@ -1,8 +1,8 @@
-import {none, Option, some} from "./option";
-import {Collection, Nil} from "./collection";
-import {failure, success, TryLike} from "./try";
-import {toErrorConversion} from "./util";
-import {Mappable} from "./mappable";
+import {none, Option, some} from './option';
+import {Collection, Nil} from './collection';
+import {failure, success, TryLike} from './try';
+import {toErrorConversion} from './util';
+import {Mappable} from './mappable';
 
 export interface EitherMatch<LEFT, RIGHT, T> {
     right: (right: RIGHT) => T;
@@ -113,7 +113,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      *  @param fb the function to apply if this is a `Right`
      *  @return the results of applying the function
      */
-    fold<C>(fa: (left: LEFT) => C, fb: (right: RIGHT) => C) {
+    fold<C>(fa: (left: LEFT) => C, fb: (right: RIGHT) => C): C {
         return this.match({
             right: v => fb(v),
             left: e => fa(e)
@@ -147,7 +147,9 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     foreach(f: (right: RIGHT) => void): void {
         this.match<void>({
             right: b => f(b),
-            left: () => {}
+            left: () => {
+                // do nothing.
+            }
         });
     }
 
@@ -228,7 +230,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      *  @param elem    the element to test.
      *  @return `true` if this is a `Right` value `===` to `elem`.
      */
-    contains(elem: RIGHT): Boolean {
+    contains(elem: RIGHT): boolean {
         return this.match({
             right: b => elem === b,
             left: () => false
@@ -244,13 +246,12 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      *  left(12).forall(_ => false) // true
      *  ```
      */
-    forall(f: (right: RIGHT) => Boolean): Boolean {
+    forall(f: (right: RIGHT) => boolean): boolean {
         return this.match({
             right: b => f(b),
             left: () => true
         });
     }
-
 
 
     /** Returns `false` if `Left` or returns the result of the application of
@@ -262,13 +263,12 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      *  left(12).exists(_ => true) // false
      *  ```
      */
-    exists(p: (right: RIGHT) => Boolean): Boolean {
+    exists(p: (right: RIGHT) => boolean): boolean {
         return this.match({
             right: b => p(b),
             left: () => false
         });
     }
-
 
 
     /** Binds the given function across `Right`.
@@ -322,11 +322,11 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      * left(7).filterOrElse(_ => false, () => -1) // Left(7)
      * ```
      */
-    filterOrElse(p: (v: RIGHT) => Boolean, zero: () => LEFT): Either<LEFT, RIGHT> {
+    filterOrElse(p: (v: RIGHT) => boolean, zero: () => LEFT): Either<LEFT, RIGHT> {
         return this.match({
             right: (v) => p(v) ? this : left(zero()),
             left: () => this,
-        })
+        });
     }
 
     /** Returns `Right` with the existing value of `Right` if this is a `Right`
@@ -340,11 +340,11 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      * left(7).filterOrElseValue(_ => false, -1) // Left(7)
      * ```
      */
-    filterOrElseValue(p: (v: RIGHT) => Boolean, zero: LEFT): Either<LEFT, RIGHT> {
+    filterOrElseValue(p: (v: RIGHT) => boolean, zero: LEFT): Either<LEFT, RIGHT> {
         return this.match({
             right: (v) => p(v) ? this : left(zero),
             left: () => this,
-        })
+        });
     }
 
     /** Returns a `Collection` containing the `Right` value if
@@ -380,10 +380,9 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
     toTry(toError: (e: LEFT) => Error = toErrorConversion): TryLike<RIGHT> {
         return this.match<TryLike<RIGHT>>({
             right: (b) => success(b),
-            left: (e)  => failure(toError(e))
+            left: (e) => failure(toError(e))
         });
     }
-
 
 
 }
@@ -403,7 +402,7 @@ export class Left<T> extends Either<T, any> {
         return true;
     }
 
-    withRight<RIGHT>(): Either<T, RIGHT>{
+    withRight<RIGHT>(): Either<T, RIGHT> {
         return this;
     }
 }
@@ -424,13 +423,13 @@ export class Right<T> extends Either<any, T> {
         return false;
     }
 
-    withLeft<LEFT>(): Either<LEFT, T>{
+    withLeft<LEFT>(): Either<LEFT, T> {
         return this;
     }
 
 }
 
-export module Either {
+export namespace Either {
     export class LeftProjection<A, B> {
 
         constructor(private readonly e: Either<A, B>) {
@@ -462,7 +461,9 @@ export module Either {
         foreach<U>(f: (value: A) => U): void {
             this.e.match({
                 left: l => f(l),
-                right: () => {}
+                right: () => {
+                    // do nothing.
+                }
             });
         }
 
@@ -477,7 +478,7 @@ export module Either {
             return this.e.match({
                 left: a => a,
                 right: or
-            })
+            });
         }
 
         /** Returns the value from this `Left` or the given argument if this is a `Right`.
@@ -491,7 +492,7 @@ export module Either {
             return this.e.match({
                 left: a => a,
                 right: () => or
-            })
+            });
         }
 
 

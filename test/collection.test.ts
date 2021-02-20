@@ -1,8 +1,4 @@
-import {Collection, Nil} from "./collection";
-import {none, some} from "./option";
-import {forComprehension, identity, step} from "./util";
-import {HashMap} from "./hashmap";
-import {HashSet} from "./hashset";
+import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step} from '../src';
 
 describe('Collection', () => {
 
@@ -25,7 +21,7 @@ describe('Collection', () => {
     test('flatten', () => {
 
         expect(Collection.of<any>(1, Collection.of(2, 3), 4).flatten().toArray)
-            .toEqual([1, 2, 3, 4])
+            .toEqual([1, 2, 3, 4]);
 
     });
 
@@ -253,7 +249,7 @@ describe('Collection', () => {
         ).groupBy(x => x.name)).toEqual(HashMap.of(
             ['Foo1', Collection.of({name: 'Foo1', amount: 1}, {name: 'Foo1', amount: 2})],
             ['Foo2', Collection.of({name: 'Foo2', amount: 3})],
-        ))
+        ));
     });
 
     test('sortBy', () => {
@@ -265,7 +261,7 @@ describe('Collection', () => {
             {name: 'Foo1', amount: 1},
             {name: 'Foo1', amount: 2},
             {name: 'Foo2', amount: 3},
-        ))
+        ));
     });
 
 
@@ -364,7 +360,7 @@ describe('Collection', () => {
             {amount: 2},
         ).maxByOption(x => x.amount)).toEqual(some({amount: 3}));
 
-    })
+    });
 
     test('sliding', () => {
         expect(Collection.empty.sliding(2)).toEqual(Collection.empty);
@@ -398,17 +394,17 @@ describe('Collection', () => {
 
     });
 
-    test("appended, appendedAll, prepended, prependedAll, concat", () => {
+    test('appended, appendedAll, prepended, prependedAll, concat', () => {
         expect(Collection.of(2).appended(1)).toEqual(Collection.of(2, 1));
         expect(Collection.of(2).prepended(1)).toEqual(Collection.of(1, 2));
         expect(Collection.of(2).appendedAll(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
         expect(Collection.of(2).concat(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
         expect(Collection.of(2).prependedAll(Collection.of(0, 1))).toEqual(Collection.of(0, 1, 2));
-    })
+    });
 
     test('distinct', () => {
         expect(Collection.of(1, 1, 2, 2, 3).distinct).toEqual(Collection.of(1, 2, 3));
-    })
+    });
 
     test('distinctBy', () => {
         expect(Collection.of(
@@ -419,7 +415,7 @@ describe('Collection', () => {
             {name: 'Foo', age: 1},
             {name: 'Bar', age: 3},
         ));
-    })
+    });
 
     test('indexOf', () => {
         expect(Collection.of(1, 2, 3).indexOf(2)).toEqual(1);
@@ -454,7 +450,7 @@ describe('Collection', () => {
     test('forComprehension', () => {
         const res = forComprehension(
             step('n', () => Collection.of(1,2,3))
-        ).yield(({n}) => n + 1)
+        ).yield(({n}) => n + 1);
         expect(res).toEqual(Collection.of(2, 3, 4));
 
         expect(forComprehension(
@@ -560,4 +556,4 @@ describe('Collection', () => {
 
 
 
-})
+});

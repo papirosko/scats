@@ -1,7 +1,7 @@
-import {none, Option, some} from "./option";
-import {Either, left, right} from "./either";
-import {identity} from "./util";
-import {Mappable} from "./mappable";
+import {none, Option, some} from './option';
+import {Either, left, right} from './either';
+import {identity} from './util';
+import {Mappable} from './mappable';
 
 export interface TryMatch<T, R> {
     success: (result: T) => R;
@@ -20,7 +20,6 @@ export abstract class TryLike<T> implements Mappable<T>{
     abstract orElse(value: () => TryLike<T>): TryLike<T>;
     abstract readonly get: T;
     abstract match<R>(matcher: TryMatch<T, R>): R;
-    abstract foreach<U>(f: (value: T) => U): void;
     abstract flatMap<U>(f: (value: T) => TryLike<U>): TryLike<U>;
     abstract filter(p: (value: T) => boolean): TryLike<T>;
     abstract readonly failed: TryLike<Error>;
@@ -45,6 +44,11 @@ export abstract class TryLike<T> implements Mappable<T>{
         });
     }
 
+    foreach<U>(f: (value: T) => U): void {
+        if (this.isSuccess) {
+            f(this.get);
+        }
+    }
 
 }
 
@@ -71,28 +75,24 @@ export class Success<T> extends TryLike<T> {
         return success(f(this.result));
     }
 
-    get get() {
+    get get(): T {
         return this.result;
     }
 
-    getOrElse(value: () => T): T {
+    getOrElse(_: () => T): T {
         return this.result;
     }
 
-    getOrElseValue(value: T): T {
+    getOrElseValue(_: T): T {
         return this.result;
     }
 
-    orElse(value: () => TryLike<T>): TryLike<T> {
+    orElse(_: () => TryLike<T>): TryLike<T> {
         return this;
     }
 
     match<R>(matcher: TryMatch<T, R>): R {
         return matcher.success(this.result);
-    }
-
-    foreach<U>(f: (value: T) => U): void {
-        f(this.result);
     }
 
     flatMap<U>(f: (value: T) => TryLike<U>): TryLike<U> {
@@ -108,7 +108,7 @@ export class Success<T> extends TryLike<T> {
             if (p(this.result)) {
                 return this;
             } else {
-                return failure(new Error('Predicate does not hold for ' + this.result))
+                return failure(new Error('Predicate does not hold for ' + this.result));
             }
         } catch (e) {
             return failure(e);
@@ -116,8 +116,8 @@ export class Success<T> extends TryLike<T> {
     }
 
     get failed(): TryLike<Error> {
-        return failure(new Error('Success.failed'))
-    };
+        return failure(new Error('Success.failed'));
+    }
 
     fold<U>(fa: (e: Error) => U, fb: (result: T) => U): U {
         try {
@@ -127,15 +127,15 @@ export class Success<T> extends TryLike<T> {
         }
     }
 
-    recover(f: (e: Error) => any): TryLike<any> {
+    recover(_: (e: Error) => any): TryLike<any> {
         return this;
     }
 
-    recoverWith(f: (e: Error) => TryLike<any>): TryLike<any> {
+    recoverWith(_: (e: Error) => TryLike<any>): TryLike<any> {
         return this;
     }
 
-    transform<U>(s: (value: T) => TryLike<U>, f: (e: Error) => TryLike<U>): TryLike<U> {
+    transform<U>(s: (value: T) => TryLike<U>, _: (e: Error) => TryLike<U>): TryLike<U> {
         return this.flatMap(s);
     }
 
@@ -161,7 +161,7 @@ export class Failure extends TryLike<any> {
         return left(this.error);
     }
 
-    map<B>(f: (x: any) => B) {
+    map<B>(_: (x: any) => B): TryLike<any> {
         return this;
     }
 
@@ -179,7 +179,7 @@ export class Failure extends TryLike<any> {
 
     orElse<T>(value: () => TryLike<T>): TryLike<T> {
         try {
-            return value()
+            return value();
         } catch (e) {
             return failure(e);
         }
@@ -189,22 +189,19 @@ export class Failure extends TryLike<any> {
         return matcher.failure(this.error);
     }
 
-    foreach<U>(f: (value: any) => U): void {
-    }
-
-    flatMap<U>(f: (value: any) => TryLike<U>): TryLike<U> {
+    flatMap<U>(_: (value: any) => TryLike<U>): TryLike<U> {
         return this;
     }
 
-    filter(p: (value: any) => boolean): TryLike<any> {
+    filter(_: (value: any) => boolean): TryLike<any> {
         return this;
     }
 
     get failed(): TryLike<Error> {
-        return success(this.error)
-    };
+        return success(this.error);
+    }
 
-    fold<U>(fa: (e: Error) => U, fb: (result: any) => U): U {
+    fold<U>(fa: (e: Error) => U, _: (result: any) => U): U {
         return fa(this.error);
     }
 
@@ -232,16 +229,16 @@ export class Failure extends TryLike<any> {
 }
 
 
-export function Try<T, E extends Error>(block: () => T): TryLike<T> {
+export function Try<T>(block: () => T): TryLike<T> {
     try {
-        return new Success(block())
+        return new Success(block());
     } catch (e) {
         return new Failure(e);
     }
 }
 
 export namespace Try {
-    export function promise<T, E extends Error>(block: () => Promise<T>): Promise<TryLike<T>> {
+    export function promise<T>(block: () => Promise<T>): Promise<TryLike<T>> {
         try {
             return block()
                 .then(res => new Success(res))

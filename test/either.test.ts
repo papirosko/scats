@@ -1,8 +1,18 @@
-import {Either, left, Left, Right, right} from './either';
-import {none, some} from './option';
-import {failure, success, Try} from "./try";
-import {Collection, Nil} from "./collection";
-import {forComprehension, step} from "./util";
+import {
+    Collection,
+    failure,
+    forComprehension,
+    left,
+    Left,
+    Nil,
+    none,
+    Right,
+    right,
+    some,
+    step,
+    success,
+    Try
+} from '../src';
 
 describe('Either', () => {
 
@@ -23,7 +33,7 @@ describe('Either', () => {
         expect(right('123').isRight).toBeTruthy();
         expect(left('123').isLeft).toBeTruthy();
         expect(left('123').isRight).toBeFalsy();
-    })
+    });
 
     test('match', () => {
 
@@ -40,13 +50,13 @@ describe('Either', () => {
 
 
     test('fold', () => {
-        const resultF = Try(() => {throw new Error('error')}).toEither
+        const resultF = Try(() => {throw new Error('error');}).toEither;
         expect(resultF.fold(
             e => `Operation failed with ${e.message}`,
             v => `Operation produced value: ${v}`
         )).toEqual('Operation failed with error');
 
-        const resultS = Try(() => 12).toEither
+        const resultS = Try(() => 12).toEither;
         expect(resultS.fold(
             e => `Operation failed with ${e.message}`,
             v => `Operation produced value: ${v}`
@@ -63,7 +73,7 @@ describe('Either', () => {
         right(12).foreach(x => r = x);
         expect(r).toEqual(12);
 
-        let r1 = 0;
+        const r1 = 0;
         right(12).left.foreach(x => r = x);
         expect(r1).toEqual(0);
 
@@ -196,12 +206,12 @@ describe('Either', () => {
 
     test('left docs', () => {
         expect(forComprehension(
-           step('s', () => left("flower").left)
+           step('s', () => left('flower').left)
         ).yield(({s}) => s.length)).toEqual(left(6));
 
         expect(forComprehension(
-           step('s', () => left("flower").left),
-           step('m', () => left("bird").left),
+           step('s', () => left('flower').left),
+           step('m', () => left('bird').left),
         ).yield(({s, m}) => s.length + m.length)).toEqual(left(10));
     });
 

@@ -1,8 +1,4 @@
-import {Collection} from "./collection";
-import {HashMap} from "./hashmap";
-import {none, some} from "./option";
-import {HashSet} from "./hashset";
-import {identity} from "./util";
+import {Collection, HashMap, HashSet, none, some} from '../src';
 
 describe('Hashmap', () => {
 

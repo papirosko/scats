@@ -1,4 +1,4 @@
-import {Either, right, left} from './either';
+import {Either, right, left} from '../src/either';
 
 
 
@@ -54,4 +54,4 @@ describe('Validation with either', () => {
 
     });
 
-})
+});

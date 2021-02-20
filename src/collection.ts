@@ -1,8 +1,8 @@
-import {HashMap} from "./hashmap";
-import {HashSet} from "./hashset";
-import {ArrayIterable} from "./array-iterable";
-import {Mappable} from "./mappable";
-import {Filterable} from "./util";
+import {HashMap} from './hashmap';
+import {HashSet} from './hashset';
+import {ArrayIterable} from './array-iterable';
+import {Mappable} from './mappable';
+import {Filterable} from './util';
 
 export class Collection<T> extends ArrayIterable<T, Collection<T>>
     implements Mappable<T>,
@@ -92,7 +92,7 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
     }
 
     flatten<B>(): Collection<B> {
-        let res: B[] = [];
+        const res: B[] = [];
         this.items.forEach(i => {
             if (i instanceof Collection) {
                 res.push(...i.items);
@@ -152,7 +152,7 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
     }
 
     get distinct(): Collection<T> {
-        return HashSet.of(...this.items).toCollection();
+        return HashSet.of(...this.items).toCollection;
     }
 
     distinctBy(key: (item: T) => string | number): Collection<T> {

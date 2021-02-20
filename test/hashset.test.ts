@@ -1,19 +1,16 @@
-import {HashSet} from "./hashset";
-import {identity} from "./util";
-import {none, some} from "./option";
-import {Collection, Nil} from "./collection";
+import {HashSet, identity, none, some} from '../src';
 
 describe('HashSet', () => {
 
     test('constructor', () => {
 
-        expect(new HashSet(new Set([1, 1, 2, 3])).toSet()).toEqual(new Set([1, 2, 3]));
-        expect(HashSet.of(1, 1, 2, 3).toSet()).toEqual(new Set([1, 2, 3]));
+        expect(new HashSet(new Set([1, 1, 2, 3])).toSet).toEqual(new Set([1, 2, 3]));
+        expect(HashSet.of(1, 1, 2, 3).toSet).toEqual(new Set([1, 2, 3]));
 
     });
 
     test('toCollection', () => {
-        const res = HashSet.of(1, 1, 2, 3).toCollection();
+        const res = HashSet.of(1, 1, 2, 3).toCollection;
         expect(res.contains(1)).toBeTruthy();
         expect(res.contains(2)).toBeTruthy();
         expect(res.contains(3)).toBeTruthy();

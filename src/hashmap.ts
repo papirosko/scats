@@ -1,7 +1,7 @@
-import {option, Option} from "./option";
-import {Collection} from "./collection";
-import {HashSet} from "./hashset";
-import {ArrayIterable} from "./array-iterable";
+import {option, Option} from './option';
+import {Collection} from './collection';
+import {HashSet} from './hashset';
+import {ArrayIterable} from './array-iterable';
 
 export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
 
@@ -13,7 +13,7 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         super();
     }
 
-    static of<K, V>(...values: [k: K, v: V][]) {
+    static of<K, V>(...values: [k: K, v: V][]): HashMap<K, V> {
         return new HashMap<K, V>(new Map(values));
     }
 
@@ -23,7 +23,7 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return this.map.size;
     }
 
-    get isEmpty() {
+    get isEmpty(): boolean {
         return this.map.size <= 0;
     }
 
@@ -31,11 +31,11 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return option(this.map.get(key));
     }
 
-    getOrElse(key: K, defaultValue: () => V) {
+    getOrElse(key: K, defaultValue: () => V): V {
         return this.get(key).getOrElse(defaultValue);
     }
 
-    getOrElseValue(key: K, defaultValue: V) {
+    getOrElseValue(key: K, defaultValue: V): V {
         return this.get(key).getOrElseValue(defaultValue);
     }
 
@@ -95,7 +95,7 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return this.map.has(key);
     }
 
-    updated(key: K, value: V) {
+    updated(key: K, value: V): HashMap<K, V> {
         return this.set(key, value);
     }
 

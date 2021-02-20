@@ -1,8 +1,8 @@
-import {none, option, some, Option} from "./option";
-import {left, right} from "./either";
-import {Collection} from "./collection";
-import {HashSet} from "./hashset";
-import {HashMap} from "./hashmap";
+import {none, option, some, Option} from '../src/option';
+import {left, right} from '../src/either';
+import {Collection} from '../src/collection';
+import {HashSet} from '../src/hashset';
+import {HashMap} from '../src/hashmap';
 
 describe('Option', () => {
 
@@ -13,7 +13,7 @@ describe('Option', () => {
         expect(some(1)).toEqual(option(1));
         expect(some(1)).not.toEqual(some(2));
         expect(some(1)).not.toEqual(none);
-    })
+    });
 
     test('should detect nulls and undefined', () => {
 
@@ -100,35 +100,35 @@ describe('Option', () => {
     });
 
     test('exists', () => {
-        expect(option(1).exists(x => x === 1)).toBeTruthy()
+        expect(option(1).exists(x => x === 1)).toBeTruthy();
         expect(option(1).exists(x => x === 2)).toBeFalsy();
         expect(option(null).exists(x => x === 2)).toBeFalsy();
     });
 
     test('filter', () => {
-        expect(option(1).filter(x => x >= 1)).toEqual(some(1))
+        expect(option(1).filter(x => x >= 1)).toEqual(some(1));
         expect(option(1).filter(x => x < 1)).toEqual(none);
         expect(option(null).filter(x => x! > 2)).toEqual(none);
     });
 
     test('filterNot', () => {
-        expect(option(1).filterNot(x => x >= 1)).toEqual(none)
+        expect(option(1).filterNot(x => x >= 1)).toEqual(none);
         expect(option(1).filterNot(x => x < 1)).toEqual(some(1));
         expect(option(null).filterNot(x => x! > 2)).toEqual(none);
     });
 
     test('should support getOrElseValue', () => {
-        expect(option(1).getOrElseValue(2)).toEqual(1)
+        expect(option(1).getOrElseValue(2)).toEqual(1);
         expect(option<any>(null).getOrElseValue(2)).toEqual(2);
     });
 
     test('should support orElse', () => {
-        expect(option(1).orElse(() => some(2))).toEqual(some(1))
+        expect(option(1).orElse(() => some(2))).toEqual(some(1));
         expect(option<any>(null).orElse(() => some<any>(2))).toEqual(some(2));
     });
 
     test('orElseValue', () => {
-        expect(option(1).orElseValue(some(2))).toEqual(some(1))
+        expect(option(1).orElseValue(some(2))).toEqual(some(1));
         expect(option<any>(null).orElseValue(some<any>(2))).toEqual(some(2));
     });
 
@@ -221,6 +221,11 @@ describe('Option', () => {
     test('when', () => {
         expect(Option.when(true)(() => 1)).toEqual(some(1));
         expect(Option.when(false)(() => 1)).toEqual(none);
+    });
+
+    test('useless', () => {
+        expect(Option.useless(true)(() => 1)).toEqual(none);
+        expect(Option.useless(false)(() => 1)).toEqual(some(1));
     });
 
 });

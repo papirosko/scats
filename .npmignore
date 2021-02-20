@@ -1,0 +1,6 @@
+.idea
+test
+jest.config.js
+package-lock.json
+tsconfig.json
+tsconfig-eslint.json

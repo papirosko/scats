@@ -1,9 +1,9 @@
-import {Collection} from "./collection";
-import {Either, Left, left, Right, right} from "./either";
-import {ArrayIterable} from "./array-iterable";
-import {HashSet} from "./hashset";
-import {HashMap} from "./hashmap";
-import {Mappable} from "./mappable";
+import {Collection} from './collection';
+import {Either, Left, left, Right, right} from './either';
+import {ArrayIterable} from './array-iterable';
+import {HashSet} from './hashset';
+import {HashMap} from './hashmap';
+import {Mappable} from './mappable';
 
 export interface OptionMatch<A, T> {
     some: (value: A) => T;
@@ -15,14 +15,23 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
 
     abstract readonly get: A;
 
-    static when<A>(cond: Boolean): (a: () => A) => Option<A> {
+    /** When a given condition is true, evaluates the `a` argument and returns
+     *  Some(a). When the condition is false, `a` is not evaluated and None is
+     *  returned.
+     */
+    static when<A>(cond: boolean): (a: () => A) => Option<A> {
         return a => {
             if (cond) {
                 return some(a());
             } else {
                 return none;
             }
-        }
+        };
+    }
+
+
+    static useless<A>(cond: boolean): (a: () => A) => Option<A> {
+        return Option.when(!cond);
     }
 
     protected fromArray(array: A[]): Option<A> {
@@ -39,7 +48,7 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         } else {
             return p(this.get);
         }
-    };
+    }
 
     filter(p: (value: A) => boolean): Option<A> {
         if (this.isEmpty) {
@@ -87,9 +96,9 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
 
     foldValue<B>(ifEmpty: () => B): (f: (_: A) => B) => B {
         if (this.isEmpty) {
-            return function() { return ifEmpty() };
+            return function() { return ifEmpty(); };
         } else {
-            return (f: (_: A) => B) => { return f(this.get) };
+            return (f: (_: A) => B) => { return f(this.get); };
         }
     }
 
@@ -106,11 +115,11 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
 
     getOrElse(f: () => A): A {
         return this.isEmpty ? f() : this.get;
-    };
+    }
 
     getOrElseValue(other: A): A {
         return this.isEmpty ? other : this.get;
-    };
+    }
 
     getOrElseThrow(error: () => Error): A {
         if (this.isEmpty) {
@@ -118,7 +127,7 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         } else {
             return this.get;
         }
-    };
+    }
 
 
     contains<A1 extends A>(x: A1): boolean {
@@ -183,7 +192,7 @@ export class Some<A> extends Option<A> {
         super();
     }
 
-    get get() {
+    get get(): A {
         return this.value;
     }
 

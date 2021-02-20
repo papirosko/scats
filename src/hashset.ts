@@ -1,6 +1,6 @@
-import {Collection} from "./collection";
-import {ArrayIterable} from "./array-iterable";
-import {HashMap} from "./hashmap";
+import {Collection} from './collection';
+import {ArrayIterable} from './array-iterable';
+import {HashMap} from './hashmap';
 
 export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
 
@@ -18,15 +18,15 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return new HashSet<T>(new Set(items));
     }
 
-    toCollection() {
+    get toCollection(): Collection<T> {
         return new Collection(Array.from(this.items.keys()));
     }
 
-    toSet() {
+    get toSet(): Set<T> {
         return this.items;
     }
 
-    contains(item: T) {
+    contains(item: T): any {
         return this.items.has(item);
     }
 
@@ -46,7 +46,7 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return Array.from(this.items.keys());
     }
 
-    get isEmpty() {
+    get isEmpty(): boolean {
         return this.items.size <= 0;
     }
 

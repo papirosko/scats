@@ -1,18 +1,18 @@
-import {none, option, Option, some} from "./option";
-import {HashMap} from "./hashmap";
-import {Collection} from "./collection";
+import {none, option, Option, some} from './option';
+import {HashMap} from './hashmap';
+import {Collection} from './collection';
 
 export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     abstract get toArray(): Array<T>;
 
-    protected abstract fromArray(array: T[]): C
+    protected abstract fromArray(array: T[]): C;
 
     foreach<U>(job: (item: T) => U): void {
         this.toArray.forEach(x => job(x));
     }
 
-    contains(item: T) {
+    contains(item: T): boolean {
         return this.toArray.indexOf(item) >= 0;
     }
 
@@ -37,11 +37,11 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return res;
     }
 
-    get isEmpty() {
+    get isEmpty(): boolean {
         return this.size <= 0;
     }
 
-    get nonEmpty() {
+    get nonEmpty(): boolean {
         return !this.isEmpty;
     }
 
@@ -77,7 +77,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     get last(): T {
         if (this.isEmpty) {
-            throw new Error('empty.last')
+            throw new Error('empty.last');
         } else {
             return this.toArray[this.size - 1];
         }
@@ -85,7 +85,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     reduceLeft(op: (i1: T, i2: T) => T): T {
         if (this.isEmpty) {
-            throw new Error('empty.reduceLeft')
+            throw new Error('empty.reduceLeft');
         }
 
         const array = this.toArray;
@@ -112,11 +112,11 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     reduceRight(op: (i1: T, i2: T) => T): T {
         if (this.isEmpty) {
-            throw new Error('empty.reduceRight')
+            throw new Error('empty.reduceRight');
         }
 
-        let acc = this.last
-        const array = this.toArray.reverse()
+        let acc = this.last;
+        const array = this.toArray.reverse();
         if (array.length > 1) {
             for (let i = 1; i< array.length; i++) {
                 acc = op(acc, array[i]);
@@ -212,7 +212,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     takeWhile(p: (item: T) => boolean): C {
         const array = this.toArray;
-        let res = true
+        let res = true;
         let i = 0;
         for (; res && i < array.length; i++) {
             res = p(array[i]);
@@ -251,7 +251,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
 
     dropWhile(p: (item: T) => boolean): C {
         const array = this.toArray;
-        let res = true
+        let res = true;
         let i = 0;
         for (; res && i < array.length; i++) {
             res = p(array[i]);
@@ -265,7 +265,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
     }
 
 
-    sliding(length: number, step: number = 1): Collection<C> {
+    sliding(length: number, step = 1): Collection<C> {
         if (this.isEmpty) {
             return Collection.empty;
         } else {
@@ -295,16 +295,16 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
         return this.sliding(length, length);
     }
 
-    mkString(separator: string = ''): string {
+    mkString(separator = ''): string {
         return this.toArray.join(separator);
     }
 
 
     sum(elementToNum: (element: T) => number): number {
         if (this.isEmpty) {
-            return 0
+            return 0;
         } else {
-            return this.toArray.reduce<number>((acc, next) => acc + elementToNum(next), 0)
+            return this.toArray.reduce<number>((acc, next) => acc + elementToNum(next), 0);
         }
     }
 
@@ -340,14 +340,14 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
      * $willForceEvaluation
      */
     get init(): C {
-        if (this.isEmpty) throw new Error('empty.init')
+        if (this.isEmpty) throw new Error('empty.init');
         return this.dropRight(1);
     }
 
 
 
     /** The rest of the collection without its first element. */
-    get tail() {
+    get tail(): C {
         if (this.isEmpty) throw new Error('empty.tail');
         return this.drop(1);
     }
@@ -383,7 +383,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
                 return acc.updated(nextKey, updatedColl);
             });
 
-        }
+        };
     }
 
 
@@ -411,8 +411,8 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
                     const nextValue = value(next);
                     return acc.updated(nextKey, acc.get(nextKey).map(e => reduce(e, nextValue)).getOrElseValue(nextValue));
                 });
-            }
-        }
+            };
+        };
     }
 
 
@@ -439,7 +439,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
                 res.push(acc);
             });
             return this.fromArray(res);
-        }
+        };
     }
 
     /** Produces a collection containing cumulative results of applying the operator going right to left.
@@ -467,7 +467,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
                 res.push(acc);
             });
             return this.fromArray(res.reverse());
-        }
+        };
     }
 
     get zipWithIndex(): Collection<[T, number]> {
