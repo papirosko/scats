@@ -213,6 +213,11 @@ describe('Option', () => {
         await expect(option(undefined).mapPromise(x => Promise.resolve(x))).resolves.toEqual(none);
     });
 
+    test('getOrElseThrow', () => {
+        expect(some(1).getOrElseThrow(() => new Error('false'))).toEqual(1);
+        expect(() => none.getOrElseThrow(() => new Error('false'))).toThrowError('false');
+    });
+
 });
 
 
