@@ -49,6 +49,10 @@ describe('HashSet', () => {
         expect(HashSet.of(1, 2).map(x => x + 1)).toEqual(HashSet.of(2, 3));
     });
 
+    test('flatMap', () => {
+        expect(HashSet.of(1, 2).flatMap(x => HashSet.of(x, x + 1))).toEqual(HashSet.of(1, 2, 3));
+    });
+
     test('appended, appendedAll, removed, removedAll, concat, union', () => {
         expect(HashSet.of(1, 2).appended(3)).toEqual(HashSet.of(1, 2, 3));
         expect(HashSet.of(1, 2).appendedAll(HashSet.of(2, 3))).toEqual(HashSet.of(1, 2, 3));

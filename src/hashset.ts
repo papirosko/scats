@@ -34,6 +34,14 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return HashSet.of(...Array.from(this.items).map(i => f(i)));
     }
 
+    flatMap<B>(f: (item: T) => HashSet<B>): HashSet<B> {
+        let res = HashSet.empty ;
+        this.items.forEach(i => {
+            res = res.union(f(i));
+        });
+        return res;
+    }
+
     get toArray(): Array<T> {
         return Array.from(this.items.keys());
     }
