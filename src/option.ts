@@ -15,6 +15,16 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
 
     abstract readonly get: A;
 
+    static when<A>(cond: Boolean): (a: () => A) => Option<A> {
+        return a => {
+            if (cond) {
+                return some(a());
+            } else {
+                return none;
+            }
+        }
+    }
+
     protected fromArray(array: A[]): Option<A> {
         if (array.length <= 0) {
             return none;

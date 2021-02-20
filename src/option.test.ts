@@ -1,4 +1,4 @@
-import {none, option, some} from "./option";
+import {none, option, some, Option} from "./option";
 import {left, right} from "./either";
 import {Collection} from "./collection";
 import {HashSet} from "./hashset";
@@ -216,6 +216,11 @@ describe('Option', () => {
     test('getOrElseThrow', () => {
         expect(some(1).getOrElseThrow(() => new Error('false'))).toEqual(1);
         expect(() => none.getOrElseThrow(() => new Error('false'))).toThrowError('false');
+    });
+
+    test('when', () => {
+        expect(Option.when(true)(() => 1)).toEqual(some(1));
+        expect(Option.when(false)(() => 1)).toEqual(none);
     });
 
 });
