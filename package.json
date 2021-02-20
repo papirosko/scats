@@ -1,13 +1,13 @@
 {
   "name": "scats",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "Useful scala classes in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "jest --coverage",
+    "test": "jest",
     "compile": "tsc",
     "build": "npm run compile"
   },
