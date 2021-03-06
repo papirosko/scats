@@ -228,4 +228,14 @@ describe('HashSet', () => {
         expect(HashSet.of(1, 2, 2).sum(identity)).toEqual(3);
     });
 
+    test('for of', () => {
+        let sum = 0;
+        for (const i of HashSet.of(1, 2, 2, 3, 3, 3)) {
+            sum += i;
+        }
+
+        expect(sum).toBe(6);
+    });
+
+
 });

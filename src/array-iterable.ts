@@ -2,7 +2,29 @@ import {none, option, Option, some} from './option';
 import {HashMap} from './hashmap';
 import {Collection} from './collection';
 
-export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
+export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implements Iterable<T> {
+
+    [Symbol.iterator](): Iterator<T, T | undefined, undefined> {
+        let i = 0;
+        const items = this.toArray;
+        return {
+            next() {
+                if (i < items.length) {
+                    const value = items[i];
+                    i = i + 1;
+                    return {
+                        value: value,
+                        done: false
+                    };
+                } else {
+                    return {
+                        value: undefined,
+                        done: true
+                    };
+                }
+            }
+        };
+    }
 
     abstract get toArray(): Array<T>;
 
@@ -105,7 +127,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> {
     foldRight<B>(initial: B): (op: (next: T, acc: B) => B) => B {
         return (op: (next: T, acc: B) => B) => {
             return new Collection(this.toArray)
-                .reverse()
+                .reverse
                 .foldLeft(initial)((a, n) => op(n, a));
         };
     }

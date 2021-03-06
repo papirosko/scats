@@ -173,7 +173,7 @@ describe('Collection', () => {
     });
 
     test('should support reverse', () => {
-        expect(Collection.of(1, 2).reverse()).toEqual(Collection.of(2, 1));
+        expect(Collection.of(1, 2).reverse).toEqual(Collection.of(2, 1));
     });
 
     test('should support forall', () => {
@@ -426,7 +426,7 @@ describe('Collection', () => {
     });
 
     test('toSet', () => {
-        expect(Collection.of(1, 2, 2, 3).toSet()).toEqual(HashSet.of(1, 2, 3));
+        expect(Collection.of(1, 2, 2, 3).toSet).toEqual(HashSet.of(1, 2, 3));
     });
 
     test('toMap', () => {
@@ -554,6 +554,14 @@ describe('Collection', () => {
             .toEqual(Collection.of(Collection.of(1,2,3), Collection.of(2,3), Collection.of(3), Nil));
     });
 
+    test('for of', () => {
+        let sum = 0;
+        for (const i of Collection.of(1, 2, 3)) {
+            sum += i;
+        }
+
+        expect(sum).toBe(6);
+    });
 
 
 });

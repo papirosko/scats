@@ -11,6 +11,42 @@ npm i scats
 ## Collection
 Represents the collection of items of some type.
 
+```typescript
+import {Collection, Nil} from "scats";
+
+const empty = Collection.empty; // empty collection
+const empty2 = Nil; // empty collection
+const example = new Collection([1, 2, 3]); // create instance from arrau
+const example2 = Collection.fill(3)(idx => idx + 1); // Collection.of(1, 2, 3)
+const c = Collection.of(1, 2, 3);
+for (let el of c) {
+    console.log(el); // 1, 2, 3
+}
+c.slice(2, 5); // Collection.of(3)
+c.map(e => e + 1); // Collection.of(2, 3, 4)
+Collection.of(1, 2).flatMap(x => Collection.of(x, x + 1)); // Collection.of(1, 2, 2, 3)
+Collection.of(1, Collection.of(2, 3), 4).flatten<number>(); // Collection.of(1, 2, 3, 4)    
+Collection.of(1, 2, 3).get(1); // 2    
+Collection.of(1, 2, 3).toArray; // [1, 2, 3]    
+Collection.of(1, 2, 3).reverse; // Collection.of(3, 2, 1)    
+Collection.of(2, 3, 1).sort((a, b) => a - b); // Collection.of(1, 2, 3)    
+Collection.of({x: 2}, {x: 1}, {x: 3}).sortBy(el => el.x); // Collection.of(1, 2, 3)
+Collection.of(1, 2).appended(3); // Collection.of(1, 2, 3)
+Collection.of(1, 2).appendedAll(Collection.of(3, 4)); // Collection.of(1, 2, 3, 4)
+Collection.of(1, 2).prepended(0); // Collection.of(0, 1, 2)
+Collection.of(1, 2).prependedAll(Collection.of(-1, 0)); // Collection.of(-1, 0, 1, 2)
+Collection.of(1, 2).concat(Collection.of(3, 4)); // Collection.of(1, 2, 3, 4)
+Collection.of(1, 2, 2).toSet; // HashSet.of(1, 2)
+Collection.of(1, 2, 2).distinct; // Collection.of(1, 2)
+Collection.of({x: 2}, {x: 1}, {x: 2}).distinctBy(el => el.x); // Collection.of({x: 2}, {x: 1})
+Collection.of({id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}).toMap(el => [el.id, el.name]); // HashMap(1 -> 'Alice', 2 -> 'Bob')
+c.sum(identity); // 6. We have to provide identity to convert element to number
+c.take(2); // Collection.of(1, 2)
+c.drop(1); // Collection.of(2, 3);
+c.head; // 1
+```
+
+
 ## Option
 Represents a possibly empty value.
 

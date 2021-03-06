@@ -108,12 +108,13 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return this.items[idx];
     }
 
+
     get toArray(): T[] {
         return this.items;
     }
 
 
-    reverse(): Collection<T> {
+    get reverse(): Collection<T> {
         return new Collection(this.items.reverse());
     }
 
@@ -147,7 +148,7 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return this.appendedAll(other);
     }
 
-    toSet(): HashSet<T> {
+    get toSet(): HashSet<T> {
         return HashSet.of(...this.items);
     }
 

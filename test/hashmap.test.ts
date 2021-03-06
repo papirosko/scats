@@ -245,4 +245,13 @@ describe('Hashmap', () => {
         expect(HashMap.of(['1', 1], ['2', 2]).filterNot(([_, v]) => v <= 1)).toEqual(HashMap.of(['2', 2]));
     });
 
+    test('for of', () => {
+        let sum = 0;
+        for (const [, i] of HashMap.of(['1', 1], ['2', 2], ['3', 3])) {
+            sum += i;
+        }
+
+        expect(sum).toBe(6);
+    });
+
 });
