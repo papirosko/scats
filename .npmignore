@@ -1,7 +1,7 @@
 .idea
 .eslintrc.js
 test
-jest.config.js
+jest.config.ts
 package-lock.json
 tsconfig.json
 tsconfig-eslint.json
