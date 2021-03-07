@@ -65,29 +65,144 @@ Represents the result of error prone block.
 
 
 ```typescript
-import {Try} from "scats";
+import {Try} from 'scats';
 
 const a = Try(() => 1); // a = success(1);
-const b = Try(() => { throw new Error(2) }); // a = error(2);
+const b = Try(() => { throw new Error(2) }); // b = failure(new Error(2));
+
+a.toOption; // some(1)
+b.toOption; // none
+
+a.toEither; // right(1)
+b.toEither; // left(new Error(2))
+
+a.map(x => x + 1); // success(2);
+b.map(x => x + 1); // failure(new Error(2));
+
+a.isSuccess; // true
+a.isFailure; // false
+
+a.match({
+    success: () => 100,
+    failure: () => 200
+}); // 100
+b.match({
+    success: value => 100,
+    failure: error => 200
+}); // 200
+
+
+a.foreach(x => console.log(x)); // prints 1
+b.foreach(x => console.log(x)); // prints nothing
+
+a.recover(e => 2); // success(1)
+b.recover(e => 2); // success(2)
+b.recover(e => { throw new Error('fallback'); }); // failure(new Error('fallback'));
+
+a.recoverWith(e => success(2)); // success(1)
+b.recoverWith(e => success(2)); // success(2)
+b.recoverWith(e => failure(new Error('fallback'))); // failure(new Error('fallback'));
 ```
 
 Also works with promises:
 
 ```typescript
-import {Try} from "scats";
+import {Try} from 'scats';
 
 const a = await Try.promise(() => Promise.resolve(1)); // a = success(1);
+await a.mapPromise(x => Promise.resolve(x)); // success(1)
+
+
 ```
 
 
 
 ## Either
-Represents the value, marked as left or right.
+Represents the value, marked as left or right. Either is right-biased.
 
+```typescript
+import {left, right, forComprehension} from 'scats';
+
+const r = right('123'); // Right('123');
+const l = left('left value'); // Left('123');
+right(123).isRight; // true
+right(123).isLeft; // false
+left('left value').isRight; // false
+left('left value').isLeft; // true
+
+right(123).match({
+    right: () => 'right',
+    left: () => 'left'
+}); // 'right'
+left('left value').match({
+    right: () => 'right',
+    left: () => 'left'
+}); // 'left'
+
+right(123).fold(
+    leftValue => console.log(`left: ${leftValue}`),
+    rightValue => console.log(`right: ${rightValue}`)
+); // 'right: 123'
+
+left('left value').fold(
+    leftValue => console.log(`left: ${leftValue}`),
+    rightValue => console.log(`right: ${rightValue}`)
+); // 'left: left value'
+
+right(123).swap; // left(123);
+
+right(123).foreach(x => console.log(x)); // 123
+left(123).foreach(x => console.log(x)); // prints nothing
+
+right(123).getOrElse(() => 1); // 123
+right(123).getOrElseValue(1); // 123
+left(123).getOrElse(() => 1); // 1
+left(123).getOrElseValue(1); // 1
+
+right(123).orElse(() => right(444)); // right(123)
+right(123).orElseValue(right(444)); // right(123)
+left(123).orElse(() => right(444)); // right(444)
+left(123).orElseValue(right(444)); // right(444)
+
+right(123).contains(123); // true
+right(123).contains(124); // false
+left(123).contains(123); // false
+left(123).contains(124); // false
+
+right(123).forall(x => x >= 10); // true
+right(123).forall(x => x < 10); // false
+left(123).forall(x => x >= 10); // false
+left(123).forall(x => x < 10); // fales
+
+right(123).exists(x => x >= 10); // true
+right(123).exists(x => x < 10); // false
+left(123).exists(x => x >= 10); // false
+left(123).exists(x => x < 10); // fales
+
+right(123).map(x => x + 1); // right(124)
+right(123).left.map(x => x + 1); // right(123)
+left(123).map(x => x + 1); // right(123)
+left(123).left.map(x => x + 1); // right(124)
+
+right(123).toCollection; // Collection.of(123)
+left(123).toCollection; // Collection.empty
+right(123).toOption; // Some(123)
+left(123).toOption; // None
+right(123).toTry; // Success(123)
+left(123).toTry; // Failure(new Error(123))
+
+right(123).left; // left-biased Either
+
+forComprehension(
+    step('s', () => left('flower').left),
+    step('m', () => left('bird').left),
+).yield(({s, m}) => s.length + m.length); // left(10)
+
+```
 
 ## HashMap
 ```typescript
-import {HashMap} from "scats";
+import {HashMap} from 'scats';
 
 const map = HashMap.of(['1', 1], ['2', 3]);
 map.toMap; // Map('1' -> 1, '2' -> 2)
@@ -114,7 +229,7 @@ map.updated('2', 4); // HashMap.of(['1', 1], ['2', 4])
 ## HashSet
 
 ```typescript
-import {HashSet} from "scats";
+import {HashSet} from 'scats';
 
 const set1 = HashSet.of(1, 2);
 const set2 = HashSet.of(2, 3);
@@ -124,7 +239,7 @@ set1.nonEmpty; // true
 set1.filter(x => x > 1); // HashSet.of(2)
 set1.filterNot(x => x > 1); // HashSet.of(1)
 set1.map(x => x + 1); // HashSet.of(2, 3)
-set1.toCollection(); // Collection.of(2, 3) - order may be different
+set1.toCollection; // Collection.of(2, 3) - order may be different
 set1.toMap(x => [x, x]); // HashMap.of([1, 1], [2, 2])
 set1.contains(1); // true
 set1.appended(2); // HashSet.of(1, 2)
@@ -138,7 +253,7 @@ set1.union(set2); // HashSet.of(1, 2, 3)
 ## forComprehension
 
 ```typescript
-import {forComprehension, step} from "./util";
+import {forComprehension, step} from 'scats';
 
 function toNum(x: string) {
     return Try(() => {
