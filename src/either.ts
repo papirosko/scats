@@ -71,7 +71,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
      *  // using Either
      *  function interactWithDB(x: Query): Either<Exception, Result> =
      *    try {
-     *      return Right(getResultFromDatabase(x));
+     *      return right(getResultFromDatabase(x));
      *    }
      *    catch(e) {
      *      return left(e);
