@@ -83,10 +83,6 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         }
     }
 
-    mapPromiseAll<B>(f: (v: A) => Promise<B>): Promise<Option<B>> {
-        return this.mapPromise(f);
-    }
-
 
     flatMapPromise<B>(f: (item: A) => Promise<Mappable<B>>): Promise<Mappable<B>> {
         if (this.isEmpty) {

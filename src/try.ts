@@ -36,10 +36,6 @@ export abstract class TryLike<T> implements Mappable<T>{
         });
     }
 
-    mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<TryLike<B>> {
-        return this.mapPromise(f);
-    }
-
     flatMapPromise<B>(f: (item: T) => Promise<TryLike<B>>): Promise<TryLike<B>> {
         return this.match({
             success: r => f(r),

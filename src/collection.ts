@@ -81,10 +81,30 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return new Collection<B>(res);
     }
 
+    /**
+     * Maps each element of current collection to promise. All elements will be resolved concurrently.
+     * @param f
+     */
     async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<Collection<B>> {
         return new Collection(await Promise.all(this.items.map(i => f(i))));
     }
 
+    /**
+     * Flat maps each element of current collection to promise. Next element will be mapped once the current is resolved.
+     *
+     * This allows sequential processing of big amount of tasks in chunks:
+     * ```
+     * function processItem(i: number) {
+     *       return Promise.resolve(i.toString(10));
+     * }
+     *
+     * const res: Collection<string> = (await Collection
+     *    .fill<number>(100)(identity)
+     *    .grouped(10)
+     *    .flatMapPromise(chunk => chunk.mapPromiseAll(i => processItem(i)));
+     * ```
+     * @param f
+     */
     async flatMapPromise<B>(f: (item: T) => Promise<Collection<B>>): Promise<Collection<B>> {
         let res: B[] = [];
         for (let i = 0; i < this.items.length; i++) {
@@ -93,6 +113,15 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         }
         return new Collection<B>(res);
     }
+
+    /**
+     * Maps each element of current collection to promise. All elements will be resolved concurrently.
+     * @param f
+     */
+    async flatMapPromiseAll<B>(f: (v: T) => Promise<Collection<B>>): Promise<Collection<B>> {
+        return (await this.mapPromiseAll(f)).flatten<B>();
+    }
+
 
     flatten<B>(): Collection<B> {
         const res: B[] = [];
