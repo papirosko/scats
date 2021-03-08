@@ -310,6 +310,10 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
         });
     }
 
+    mapPromiseAll<RIGHT1>(f: (v: RIGHT) => Promise<RIGHT1>): Promise<Either<LEFT, RIGHT1>> {
+        return this.mapPromise(f);
+    }
+
 
     /** Returns `Right` with the existing value of `Right` if this is a `Right`
      *  and the given predicate `p` holds for the right value,

@@ -81,6 +81,9 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return new Collection<B>(res);
     }
 
+    async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<Collection<B>> {
+        return new Collection(await Promise.all(this.items.map(i => f(i))));
+    }
 
     async flatMapPromise<B>(f: (item: T) => Promise<Collection<B>>): Promise<Collection<B>> {
         let res: B[] = [];
