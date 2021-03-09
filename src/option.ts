@@ -67,7 +67,7 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
     }
 
     map<B>(f: (item: A) => B): Option<B> {
-        return this.isEmpty ? none : option(f(this.get));
+        return this.isEmpty ? none : some(f(this.get));
     }
 
 

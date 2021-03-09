@@ -31,6 +31,7 @@ describe('Option', () => {
     test('map', () => {
 
         expect(option(1).map(x => x + 1)).toEqual(some(2));
+        expect(option(1).map(x => null)).toEqual(some(null));
         expect(option(null).map(x => (x || 0) + 1)).toEqual(none);
 
     });
