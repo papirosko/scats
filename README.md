@@ -67,41 +67,48 @@ Represents the result of error prone block.
 ```typescript
 import {Try} from 'scats';
 
-const a = Try(() => 1); // a = success(1);
-const b = Try(() => { throw new Error(2) }); // b = failure(new Error(2));
+const okResult = Try(() => 1); // a = success(1);
+const failedResult = Try(() => { throw new Error(2) }); // b = failure(new Error(2));
 
-a.toOption; // some(1)
-b.toOption; // none
+okResult.toOption; // some(1)
+failedResult.toOption; // none
 
-a.toEither; // right(1)
-b.toEither; // left(new Error(2))
+okResult.toEither; // right(1)
+failedResult.toEither; // left(new Error(2))
+okResult.toEitherMapLeft(error => 3); // right(1)
+failedResult.toEitherMapLeft(error => 3); // left(3)
 
-a.map(x => x + 1); // success(2);
-b.map(x => x + 1); // failure(new Error(2));
+okResult.map(value => value + 1); // success(2);
+failedResult.map(value => value + 1); // failure(new Error(2));
 
-a.isSuccess; // true
-a.isFailure; // false
+okResult.isSuccess; // true
+okResult.isFailure; // false
+failedResult.isSuccess; // false
+failedResult.isFailure; // true
 
-a.match({
-    success: () => 100,
-    failure: () => 200
+okResult.match({
+    success: value => 100,
+    failure: error => 200
 }); // 100
-b.match({
+failedResult.match({
     success: value => 100,
     failure: error => 200
 }); // 200
 
 
-a.foreach(x => console.log(x)); // prints 1
-b.foreach(x => console.log(x)); // prints nothing
+okResult.foreach(value => console.log(value)); // prints 1
+failedResult.foreach(value => console.log(value)); // prints nothing
 
-a.recover(e => 2); // success(1)
-b.recover(e => 2); // success(2)
-b.recover(e => { throw new Error('fallback'); }); // failure(new Error('fallback'));
+okResult.tapFailure(error => console.log(error.message)); // prints nothing
+failedResult.tapFailure(error => console.log(error.message)); // prints 2
 
-a.recoverWith(e => success(2)); // success(1)
-b.recoverWith(e => success(2)); // success(2)
-b.recoverWith(e => failure(new Error('fallback'))); // failure(new Error('fallback'));
+okResult.recover(error => 2); // success(1)
+failedResult.recover(error => 2); // success(2)
+failedResult.recover(error => { throw new Error('fallback'); }); // failure(new Error('fallback'));
+
+okResult.recoverWith(error => success(2)); // success(1)
+failedResult.recoverWith(error => success(2)); // success(2)
+failedResult.recoverWith(error => failure(new Error('fallback'))); // failure(new Error('fallback'));
 ```
 
 Also works with promises:

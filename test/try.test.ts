@@ -183,6 +183,31 @@ describe('Try', () => {
     });
 
 
+    test('tapFailure', () => {
+        let x = 0;
+
+        Try(successAware).tapFailure(() => x = x + 1);
+        expect(x).toEqual(0);
+
+        Try(errorAware).tapFailure(() => x = x + 1);
+        expect(x).toEqual(1);
+
+        expect(Try(errorAware).tapFailure(() => {
+            throw new Error('in tap')
+        })).toEqual(failure(new Error('in tap')));
+
+    });
+
+
+    test('toEither, toEitherWithLeft', () => {
+        expect(Try(successAware).toEither).toEqual(right('success'));
+        expect(Try(errorAware).toEither).toEqual(left(new Error('error')));
+
+        expect(Try(successAware).toEitherWithLeft(() => 'failed')).toEqual(right('success'));
+        expect(Try(errorAware).toEitherWithLeft(e => e.message)).toEqual(left('error'));
+
+    })
+
 });
 
 

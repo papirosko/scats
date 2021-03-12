@@ -49,6 +49,28 @@ export abstract class TryLike<T> implements Mappable<T>{
         }
     }
 
+    tapFailure(f: (e: Error) => void): TryLike<T> {
+        return this.match<TryLike<T>>({
+            success: r => this,
+            failure: e => {
+                try {
+                    f(e);
+                    return this;
+                } catch (ex) {
+                    return failure(ex);
+                }
+            }
+        });
+    }
+
+    toEitherWithLeft<L>(f: (e: Error) => L): Either<L, T> {
+        return this.match<Either<L, T>>({
+            success: r => right(r),
+            failure: e => left(f(e))
+        });
+
+    }
+
 }
 
 
