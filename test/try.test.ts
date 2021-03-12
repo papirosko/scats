@@ -193,7 +193,7 @@ describe('Try', () => {
         expect(x).toEqual(1);
 
         expect(Try(errorAware).tapFailure(() => {
-            throw new Error('in tap')
+            throw new Error('in tap');
         })).toEqual(failure(new Error('in tap')));
 
     });
@@ -206,7 +206,7 @@ describe('Try', () => {
         expect(Try(successAware).toEitherWithLeft(() => 'failed')).toEqual(right('success'));
         expect(Try(errorAware).toEitherWithLeft(e => e.message)).toEqual(left('error'));
 
-    })
+    });
 
 });
 
