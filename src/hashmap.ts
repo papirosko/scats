@@ -99,7 +99,7 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return this.set(key, value);
     }
 
-    toCollection(): Collection<[K, V]> {
+    get toCollection(): Collection<[K, V]> {
         return new Collection<[K, V]>(Array.from(this.map.entries()));
     }
 

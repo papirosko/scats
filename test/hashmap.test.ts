@@ -147,7 +147,7 @@ describe('Hashmap', () => {
 
     test('toCollection', () => {
         const map = HashMap.of(['1', 1], ['2', 3]);
-        expect(map.toCollection()).toEqual(Collection.of(['1', 1], ['2', 3]));
+        expect(map.toCollection).toEqual(Collection.of(['1', 1], ['2', 3]));
     });
 
     test('toMap', () => {
