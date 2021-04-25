@@ -26,7 +26,7 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return this.items;
     }
 
-    contains(item: T): any {
+    contains(item: T): boolean {
         return this.items.has(item);
     }
 
