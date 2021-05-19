@@ -3,9 +3,11 @@ import {Collection} from './collection';
 import {HashSet} from './hashset';
 import {ArrayIterable} from './array-iterable';
 
-export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
+export type Tuple2<K, V> = [K, V];
 
-    protected fromArray(array: [K, V][]): HashMap<K, V> {
+export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
+
+    protected fromArray(array: Tuple2<K, V>[]): HashMap<K, V> {
         return HashMap.of(...array);
     }
 
@@ -13,7 +15,7 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         super();
     }
 
-    static of<K, V>(...values: [k: K, v: V][]): HashMap<K, V> {
+    static of<K, V>(...values: Tuple2<K, V>[]): HashMap<K, V> {
         return new HashMap<K, V>(new Map(values));
     }
 
@@ -59,11 +61,11 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return this.map.values();
     }
 
-    get entries(): Collection<[K, V]> {
+    get entries(): Collection<Tuple2<K, V>> {
         return new Collection(Array.from(this.map.entries()));
     }
 
-    get entriesIterator(): IterableIterator<[K, V]> {
+    get entriesIterator(): IterableIterator<Tuple2<K, V>> {
         return this.map.entries();
     }
 
@@ -99,15 +101,15 @@ export class HashMap<K, V> extends ArrayIterable<[K, V], HashMap<K, V>> {
         return this.set(key, value);
     }
 
-    get toCollection(): Collection<[K, V]> {
-        return new Collection<[K, V]>(Array.from(this.map.entries()));
+    get toCollection(): Collection<Tuple2<K, V>> {
+        return new Collection<Tuple2<K, V>>(Array.from(this.map.entries()));
     }
 
     get toMap(): Map<K, V> {
         return this.map;
     }
 
-    get toArray(): Array<[K, V]> {
+    get toArray(): Array<Tuple2<K, V>> {
         return Array.from(this.map.entries());
     }
 }
