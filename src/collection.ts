@@ -48,9 +48,9 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
     }
 
     flatMap<B>(f: (item: T) => Collection<B>): Collection<B> {
-        let res: B[] = [];
+        const res: B[] = [];
         this.items.forEach(i => {
-            res = res.concat(f(i).items);
+            res.push(...f(i).items);
         });
         return new Collection<B>(res);
     }
@@ -106,10 +106,10 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
      * @param f
      */
     async flatMapPromise<B>(f: (item: T) => Promise<Collection<B>>): Promise<Collection<B>> {
-        let res: B[] = [];
+        const res: B[] = [];
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
-            res = res.concat((await f(item)).items);
+            res.push(...(await f(item)).items);
         }
         return new Collection<B>(res);
     }
