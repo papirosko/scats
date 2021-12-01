@@ -54,11 +54,11 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return this.items.size;
     }
 
-    concat(other: ArrayIterable<T, any>): HashSet<T> {
+    concat(other: Iterable<T>): HashSet<T> {
         return this.appendedAll(other);
     }
 
-    union(other: ArrayIterable<T, any>): HashSet<T> {
+    union(other: Iterable<T>): HashSet<T> {
         return this.concat(other);
     }
 
@@ -66,8 +66,12 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return HashSet.of(...this.toArray.concat([item]));
     }
 
-    appendedAll(other: ArrayIterable<T, any>): HashSet<T> {
-        return HashSet.of(...this.toArray.concat(other.toArray));
+    appendedAll(other: Iterable<T>): HashSet<T> {
+        const res = new Set(Array.from(this.items));
+        for (const element of other) {
+            res.add(element);
+        }
+        return new HashSet(res);
     }
 
     removed(item: T): HashSet<T> {
@@ -76,9 +80,11 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return new HashSet(res);
     }
 
-    removedAll(other: HashSet<T>): HashSet<T> {
+    removedAll(other: Iterable<T>): HashSet<T> {
         const res = new Set(Array.from(this.items));
-        other.foreach(i => res.delete(i));
+        for (const element of other) {
+            res.delete(element);
+        }
         return new HashSet(res);
     }
 

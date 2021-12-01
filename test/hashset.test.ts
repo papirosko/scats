@@ -54,6 +54,7 @@ describe('HashSet', () => {
         expect(HashSet.of(1, 2).appended(3)).toEqual(HashSet.of(1, 2, 3));
         expect(HashSet.of(1, 2).appendedAll(HashSet.of(2, 3))).toEqual(HashSet.of(1, 2, 3));
         expect(HashSet.of(1, 2).removed(2)).toEqual(HashSet.of(1));
+        expect(HashSet.of(1, 2).removedAll([2, 3])).toEqual(HashSet.of(1));
         expect(HashSet.of(1, 2).removedAll(HashSet.of(2, 3))).toEqual(HashSet.of(1));
         expect(HashSet.of(1, 2).concat(HashSet.of(2, 3))).toEqual(HashSet.of(1, 2, 3));
         expect(HashSet.of(1, 2).union(HashSet.of(2, 3))).toEqual(HashSet.of(1, 2, 3));

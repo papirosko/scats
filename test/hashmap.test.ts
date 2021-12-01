@@ -120,10 +120,19 @@ describe('Hashmap', () => {
         expect(map.toMap === map2.toMap).toBeFalsy();
     });
 
-    test('remove', () => {
+    test('removed', () => {
         const map = HashMap.of(['1', 1], ['2', 3]);
-        const map2 = map.remove('1');
+        const map2 = map.removed('1');
         expect(map2.get('1')).toEqual(none);
+        expect(map === map2).toBeFalsy();
+    });
+
+    test('removedAll', () => {
+        const map = HashMap.of(['1', 1], ['2', 2], ['3', 3]);
+        const map2 = map.removedAll(['1', '2']);
+        expect(map2.get('1')).toEqual(none);
+        expect(map2.get('2')).toEqual(none);
+        expect(map2.get('3')).toEqual(some(3));
         expect(map === map2).toBeFalsy();
     });
 
@@ -142,6 +151,13 @@ describe('Hashmap', () => {
         expect(updated.get('foo3')).toEqual(some(3));
         expect(updated === original).toBeFalsy();
         expect(updated.toMap === original.toMap).toBeFalsy();
+    });
+
+    test('updatedWith', () => {
+        const original: HashMap<string, number> = HashMap.of(['foo1', 1], ['foo2', 2]);
+        expect(original.updatedWith('foo1')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(2))
+        expect(original.updatedWith('foo2')(() => none).get('foo2')).toEqual(none)
+        expect(original.updatedWith('foo3')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(1))
     });
 
 
@@ -167,7 +183,7 @@ describe('Hashmap', () => {
     test('immutability on remove', () => {
         const originalMap = new Map([['1', 1], ['2', 2]]);
         const hm = new HashMap(originalMap);
-        const hmDel = hm.remove('2');
+        const hmDel = hm.removed('2');
         expect(hmDel.get('2')).toEqual(none);
         expect(hmDel.toMap.get('2')).toBeUndefined();
         expect(originalMap.get('2')).toEqual(2);

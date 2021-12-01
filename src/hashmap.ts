@@ -87,9 +87,17 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         return new HashMap<K, V>(new Map(next));
     }
 
-    remove(key: K): HashMap<K, V> {
+    removed(key: K): HashMap<K, V> {
         const next = new Map(this.map);
         next.delete(key);
+        return new HashMap<K, V>(next);
+    }
+
+    removedAll(keys: Iterable<K>): HashMap<K, V> {
+        const next = new Map(this.map);
+        for (const key of keys) {
+            next.delete(key);
+        }
         return new HashMap<K, V>(next);
     }
 
@@ -99,6 +107,21 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
 
     updated(key: K, value: V): HashMap<K, V> {
         return this.set(key, value);
+    }
+
+    updatedWith(key: K): (remappingFunction: (maybeValue: Option<V>) => Option<V>) => HashMap<K, V> {
+        const previousValue = this.get(key)
+        const self = this;
+        return function(remappingFunction: (maybeValue: Option<V>) => Option<V>): HashMap<K, V> {
+            const nextValue = remappingFunction(previousValue)
+            if (previousValue.isEmpty && nextValue.isEmpty) {
+                return self;
+            } else if (previousValue.isDefined && nextValue.isEmpty) {
+                return self.removed(key);
+            } else {
+                return self.updated(key, nextValue.get)
+            }
+        }
     }
 
     get toCollection(): Collection<Tuple2<K, V>> {
