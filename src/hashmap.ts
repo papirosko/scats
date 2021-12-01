@@ -109,19 +109,30 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         return this.set(key, value);
     }
 
+    /**
+     * Update a mapping for the specified key and its current optionally-mapped value
+     * (`Some` if there is current mapping, `None` if not).
+     *
+     * If the remapping function returns `Some(v)`, the mapping is updated with the new value `v`.
+     * If the remapping function returns `None`, the mapping is removed (or remains absent if initially absent).
+     * If the function itself throws an exception, the exception is rethrown, and the current mapping is left unchanged.
+     *
+     * @param key the key value
+     * @param remappingFunction a partial function that receives current optionally-mapped value and return a new mapping
+     * @return A new map with the updated mapping with the key
+     */
     updatedWith(key: K): (remappingFunction: (maybeValue: Option<V>) => Option<V>) => HashMap<K, V> {
-        const previousValue = this.get(key)
-        const self = this;
-        return function(remappingFunction: (maybeValue: Option<V>) => Option<V>): HashMap<K, V> {
-            const nextValue = remappingFunction(previousValue)
+        const previousValue = this.get(key);
+        return (remappingFunction: (maybeValue: Option<V>) => Option<V>) => {
+            const nextValue = remappingFunction(previousValue);
             if (previousValue.isEmpty && nextValue.isEmpty) {
-                return self;
+                return this;
             } else if (previousValue.isDefined && nextValue.isEmpty) {
-                return self.removed(key);
+                return this.removed(key);
             } else {
-                return self.updated(key, nextValue.get)
+                return this.updated(key, nextValue.get);
             }
-        }
+        };
     }
 
     get toCollection(): Collection<Tuple2<K, V>> {

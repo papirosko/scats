@@ -155,9 +155,9 @@ describe('Hashmap', () => {
 
     test('updatedWith', () => {
         const original: HashMap<string, number> = HashMap.of(['foo1', 1], ['foo2', 2]);
-        expect(original.updatedWith('foo1')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(2))
-        expect(original.updatedWith('foo2')(() => none).get('foo2')).toEqual(none)
-        expect(original.updatedWith('foo3')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(1))
+        expect(original.updatedWith('foo1')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(2));
+        expect(original.updatedWith('foo2')(() => none).get('foo2')).toEqual(none);
+        expect(original.updatedWith('foo3')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(1));
     });
 
 
