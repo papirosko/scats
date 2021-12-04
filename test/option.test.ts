@@ -1,8 +1,8 @@
-import {none, option, some, Option} from '../src/option';
-import {left, right} from '../src/either';
-import {Collection} from '../src/collection';
-import {HashSet} from '../src/hashset';
-import {HashMap} from '../src/hashmap';
+import {none, option, Option, some} from '../src';
+import {left, right} from '../src';
+import {Collection} from '../src';
+import {HashSet} from '../src';
+import {HashMap} from '../src';
 
 describe('Option', () => {
 

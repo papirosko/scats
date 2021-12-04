@@ -9,7 +9,7 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
                Filterable<T, Collection<T>> {
 
 
-    constructor(private readonly items: T[]) {
+    constructor(protected readonly items: T[]) {
         super();
     }
 
@@ -164,16 +164,16 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
         return new Collection(this.items.concat([item]));
     }
 
-    appendedAll(other: Collection<T>): Collection<T> {
-        return new Collection(this.items.concat(other.items));
+    appendedAll(other: Iterable<T>): Collection<T> {
+        return new Collection(this.items.concat(...other));
     }
 
     prepended(item: T): Collection<T> {
         return new Collection([item].concat(this.items));
     }
 
-    prependedAll(other: Collection<T>): Collection<T> {
-        return new Collection(other.items.concat(this.items));
+    prependedAll(other: Iterable<T>): Collection<T> {
+        return new Collection(Array.from(other).concat(this.items));
     }
 
     concat(other: Collection<T>): Collection<T> {
@@ -182,6 +182,10 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
 
     get toSet(): HashSet<T> {
         return HashSet.of(...this.items);
+    }
+
+    get toBuffer(): ArrayBuffer<T> {
+        return new ArrayBuffer(this.items);
     }
 
     get distinct(): Collection<T> {
@@ -255,3 +259,199 @@ export class Collection<T> extends ArrayIterable<T, Collection<T>>
 
 
 export const Nil = Collection.empty;
+
+export class ArrayBuffer<T> extends Collection<T> {
+
+
+    constructor(protected readonly items: T[]) {
+        super(items);
+    }
+
+    static of<T>(...elements: T[]): ArrayBuffer<T> {
+        return new ArrayBuffer<T>(elements);
+    }
+
+    protected fromArray(array: T[]): ArrayBuffer<T> {
+        if (!array || array.length <= 0) {
+            return new ArrayBuffer<T>([]);
+        } else {
+            return new ArrayBuffer(array);
+        }
+    }
+
+    private checkWithinBounds(lo: number, hi: number) {
+        if (lo < 0) throw new Error(`$lo is out of bounds (min 0, max ${this.items.length - 1})`);
+        if (hi > this.size) throw new Error(`$lo is out of bounds (min 0, max ${this.items.length - 1})`);
+    }
+
+    get(index: number): T {
+        this.checkWithinBounds(index, index + 1);
+        return this.items[index];
+    }
+
+    update(index: number, element: T): void {
+        this.checkWithinBounds(index, index + 1);
+        this.items[index] = element;
+    }
+
+    set(index: number, element: T): void {
+        this.update(index, element);
+    }
+
+
+    get length() {
+        return this.size;
+    }
+
+    clear() {
+        this.items.length = 0;
+    }
+
+
+    append(element: T): this {
+        this.items.push(element);
+        return this;
+    }
+
+    appendAll(elements: Iterable<T>): this {
+        this.items.push(...elements);
+        return this;
+    }
+
+    prepend(element: T): this {
+        this.items.unshift(element);
+        return this;
+    }
+
+    prependAll(elements: Iterable<T>): this {
+        this.items.unshift(...elements);
+        return this;
+    }
+
+    insert(idx: number, element: T): void {
+        this.items.splice(idx, 0, element);
+    }
+
+    insertAll(idx: number, elements: Iterable<T>): void {
+        this.items.splice(idx, 0, ...elements);
+    }
+
+    remove(index: number, count: number = 1): T {
+        if (count > 0) {
+            this.checkWithinBounds(index, index + 1)
+            return this.items.splice(index, count)[0];
+        } else {
+            throw new Error('removing negative number of elements: ' + count)
+        }
+    }
+
+    subtractOne(element: T): this {
+        const i = this.items.indexOf(element);
+        if (i != -1) {
+            this.remove(i);
+        }
+        return this
+    }
+
+    subtractAll(elements: Iterable<T>): this {
+        if (elements === this || elements === this.items) {
+            const buf = new ArrayBuffer(Array.from(elements));
+            buf.foreach(e => this.subtractOne(e));
+        } else {
+            for (const element of elements) {
+                this.subtractOne(element);
+            }
+        }
+        return this;
+    }
+
+    sort(compareFn?: (a: T, b: T) => number): this {
+        this.items.sort(compareFn);
+        return this;
+    }
+
+    get toCollection(): Collection<T> {
+        return this;
+    }
+
+
+    flatMap<B>(f: (item: T) => ArrayBuffer<B>): ArrayBuffer<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            res.push(...f(i).items);
+        });
+        return new ArrayBuffer<B>(res);
+    }
+
+    async flatMapPromise<B>(f: (item: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
+        const res: B[] = [];
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            res.push(...(await f(item)).items);
+        }
+        return new ArrayBuffer<B>(res);
+    }
+
+    map<B>(f: (item: T) => B): ArrayBuffer<B> {
+        return new ArrayBuffer<B>(this.items.map(i => f(i)));
+    }
+
+    async mapPromise<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
+        const res: B[] = [];
+        for (let i = 0; i < this.items.length; i++) {
+            res.push(await f(this.items[i]));
+        }
+        return new ArrayBuffer<B>(res);
+    }
+
+    async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
+        return new ArrayBuffer(await Promise.all(this.items.map(i => f(i))));
+    }
+
+    async flatMapPromiseAll<B>(f: (v: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
+        return (await this.mapPromiseAll(f)).flatten<B>();
+    }
+
+    flatten<B>(): ArrayBuffer<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            if (i instanceof ArrayBuffer) {
+                res.push(...i.items);
+            } else {
+                res.push(i as any as B);
+            }
+        });
+        return new ArrayBuffer<B>(res);
+    }
+
+    sortBy(fieldToNumber: (a: T) => number): ArrayBuffer<T> {
+        return this.sort((a, b) => fieldToNumber(a) - fieldToNumber(b));
+    }
+
+
+    appended(item: T): ArrayBuffer<T> {
+        return new ArrayBuffer(this.items.concat([item]));
+    }
+
+    appendedAll(other: Iterable<T>): ArrayBuffer<T> {
+        return new ArrayBuffer(this.items.concat(...other));
+    }
+
+    prepended(item: T): ArrayBuffer<T> {
+        return new ArrayBuffer([item].concat(this.items));
+    }
+
+    prependedAll(other: Iterable<T>): ArrayBuffer<T> {
+        return new ArrayBuffer(Array.from(other).concat(this.items));
+    }
+
+    concat(other: Iterable<T>): ArrayBuffer<T> {
+        return this.appendedAll(other);
+    }
+
+    slice(from: number, until: number): ArrayBuffer<T> {
+        return new ArrayBuffer<T>(this.items.slice(from, until));
+    }
+
+
+}

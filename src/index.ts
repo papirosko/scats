@@ -5,3 +5,4 @@ export * from './hashset';
 export * from './option';
 export * from './try';
 export * from './util';
+export * from './array-buffer';

@@ -1,4 +1,4 @@
-import {Either, right, left} from '../src/either';
+import {Either, right, left} from '../src';
 
 
 
