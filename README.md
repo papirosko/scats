@@ -16,7 +16,7 @@ import {Collection, Nil} from "scats";
 
 const empty = Collection.empty; // empty collection
 const empty2 = Nil; // empty collection
-const example = new Collection([1, 2, 3]); // create instance from arrau
+const example = new Collection([1, 2, 3]); // create instance from array
 const example2 = Collection.fill(3)(idx => idx + 1); // Collection.of(1, 2, 3)
 const c = Collection.of(1, 2, 3);
 for (let el of c) {
@@ -338,4 +338,49 @@ await forComprehension.promise(
     task('num3', () => toNumPromise('3')),
 ).yield(({num1, num2, num3}) => num1 + num2 + num3); // throws Error('Error in task')
 
+```
+
+
+
+## ArrayBuffer
+Represents the mutable collection of items of some type backed by array.
+
+```typescript
+import {mutable} from "scats";
+import ArrayBuffer = mutable.ArrayBuffer;
+
+const empty = ArrayBuffer.empty; // []
+const example = new ArrayBuffer([1, 2, 3]); // create instance from array
+const example2 = ArrayBuffer.fill(3)(idx => idx + 1); // ArrayBuffer.of(1, 2, 3)
+const c = ArrayBuffer.of(1, 2, 3);
+for (let el of c) {
+    console.log(el); // 1, 2, 3
+}
+c.slice(2, 5); // ArrayBuffer.of(3)
+c.map(e => e + 1); // ArrayBuffer.of(2, 3, 4) (new instance)
+ArrayBuffer.of(1, 2).flatMap(x => ArrayBuffer.of(x, x + 1)); // ArrayBuffer.of(1, 2, 2, 3)
+ArrayBuffer.of(1, ArrayBuffer.of(2, 3), 4).flatten<number>(); // ArrayBuffer.of(1, 2, 3, 4)    
+ArrayBuffer.of(1, 2, 3).get(1); // 2    
+ArrayBuffer.of(1, 2, 3).toArray; // [1, 2, 3]    
+ArrayBuffer.of(1, 2, 3).reverse; // ArrayBuffer.of(3, 2, 1)    
+ArrayBuffer.of(2, 3, 1).sort((a, b) => a - b); // ArrayBuffer.of(1, 2, 3)    
+ArrayBuffer.of({x: 2}, {x: 1}, {x: 3}).sortBy(el => el.x); // ArrayBuffer.of(1, 2, 3)
+ArrayBuffer.of(1, 2).append(3); // ArrayBuffer.of(1, 2, 3) - same instance
+ArrayBuffer.of(1, 2).appended(3); // ArrayBuffer.of(1, 2, 3) - new instance
+ArrayBuffer.of(1, 2).appendAll(ArrayBuffer.of(3, 4)); // ArrayBuffer.of(1, 2, 3, 4) - same instance
+ArrayBuffer.of(1, 2).appendAll([3, 4]); // ArrayBuffer.of(1, 2, 3, 4) - same instance
+ArrayBuffer.of(1, 2).appendedAll(ArrayBuffer.of(3, 4)); // ArrayBuffer.of(1, 2, 3, 4) - new instance
+ArrayBuffer.of(1, 2).prepend(0); // ArrayBuffer.of(0, 1, 2) - same instance
+ArrayBuffer.of(1, 2).prepended(0); // ArrayBuffer.of(0, 1, 2) - new instance
+ArrayBuffer.of(1, 2).prepended(ArrayBuffer.of(-1, 0)); // ArrayBuffer.of(-1, 0, 1, 2) - same instance
+ArrayBuffer.of(1, 2).prependedAll(ArrayBuffer.of(-1, 0)); // ArrayBuffer.of(-1, 0, 1, 2) - new instance
+ArrayBuffer.of(1, 2).concat(ArrayBuffer.of(3, 4)); // ArrayBuffer.of(1, 2, 3, 4)
+ArrayBuffer.of(1, 2, 2).toSet; // HashSet.of(1, 2)
+ArrayBuffer.of(1, 2, 2).distinct; // ArrayBuffer.of(1, 2) - new instance
+ArrayBuffer.of({x: 2}, {x: 1}, {x: 2}).distinctBy(el => el.x); // ArrayBuffer.of({x: 2}, {x: 1}) - new instance
+ArrayBuffer.of({id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}).toMap(el => [el.id, el.name]); // HashMap(1 -> 'Alice', 2 -> 'Bob')
+c.sum(identity); // 6. We have to provide identity to convert element to number
+c.take(2); // Collection.of(1, 2)
+c.drop(1); // Collection.of(2, 3);
+c.head; // 1
 ```

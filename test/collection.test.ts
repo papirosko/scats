@@ -1,4 +1,5 @@
-import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step} from '../src';
+import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step, mutable} from '../src';
+import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('Collection', () => {
 
@@ -591,6 +592,10 @@ describe('Collection', () => {
         }
 
         expect(sum).toBe(6);
+    });
+
+    test('toBuffer', () => {
+        expect(Collection.of(1, 2).toBuffer).toEqual(ArrayBuffer.of(1, 2));
     });
 
 

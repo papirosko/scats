@@ -1,7 +1,6 @@
-import {Collection} from './collection';
+import {Collection, mutable} from './collection';
 import {ArrayIterable} from './array-iterable';
 import {HashMap} from './hashmap';
-import {ArrayBuffer} from './array-buffer';
 
 export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
 
@@ -27,8 +26,8 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return this.items;
     }
 
-    get toBuffer(): ArrayBuffer<T> {
-        return new ArrayBuffer(Array.from(this.items.keys()));
+    get toBuffer(): mutable.ArrayBuffer<T> {
+        return new mutable.ArrayBuffer(Array.from(this.items.keys()));
     }
 
     contains(item: T): boolean {

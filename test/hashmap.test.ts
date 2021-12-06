@@ -158,6 +158,7 @@ describe('Hashmap', () => {
         expect(original.updatedWith('foo1')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(2));
         expect(original.updatedWith('foo2')(() => none).get('foo2')).toEqual(none);
         expect(original.updatedWith('foo3')((opt) => some(opt.getOrElseValue(0) + 1)).get('foo1')).toEqual(some(1));
+        expect(original.updatedWith('foo3')(() => none)).toEqual(original);
     });
 
 

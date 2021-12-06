@@ -238,5 +238,11 @@ describe('HashSet', () => {
         expect(sum).toBe(6);
     });
 
+    test('toBuffer', () => {
+        const buf = HashSet.of(1, 2).toBuffer;
+        expect(buf.size).toEqual(2);
+        expect(buf.contains(1)).toBeTruthy();
+        expect(buf.contains(2)).toBeTruthy();
+    });
 
 });
