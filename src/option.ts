@@ -102,7 +102,7 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
     }
 
     forall(p: (_: A) => boolean): boolean {
-        return this.isEmpty ? false : p(this.get);
+        return this.isEmpty ? true : p(this.get);
     }
 
 

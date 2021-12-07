@@ -141,7 +141,8 @@ describe('Option', () => {
     test('forall', () => {
         expect(option(1).forall(x => x >= 1)).toBeTruthy();
         expect(option(1).forall(x => x < 1)).toBeFalsy();
-        expect(option<any>(null).forall(x => x < 1)).toBeFalsy();
+        expect(option<any>(null).forall(x => x < 1)).toBeTruthy();
+        expect(none.forall(x => x < 1)).toBeTruthy();
     });
 
     test('foreach', () => {
