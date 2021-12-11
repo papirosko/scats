@@ -1,15 +1,11 @@
-import {HashMap} from './hashmap';
-import {HashSet} from './hashset';
-import {ArrayIterable} from './array-iterable';
 import {Mappable} from './mappable';
+import {HashMap, HashSet} from './index';
 import {Filterable} from './util';
+import {ArrayIterable} from './array-iterable';
 
-
-abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> extends ArrayIterable<T, C> {
+export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> extends ArrayIterable<T, C> {
 
     protected abstract readonly items: T[];
-
-
 
 
     protected checkWithinBounds(lo: number, hi: number) {
@@ -40,7 +36,7 @@ abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> extends
     }
 
     get distinct(): C {
-        return this.fromArray(HashSet.of(...this.items).toArray);
+        return this.fromArray(Array.from(new Set(this.items)));
     }
 
     distinctBy(key: (item: T) => string | number): C {
@@ -227,8 +223,8 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
 
 
 
-    get toBuffer(): mutable.ArrayBuffer<T> {
-        return new mutable.ArrayBuffer(this.items);
+    get toBuffer(): ArrayBuffer<T> {
+        return new ArrayBuffer(this.items);
     }
 
 
@@ -286,180 +282,175 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
 
 export const Nil = Collection.empty;
 
+export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
 
-export namespace mutable {
-
-    export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
-
-        static get empty(): mutable.ArrayBuffer<any> {
-            return new ArrayBuffer<any>([]);
-        }
-
-        constructor(protected readonly items: T[]) {
-            super();
-        }
-
-        static of<T>(...elements: T[]): ArrayBuffer<T> {
-            return new ArrayBuffer<T>(elements);
-        }
-
-        static fill<A>(len: number): (elem: (idx: number) => A) => ArrayBuffer<A> {
-            return function (elem: (idx: number) => A): ArrayBuffer<A> {
-                const res: A[] = new Array<A>(len);
-                for (let i = 0; i < len; i++) {
-                    res[i] = elem(i);
-                }
-                return new ArrayBuffer(res);
-            };
-        }
-
-        protected fromArray(array: T[]): ArrayBuffer<T> {
-            if (!array || array.length <= 0) {
-                return new ArrayBuffer<T>([]);
-            } else {
-                return new ArrayBuffer(array);
-            }
-        }
-
-
-
-        update(index: number, element: T): void {
-            this.checkWithinBounds(index, index + 1);
-            this.items[index] = element;
-        }
-
-        set(index: number, element: T): void {
-            this.update(index, element);
-        }
-
-
-        clear(): void {
-            this.items.length = 0;
-        }
-
-
-        append(element: T): this {
-            this.items.push(element);
-            return this;
-        }
-
-        appendAll(elements: Iterable<T>): this {
-            this.items.push(...elements);
-            return this;
-        }
-
-        prepend(element: T): this {
-            this.items.unshift(element);
-            return this;
-        }
-
-        prependAll(elements: Iterable<T>): this {
-            this.items.unshift(...elements);
-            return this;
-        }
-
-        insert(idx: number, element: T): void {
-            this.items.splice(idx, 0, element);
-        }
-
-        insertAll(idx: number, elements: Iterable<T>): void {
-            this.items.splice(idx, 0, ...elements);
-        }
-
-        remove(index: number, count = 1): T {
-            if (count > 0) {
-                this.checkWithinBounds(index, index + 1);
-                return this.items.splice(index, count)[0];
-            } else {
-                throw new Error('removing negative number of elements: ' + count);
-            }
-        }
-
-        subtractOne(element: T): this {
-            const i = this.items.indexOf(element);
-            if (i != -1) {
-                this.remove(i);
-            }
-            return this;
-        }
-
-        subtractAll(elements: Iterable<T>): this {
-            if (elements === this || elements === this.items) {
-                const buf = new ArrayBuffer(Array.from(elements));
-                buf.foreach(e => this.subtractOne(e));
-            } else {
-                for (const element of elements) {
-                    this.subtractOne(element);
-                }
-            }
-            return this;
-        }
-
-
-        /**
-         * returns same instance
-         * @param compareFn
-         */
-        sort(compareFn?: (a: T, b: T) => number): this {
-            this.items.sort(compareFn);
-            return this;
-        }
-
-        get toCollection(): Collection<T> {
-            return new Collection<T>(this.items.slice(0));
-        }
-
-
-        flatMap<B>(f: (item: T) => ArrayBuffer<B>): ArrayBuffer<B> {
-            const res: B[] = [];
-            this.items.forEach(i => {
-                res.push(...f(i).items);
-            });
-            return new ArrayBuffer<B>(res);
-        }
-
-        async flatMapPromise<B>(f: (item: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
-            const res: B[] = [];
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
-                res.push(...(await f(item)).items);
-            }
-            return new ArrayBuffer<B>(res);
-        }
-
-        map<B>(f: (item: T) => B): ArrayBuffer<B> {
-            return new ArrayBuffer<B>(this.items.map(i => f(i)));
-        }
-
-        async mapPromise<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
-            const res: B[] = [];
-            for (let i = 0; i < this.items.length; i++) {
-                res.push(await f(this.items[i]));
-            }
-            return new ArrayBuffer<B>(res);
-        }
-
-        async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
-            return new ArrayBuffer<B>(await Promise.all(this.items.map(i => f(i))));
-        }
-
-        async flatMapPromiseAll<B>(f: (v: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
-            return (await this.mapPromiseAll(f)).flatten<B>();
-        }
-
-        flatten<B>(): ArrayBuffer<B> {
-            const res: B[] = [];
-            this.items.forEach(i => {
-                if (i instanceof ArrayBuffer) {
-                    res.push(...i.items);
-                } else {
-                    res.push(i as any as B);
-                }
-            });
-            return new ArrayBuffer<B>(res);
-        }
-
-
+    static get empty(): ArrayBuffer<any> {
+        return new ArrayBuffer<any>([]);
     }
-}
 
+    constructor(protected readonly items: T[]) {
+        super();
+    }
+
+    static of<T>(...elements: T[]): ArrayBuffer<T> {
+        return new ArrayBuffer<T>(elements);
+    }
+
+    static fill<A>(len: number): (elem: (idx: number) => A) => ArrayBuffer<A> {
+        return function (elem: (idx: number) => A): ArrayBuffer<A> {
+            const res: A[] = new Array<A>(len);
+            for (let i = 0; i < len; i++) {
+                res[i] = elem(i);
+            }
+            return new ArrayBuffer(res);
+        };
+    }
+
+    protected fromArray(array: T[]): ArrayBuffer<T> {
+        if (!array || array.length <= 0) {
+            return new ArrayBuffer<T>([]);
+        } else {
+            return new ArrayBuffer(array);
+        }
+    }
+
+
+
+    update(index: number, element: T): void {
+        this.checkWithinBounds(index, index + 1);
+        this.items[index] = element;
+    }
+
+    set(index: number, element: T): void {
+        this.update(index, element);
+    }
+
+
+    clear(): void {
+        this.items.length = 0;
+    }
+
+
+    append(element: T): this {
+        this.items.push(element);
+        return this;
+    }
+
+    appendAll(elements: Iterable<T>): this {
+        this.items.push(...elements);
+        return this;
+    }
+
+    prepend(element: T): this {
+        this.items.unshift(element);
+        return this;
+    }
+
+    prependAll(elements: Iterable<T>): this {
+        this.items.unshift(...elements);
+        return this;
+    }
+
+    insert(idx: number, element: T): void {
+        this.items.splice(idx, 0, element);
+    }
+
+    insertAll(idx: number, elements: Iterable<T>): void {
+        this.items.splice(idx, 0, ...elements);
+    }
+
+    remove(index: number, count = 1): T {
+        if (count > 0) {
+            this.checkWithinBounds(index, index + 1);
+            return this.items.splice(index, count)[0];
+        } else {
+            throw new Error('removing negative number of elements: ' + count);
+        }
+    }
+
+    subtractOne(element: T): this {
+        const i = this.items.indexOf(element);
+        if (i != -1) {
+            this.remove(i);
+        }
+        return this;
+    }
+
+    subtractAll(elements: Iterable<T>): this {
+        if (elements === this || elements === this.items) {
+            const buf = new ArrayBuffer(Array.from(elements));
+            buf.foreach(e => this.subtractOne(e));
+        } else {
+            for (const element of elements) {
+                this.subtractOne(element);
+            }
+        }
+        return this;
+    }
+
+
+    /**
+     * returns same instance
+     * @param compareFn
+     */
+    sort(compareFn?: (a: T, b: T) => number): this {
+        this.items.sort(compareFn);
+        return this;
+    }
+
+    get toCollection(): Collection<T> {
+        return new Collection<T>(this.items.slice(0));
+    }
+
+
+    flatMap<B>(f: (item: T) => ArrayBuffer<B>): ArrayBuffer<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            res.push(...f(i).items);
+        });
+        return new ArrayBuffer<B>(res);
+    }
+
+    async flatMapPromise<B>(f: (item: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
+        const res: B[] = [];
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            res.push(...(await f(item)).items);
+        }
+        return new ArrayBuffer<B>(res);
+    }
+
+    map<B>(f: (item: T) => B): ArrayBuffer<B> {
+        return new ArrayBuffer<B>(this.items.map(i => f(i)));
+    }
+
+    async mapPromise<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
+        const res: B[] = [];
+        for (let i = 0; i < this.items.length; i++) {
+            res.push(await f(this.items[i]));
+        }
+        return new ArrayBuffer<B>(res);
+    }
+
+    async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
+        return new ArrayBuffer<B>(await Promise.all(this.items.map(i => f(i))));
+    }
+
+    async flatMapPromiseAll<B>(f: (v: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
+        return (await this.mapPromiseAll(f)).flatten<B>();
+    }
+
+    flatten<B>(): ArrayBuffer<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            if (i instanceof ArrayBuffer) {
+                res.push(...i.items);
+            } else {
+                res.push(i as any as B);
+            }
+        });
+        return new ArrayBuffer<B>(res);
+    }
+
+
+}
