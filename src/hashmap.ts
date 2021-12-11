@@ -5,21 +5,15 @@ import {ArrayIterable} from './array-iterable';
 
 export type Tuple2<K, V> = [K, V];
 
-export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
+export abstract class AbstractMap<K, V> extends ArrayIterable<Tuple2<K, V>, AbstractMap<K, V>> {
 
     protected fromArray(array: Tuple2<K, V>[]): HashMap<K, V> {
         return HashMap.of(...array);
     }
 
-    constructor(private readonly map: Map<K, V>) {
+    protected constructor(protected readonly map: Map<K, V>) {
         super();
     }
-
-    static of<K, V>(...values: Tuple2<K, V>[]): HashMap<K, V> {
-        return new HashMap<K, V>(new Map(values));
-    }
-
-    static empty = new HashMap(new Map());
 
     get size(): number {
         return this.map.size;
@@ -69,22 +63,48 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         return this.map.entries();
     }
 
+    containsKey(key: K): boolean {
+        return this.map.has(key);
+    }
+
+    get toCollection(): Collection<Tuple2<K, V>> {
+        return new Collection<Tuple2<K, V>>(Array.from(this.map.entries()));
+    }
+
+    get toMap(): Map<K, V> {
+        return this.map;
+    }
+
+    get toArray(): Array<Tuple2<K, V>> {
+        return Array.from(this.map.entries());
+    }
+
+}
+
+
+export class HashMap<K, V> extends AbstractMap<K, V> {
+
+
+    constructor(protected readonly map: Map<K, V>) {
+        super(map);
+    }
+
+    static of<K, V>(...values: Tuple2<K, V>[]): HashMap<K, V> {
+        return new HashMap<K, V>(new Map(values));
+    }
+
+    static empty = new HashMap(new Map());
+
     appendedAll(map: HashMap<K, V>): HashMap<K, V> {
         return this.concat(map);
     }
 
-    concat(map: HashMap<K, V>): HashMap<K, V> {
-        const mergedMap = new Map<K, V>([
-            ...this.entries.toArray,
-            ...map.entries.toArray
-        ]);
-        return new HashMap<K, V>(mergedMap);
+    appended(key: K, value: V): HashMap<K, V> {
+        return this.set(key, value);
     }
 
-    set(key: K, value: V): HashMap<K, V> {
-        const next = new Map(this.map);
-        next.set(key, value);
-        return new HashMap<K, V>(new Map(next));
+    updated(key: K, value: V): HashMap<K, V> {
+        return this.set(key, value);
     }
 
     removed(key: K): HashMap<K, V> {
@@ -101,12 +121,18 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         return new HashMap<K, V>(next);
     }
 
-    containsKey(key: K): boolean {
-        return this.map.has(key);
+    concat(map: HashMap<K, V>): HashMap<K, V> {
+        const mergedMap = new Map<K, V>([
+            ...this.entries.toArray,
+            ...map.entries.toArray
+        ]);
+        return new HashMap<K, V>(mergedMap);
     }
 
-    updated(key: K, value: V): HashMap<K, V> {
-        return this.set(key, value);
+    set(key: K, value: V): HashMap<K, V> {
+        const next = new Map(this.map);
+        next.set(key, value);
+        return new HashMap<K, V>(new Map(next));
     }
 
     /**
@@ -135,15 +161,102 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         };
     }
 
-    get toCollection(): Collection<Tuple2<K, V>> {
-        return new Collection<Tuple2<K, V>>(Array.from(this.map.entries()));
-    }
+}
 
-    get toMap(): Map<K, V> {
-        return this.map;
-    }
 
-    get toArray(): Array<Tuple2<K, V>> {
-        return Array.from(this.map.entries());
+export namespace mutable {
+    export class HashMap<K, V> extends AbstractMap<K, V> {
+
+        constructor(protected readonly map: Map<K, V>) {
+            super(map);
+        }
+
+        static of<K, V>(...values: Tuple2<K, V>[]): HashMap<K, V> {
+            return new mutable.HashMap<K, V>(new Map(values));
+        }
+
+        addAll(values: Iterable<Tuple2<K, V>>): this {
+            for (const [key, value] of values) {
+                this.map.set(key, value);
+            }
+            return this;
+        }
+
+
+
+        updateWith(key: K): (remappingFunction: (maybeValue: Option<V>) => Option<V>) => Option<V> {
+            const previousValue = this.get(key);
+
+            return (remappingFunction: (maybeValue: Option<V>) => Option<V>) => {
+                const nextValue = remappingFunction(previousValue);
+                if (previousValue.isEmpty && nextValue.isEmpty) {
+                    return nextValue;
+                } else if (previousValue.isDefined && nextValue.isEmpty) {
+                    this.remove(key);
+                    return nextValue;
+                } else {
+                    this.update(key, nextValue.get);
+                    return nextValue;
+                }
+
+            };
+        }
+
+        subtractAll(values: Iterable<K>): this {
+            if (this.isEmpty) {
+                return this;
+            }
+
+            for (const key of values) {
+                this.map.delete(key)
+                if (this.isEmpty) {
+                    return this;
+                }
+            }
+
+            return this;
+        }
+
+
+        clear(): void {
+            this.map.clear();
+        }
+
+
+        getOrElseUpdate(key: K, defaultValue: () => V): V {
+            return this.get(key).getOrElse(() => {
+                const newValue = defaultValue();
+                this.map.set(key, newValue);
+                return newValue;
+            });
+        }
+
+        put(key: K, value: V): Option<V> {
+            const res = this.get(key);
+            this.addOne(key, value);
+            return res;
+        }
+
+        remove(key: K): Option<V> {
+            const res = this.get(key);
+            this.subtractOne(key);
+            return res;
+        }
+
+        update(key: K, value: V): void {
+            this.addOne(key, value);
+        }
+
+        addOne(key: K, value: V): this {
+            this.map.set(key, value);
+            return this;
+        }
+
+        subtractOne(key: K): this {
+            this.map.delete(key);
+            return this;
+        }
+
+
     }
 }
