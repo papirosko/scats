@@ -79,7 +79,7 @@ export abstract class Option<A> extends ArrayIterable<A, Option<A>> implements M
         if (this.isEmpty) {
             return Promise.resolve(none);
         } else {
-            return option(await f(this.get));
+            return option<B>(await f(this.get));
         }
     }
 

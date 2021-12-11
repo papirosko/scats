@@ -208,7 +208,7 @@ export namespace mutable {
             }
 
             for (const key of values) {
-                this.map.delete(key)
+                this.map.delete(key);
                 if (this.isEmpty) {
                     return this;
                 }

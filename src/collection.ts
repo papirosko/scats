@@ -173,7 +173,7 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
      * @param f
      */
     async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<Collection<B>> {
-        return new Collection(await Promise.all(this.items.map(i => f(i))));
+        return new Collection<B>(await Promise.all(this.items.map(i => f(i))));
     }
 
     /**
@@ -440,7 +440,7 @@ export namespace mutable {
         }
 
         async mapPromiseAll<B>(f: (v: T) => Promise<B>): Promise<ArrayBuffer<B>> {
-            return new ArrayBuffer(await Promise.all(this.items.map(i => f(i))));
+            return new ArrayBuffer<B>(await Promise.all(this.items.map(i => f(i))));
         }
 
         async flatMapPromiseAll<B>(f: (v: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
