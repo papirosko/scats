@@ -1,17 +1,15 @@
 import {Option} from './index';
-import {AbstractMap} from './abstract-map';
-
-export type Tuple2<K, V> = [K, V];
+import {AbstractMap, Tuple2} from './abstract-map';
 
 
 
-export class HashMap<K, V> extends AbstractMap<K, V> {
+export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
 
     protected fromArray(array: Tuple2<K, V>[]): HashMap<K, V> {
         return HashMap.of(...array);
     }
 
-    constructor(protected readonly map: Map<K, V>) {
+    protected constructor(protected readonly map: Map<K, V>) {
         super(map);
     }
 
@@ -29,16 +27,37 @@ export class HashMap<K, V> extends AbstractMap<K, V> {
         return this.set(key, value);
     }
 
+    /**
+     * Creates a new map obtained by updating this map with a given key/value pair.
+     * @param  key the key
+     * @param  value the value
+     * @tparam V1 the type of the added value
+     * @return A new map with the new key/value mapping added to this map.
+     */
     updated(key: K, value: V): HashMap<K, V> {
         return this.set(key, value);
     }
 
+    /**
+     * Removes a key from this map, returning a new map.
+     *
+     * @param key the key to be removed
+     * @return a new map without a binding for ''key''
+     */
     removed(key: K): HashMap<K, V> {
         const next = new Map(this.map);
         next.delete(key);
         return new HashMap<K, V>(next);
     }
 
+    /**
+     * Creates a new map from this map by removing all elements of another
+     * collection.
+     *
+     * @param keys   the collection containing the removed elements.
+     * @return a new map that contains all elements of the current map
+     * except one less occurrence of each of the elements of `elems`.
+     */
     removedAll(keys: Iterable<K>): HashMap<K, V> {
         const next = new Map(this.map);
         for (const key of keys) {

@@ -8,7 +8,7 @@ export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> 
     protected abstract readonly items: T[];
 
 
-    protected checkWithinBounds(lo: number, hi: number) {
+    protected checkWithinBounds(lo: number, hi: number): void {
         if (lo < 0) throw new Error(`$lo is out of bounds (min 0, max ${this.items.length - 1})`);
         if (hi > this.size) throw new Error(`$lo is out of bounds (min 0, max ${this.items.length - 1})`);
     }

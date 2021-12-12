@@ -143,6 +143,16 @@ describe('Hashmap', () => {
     });
 
 
+    test('appended', () => {
+        const original = HashMap.of(['foo1', 1], ['foo2', 2]);
+        const appended = original.appended('foo3', 3);
+        expect(appended.get('foo1')).toEqual(some(1));
+        expect(appended.get('foo2')).toEqual(some(2));
+        expect(appended.get('foo3')).toEqual(some(3));
+        expect(appended === original).toBeFalsy();
+        expect(appended.toMap === original.toMap).toBeFalsy();
+    });
+
     test('updated', () => {
         const original = HashMap.of(['foo1', 1], ['foo2', 2]);
         const updated = original.updated('foo3', 3);
@@ -173,21 +183,19 @@ describe('Hashmap', () => {
     });
 
     test('immutability on set', () => {
-        const originalMap = new Map([['1', 1], ['2', 2]]);
-        const hm = new HashMap(originalMap);
+        const hm = HashMap.of<string, number>(['1', 1], ['2', 2]);
         const hmSet = hm.set('3', 3);
         expect(hmSet.get('3')).toEqual(some(3));
         expect(hmSet.toMap.get('3')).toEqual(3);
-        expect(originalMap.get('3')).toBeUndefined();
+        expect(hm.get('3')).toEqual(none);
     });
 
     test('immutability on remove', () => {
-        const originalMap = new Map([['1', 1], ['2', 2]]);
-        const hm = new HashMap(originalMap);
+        const hm = HashMap.of(['1', 1], ['2', 2]);
         const hmDel = hm.removed('2');
         expect(hmDel.get('2')).toEqual(none);
         expect(hmDel.toMap.get('2')).toBeUndefined();
-        expect(originalMap.get('2')).toEqual(2);
+        expect(hm.get('2')).toEqual(some(2));
     });
 
     test('toArray', () => {

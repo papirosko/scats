@@ -2,9 +2,10 @@ import {ArrayIterable} from './array-iterable';
 import {option, Option} from './option';
 import {HashSet} from './hashset';
 import {Collection} from './collection';
-import {Tuple2} from './hashmap';
 
-export abstract class AbstractMap<K, V> extends ArrayIterable<Tuple2<K, V>, AbstractMap<K, V>> {
+export type Tuple2<K, V> = [K, V];
+
+export abstract class AbstractMap<K, V, S extends AbstractMap<K, V, any>> extends ArrayIterable<Tuple2<K, V>, S> {
 
 
     protected constructor(protected readonly map: Map<K, V>) {
