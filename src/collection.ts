@@ -110,10 +110,12 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
         }
     }
 
-
-
     static of<T>(...items: T[]): Collection<T> {
         return new Collection<T>(items);
+    }
+
+    static from<T>(elements: Iterable<T>): Collection<T> {
+        return new Collection<T>(Array.from(elements));
     }
 
     static fill<A>(len: number): (elem: (idx: number) => A) => Collection<A> {
@@ -297,6 +299,10 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
 
     static of<T>(...elements: T[]): ArrayBuffer<T> {
         return new ArrayBuffer<T>(elements);
+    }
+
+    static from<T>(elements: Iterable<T>): ArrayBuffer<T> {
+        return new ArrayBuffer<T>(Array.from(elements));
     }
 
     static fill<A>(len: number): (elem: (idx: number) => A) => ArrayBuffer<A> {
@@ -483,7 +489,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
      *
      *    {{{
      *      getWords(lines: ArrayBuffer<string>): ArrayBuffer<string> {
-     *          return lines.flatMap(line => line.split("\\W+"))
+     *          return lines.flatMap(line => ArrayBuffer.from(line.split("\\W+")))
      *      }
      *    }}}
      *

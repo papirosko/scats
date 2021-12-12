@@ -3,19 +3,23 @@ import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('Collection', () => {
 
-    test('should create collection of', () => {
+    test('of', () => {
         expect(Collection.of(1, 2, 3, 4).toArray).toEqual([1, 2, 3, 4]);
     });
 
-    test('should create collection fill', () => {
+    test('from', () => {
+        expect(Collection.from([1, 2, 3, 4])).toEqual(Collection.of(1, 2, 3, 4));
+    });
+
+    test('fill', () => {
         expect(Collection.fill(4)(n => n).toArray).toEqual([0, 1, 2, 3]);
     });
 
-    test('should filter', () => {
+    test('filter', () => {
         expect(Collection.of(1, 2, 3, 4).filter(x => x > 2).toArray).toEqual([3, 4]);
     });
 
-    test('should filterNot', () => {
+    test('filterNot', () => {
         expect(Collection.of(1, 2, 3, 4).filterNot(x => x > 2).toArray).toEqual([1, 2]);
     });
 

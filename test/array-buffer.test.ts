@@ -3,9 +3,15 @@ import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('ArrayBuffer', () => {
 
-    test('should create ArrayBuffer.of', () => {
-        expect(ArrayBuffer.of(1, 2, 3, 4)).toEqual(ArrayBuffer.of(1, 2, 3, 4));
+    test('of', () => {
+        expect(ArrayBuffer.of(1, 2, 3, 4).toArray).toEqual([1, 2, 3, 4]);
     });
+
+    test('from', () => {
+        expect(ArrayBuffer.from([1, 2, 3, 4])).toEqual(ArrayBuffer.of(1, 2, 3, 4));
+    });
+
+
 
     test('equal', () => {
         const source1 = ArrayBuffer.of(1, 2);
