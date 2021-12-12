@@ -4,7 +4,7 @@ import * as immutable from '../hashmap';
 
 export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
 
-    constructor(protected readonly map: Map<K, V> = new Map()) {
+    constructor(map: Map<K, V> = new Map()) {
         super(map);
     }
 
@@ -16,6 +16,15 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         return new HashMap<K, V>(new Map(values));
     }
 
+    static from<K, V>(values: Iterable<Tuple2<K, V>>): HashMap<K, V> {
+        return HashMap.of(...Array.from(values));
+    }
+
+    /** Adds all elements produced by an Iterable to this HashMap.
+     *
+     *  @param values   the Iterable producing the elements to HashMap.
+     *  @return  the HashMap itself.
+     */
     addAll(values: Iterable<Tuple2<K, V>>): this {
         for (const [key, value] of values) {
             this.map.set(key, value);
@@ -54,6 +63,12 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         };
     }
 
+    /**
+     * Removes all elements produced by an iterator from this $coll.
+     *
+     * @param values   the iterator producing the elements to remove.
+     * @return the hashmap itself
+     */
     subtractAll(values: Iterable<K>): this {
         if (this.isEmpty) {
             return this;
@@ -77,6 +92,10 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         this.map.clear();
     }
 
+    /**
+     * Creates new Hashmap with the values from this HashMap
+     * @return new Hashmap
+     */
     clone(): HashMap<K, V> {
         const contentClone = new Map(this.map);
         return new HashMap<K, V>(contentClone);
@@ -141,6 +160,13 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         });
     }
 
+    /**
+     * Adds a single element to this map.
+     *
+     * @param key  the element to add.
+     * @param value  the element's value.
+     * @return the map itself
+     */
     set(key: K, value: V): this {
         this.map.set(key, value);
         return this;
@@ -210,6 +236,10 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         return this;
     }
 
+    /**
+     * Creates the immutable HashMap with the contents from this HashMap.
+     * @return immutable HashMap
+     */
     get toImmutable(): immutable.HashMap<K, V> {
         return immutable.HashMap.of(...this.map.entries());
     }

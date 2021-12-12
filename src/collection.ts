@@ -1,5 +1,5 @@
 import {Mappable} from './mappable';
-import {HashMap, HashSet} from './index';
+import {HashMap, HashSet, Option} from './index';
 import {Filterable} from './util';
 import {ArrayIterable} from './array-iterable';
 
@@ -134,6 +134,16 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
         const res: B[] = [];
         this.items.forEach(i => {
             res.push(...f(i).items);
+        });
+        return new Collection<B>(res);
+    }
+
+    flatMapOption<B>(f: (item: T) => Option<B>): Collection<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            f(i).foreach(v => {
+                res.push(v);
+            });
         });
         return new Collection<B>(res);
     }
@@ -274,7 +284,8 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
 
 export const Nil = Collection.empty;
 
-export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
+export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> implements Mappable<T>,
+    Filterable<T, ArrayBuffer<T>>{
 
     static get empty(): ArrayBuffer<any> {
         return new ArrayBuffer<any>([]);
@@ -360,9 +371,9 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
     }
 
     /**
-     * Prepends a single element at the front of this $coll.
+     * Prepends a single element at the front of this ArrayBuffer.
      *
-     *  @param element  the element to $add.
+     *  @param element  the element to add.
      *  @return the buffer itself
      */
     prepend(element: T): this {
@@ -465,6 +476,23 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
     }
 
 
+    /** Builds a new ArrayBuffer by applying a function to all elements of this ArrayBuffer
+     *  and using the elements of the resulting collections.
+     *
+     *    For example:
+     *
+     *    {{{
+     *      getWords(lines: ArrayBuffer<string>): ArrayBuffer<string> {
+     *          return lines.flatMap(line => line.split("\\W+"))
+     *      }
+     *    }}}
+     *
+     *
+     *  @param f      the function to apply to each element.
+     *  @tparam B     the element type of the returned collection.
+     *  @return       a new ArrayBuffer resulting from applying the given collection-valued function
+     *                `f` to each element of this $coll and concatenating the results.
+     */
     flatMap<B>(f: (item: T) => ArrayBuffer<B>): ArrayBuffer<B> {
         const res: B[] = [];
         this.items.forEach(i => {
@@ -472,6 +500,17 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
         });
         return new ArrayBuffer<B>(res);
     }
+
+    flatMapOption<B>(f: (item: T) => Option<B>): ArrayBuffer<B> {
+        const res: B[] = [];
+        this.items.forEach(i => {
+            f(i).foreach(v => {
+                res.push(v);
+            });
+        });
+        return new ArrayBuffer<B>(res);
+    }
+
 
     async flatMapPromise<B>(f: (item: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
         const res: B[] = [];

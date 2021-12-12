@@ -2,8 +2,12 @@ import {Collection, HashMap, HashSet, mutable, none, some} from '../src';
 
 describe('Hashmap', () => {
 
-    test('should create map of', () => {
+    test('of', () => {
         expect(HashMap.of(['1', 1], ['2', 3]).toMap).toEqual(new Map([['1', 1], ['2', 3]]));
+    });
+
+    test('from', () => {
+        expect(HashMap.from([['1', 1], ['2', 3]]).toMap).toEqual(new Map([['1', 1], ['2', 3]]));
     });
 
     test('size', () => {

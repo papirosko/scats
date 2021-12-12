@@ -17,6 +17,10 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         return new HashMap<K, V>(new Map(values));
     }
 
+    static from<K, V>(values: Iterable<Tuple2<K, V>>): HashMap<K, V> {
+        return HashMap.of(...Array.from(values));
+    }
+
     static empty = new HashMap(new Map());
 
     appendedAll(map: HashMap<K, V>): HashMap<K, V> {

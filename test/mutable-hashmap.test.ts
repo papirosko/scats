@@ -15,6 +15,11 @@ describe('mutable.HashMap', () => {
         expect(map.get('Alice')).toEqual(none);
     });
 
+    test('from', () => {
+        expect(mutable.HashMap.from([['1', 1], ['2', 3]]).toMap).toEqual(new Map([['1', 1], ['2', 3]]));
+    });
+
+
     test('addAll', () => {
         const map = mutable.HashMap.of(['Bob', 12], ['Steve', 13]);
         expect(map.size).toEqual(2);

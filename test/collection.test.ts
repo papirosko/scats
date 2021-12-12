@@ -1,4 +1,4 @@
-import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step, mutable} from '../src';
+import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step, mutable, option} from '../src';
 import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('Collection', () => {
@@ -27,10 +27,13 @@ describe('Collection', () => {
     });
 
     test('flatMap', () => {
+        expect(Collection.of<any>(1, 2).flatMap(n => Collection.fill(n)(() => n)))
+            .toEqual(Collection.of(1, 2, 2));
+    });
 
-        expect(Collection.of<any>(1, 2).flatMap(n => Collection.fill(n)(() => n)).toArray)
-            .toEqual([1, 2, 2]);
-
+    test('flatMapOption', () => {
+        expect(Collection.of<any>(1, 2).flatMapOption(x => option(x).filter(x => x >= 2)))
+            .toEqual(Collection.of(2));
     });
 
     test('mapPromise', async () => {

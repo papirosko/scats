@@ -1,4 +1,4 @@
-import {Collection, HashMap, HashSet, identity, mutable} from '../src';
+import {Collection, HashMap, HashSet, identity, mutable, option} from '../src';
 import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('ArrayBuffer', () => {
@@ -336,5 +336,11 @@ describe('ArrayBuffer', () => {
     test('toSet', () => {
         expect(ArrayBuffer.of(1, 2, 2).toSet).toEqual(HashSet.of(1, 2));
     });
+
+    test('flatMapOption', () => {
+        expect(ArrayBuffer.of<any>(1, 2).flatMapOption(x => option(x).filter(x => x >= 2)))
+            .toEqual(ArrayBuffer.of(2));
+    });
+
 
 });
