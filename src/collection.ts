@@ -218,17 +218,9 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
         return new Collection<B>(res);
     }
 
-
-
-
-
-
     get toBuffer(): ArrayBuffer<T> {
         return new ArrayBuffer(this.items);
     }
-
-
-
 
     toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
         return HashMap.of(...this.map(mapper).toArray);
@@ -316,31 +308,63 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
 
 
 
+    /** Replaces element at given index with a new value.
+     *
+     *  @param index      the index of the element to replace.
+     *  @param element     the new value.
+     *  @throws   Error if the index is not valid.
+     */
     update(index: number, element: T): void {
         this.checkWithinBounds(index, index + 1);
         this.items[index] = element;
     }
 
+    /** Replaces element at given index with a new value.
+     *
+     *  @param index      the index of the element to replace.
+     *  @param element     the new value.
+     *  @throws   Error if the index is not valid.
+     */
     set(index: number, element: T): void {
         this.update(index, element);
     }
 
 
+    /**
+     * Clears the buffer's contents. After this operation, the
+     * buffer is empty.
+     */
     clear(): void {
         this.items.length = 0;
     }
 
 
+    /**
+     * Appends the given elements to this buffer.
+     *  @param element  the element to append.
+     *  @return the buffer itself
+     */
     append(element: T): this {
         this.items.push(element);
         return this;
     }
 
+    /**
+     * Appends the elements contained in a iterable object to this buffer.
+     *  @param elements  the iterable object containing the elements to append.
+     *  @return the buffer itself
+     */
     appendAll(elements: Iterable<T>): this {
         this.items.push(...elements);
         return this;
     }
 
+    /**
+     * Prepends a single element at the front of this $coll.
+     *
+     *  @param element  the element to $add.
+     *  @return the buffer itself
+     */
     prepend(element: T): this {
         this.items.unshift(element);
         return this;
@@ -351,23 +375,55 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
         return this;
     }
 
+    /**
+     * Inserts a new element at a given index into this buffer.
+     *
+     * @param idx    the index where the new elements is inserted.
+     * @param element   the element to insert.
+     * @throws   Error if the index `idx` is not in the valid range
+     *           `0 <= idx <= length`.
+     */
     insert(idx: number, element: T): void {
+        this.checkWithinBounds(idx, idx)
         this.items.splice(idx, 0, element);
     }
 
+    /** Inserts new elements at the index `idx`. Opposed to method
+     *  `update`, this method will not replace an element with a new
+     *  one. Instead, it will insert a new element at index `idx`.
+     *
+     *  @param idx     the index where a new element will be inserted.
+     *  @param elements   the iterable object providing all elements to insert.
+     *  @throws Error if `idx` is out of bounds.
+     */
     insertAll(idx: number, elements: Iterable<T>): void {
+        this.checkWithinBounds(idx, idx)
         this.items.splice(idx, 0, ...elements);
     }
 
-    remove(index: number, count = 1): T {
+    /** Removes the element on a given index position.
+     *
+     *  @param index       the index which refers to the first element to remove.
+     *  @param count   the number of elements to remove.
+     *  @throws   Error if the index `idx` is not in the valid range
+     *            `0 <= idx <= length - count` (with `count > 0`).
+     *  @throws   Error if `count < 0`.
+     */
+    remove(index: number, count = 1): void {
         if (count > 0) {
             this.checkWithinBounds(index, index + 1);
-            return this.items.splice(index, count)[0];
-        } else {
+            this.items.splice(index, count);
+        } else if (count < 0) {
             throw new Error('removing negative number of elements: ' + count);
         }
     }
 
+    /** Removes a single element from this buffer, at its first occurrence.
+     *  If the buffer does not contain that element, it is unchanged.
+     *
+     *  @param element  the element to remove.
+     *  @return   the buffer itself
+     */
     subtractOne(element: T): this {
         const i = this.items.indexOf(element);
         if (i != -1) {
@@ -376,6 +432,11 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
         return this;
     }
 
+    /** Removes all elements produced by an iterator from this buffer.
+     *
+     *  @param elements   the iterator producing the elements to remove.
+     *  @return the buffer itself
+     */
     subtractAll(elements: Iterable<T>): this {
         if (elements === this || elements === this.items) {
             const buf = new ArrayBuffer(Array.from(elements));
@@ -392,6 +453,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
     /**
      * returns same instance
      * @param compareFn
+     * @return the buffer itself
      */
     sort(compareFn?: (a: T, b: T) => number): this {
         this.items.sort(compareFn);
@@ -452,5 +514,8 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
         return new ArrayBuffer<B>(res);
     }
 
+    toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
+        return HashMap.of(...this.map(mapper).toArray);
+    }
 
 }
