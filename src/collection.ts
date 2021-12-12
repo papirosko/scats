@@ -384,7 +384,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
      *           `0 <= idx <= length`.
      */
     insert(idx: number, element: T): void {
-        this.checkWithinBounds(idx, idx)
+        this.checkWithinBounds(idx, idx);
         this.items.splice(idx, 0, element);
     }
 
@@ -397,7 +397,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> {
      *  @throws Error if `idx` is out of bounds.
      */
     insertAll(idx: number, elements: Iterable<T>): void {
-        this.checkWithinBounds(idx, idx)
+        this.checkWithinBounds(idx, idx);
         this.items.splice(idx, 0, ...elements);
     }
 

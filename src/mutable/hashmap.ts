@@ -1,5 +1,6 @@
 import {Option} from '../option';
 import {AbstractMap, Tuple2} from '../abstract-map';
+import * as immutable from '../hashmap';
 
 export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
 
@@ -209,5 +210,8 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         return this;
     }
 
+    get toImmutable(): immutable.HashMap<K, V> {
+        return immutable.HashMap.of(...this.map.entries());
+    }
 
 }

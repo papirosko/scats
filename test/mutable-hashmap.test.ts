@@ -1,4 +1,4 @@
-import {mutable, none, some} from '../src';
+import {HashMap, mutable, none, some} from '../src';
 
 describe('mutable.HashMap', () => {
 
@@ -176,6 +176,12 @@ describe('mutable.HashMap', () => {
         expect(map.size).toEqual(1);
         expect(map2.size).toEqual(0);
         expect(map === map2).toBeFalsy();
+    });
+
+    test('toImmutable', () => {
+        const map = mutable.HashMap.of(['Bob', 12]);
+        const map2 = map.toImmutable;
+        expect(map2).toEqual(HashMap.of(['Bob', 12]));
     });
 
 });

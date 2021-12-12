@@ -1,4 +1,4 @@
-import {Option} from './index';
+import {mutable, Option} from './index';
 import {AbstractMap, Tuple2} from './abstract-map';
 
 
@@ -106,4 +106,7 @@ export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
         };
     }
 
+    get toMutable(): mutable.HashMap<K, V> {
+        return mutable.HashMap.of(...Array.from(this.map.entries()));
+    }
 }

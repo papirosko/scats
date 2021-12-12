@@ -1,4 +1,4 @@
-import {Collection, HashMap, HashSet, none, some} from '../src';
+import {Collection, HashMap, HashSet, mutable, none, some} from '../src';
 
 describe('Hashmap', () => {
 
@@ -277,6 +277,12 @@ describe('Hashmap', () => {
         }
 
         expect(sum).toBe(6);
+    });
+
+    test('toImmutable', () => {
+        const map = HashMap.of(['Bob', 12]);
+        const map2 = map.toMutable;
+        expect(map2).toEqual(mutable.HashMap.of(['Bob', 12]));
     });
 
 });
