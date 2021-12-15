@@ -1,16 +1,11 @@
-import {Collection} from './collection';
-import {ArrayIterable} from './array-iterable';
-import {ArrayBuffer} from './mutable';
 import {HashMap} from './hashmap';
+import {AbstractSet} from './abstract-set';
+import * as mutable from './mutable/hashset';
 
-export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
+export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
 
-    protected fromArray(array: T[]): HashSet<T> {
-        return HashSet.of(...array);
-    }
-
-    constructor(private readonly items: Set<T>) {
-        super();
+    protected constructor(items: Set<T>) {
+        super(items);
     }
 
     static empty = new HashSet<any>(new Set());
@@ -23,26 +18,15 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return new HashSet<T>(new Set(elements));
     }
 
-    get toCollection(): Collection<T> {
-        return new Collection(Array.from(this.items.keys()));
+    protected fromArray(array: T[]): HashSet<T> {
+        return HashSet.of(...array);
     }
 
-    get toSet(): Set<T> {
-        return this.items;
-    }
 
     toMap<K, V>(mapper: (item: T) => [K, V]): HashMap<K, V> {
         return HashMap.of(...this.map(mapper).toArray);
     }
 
-
-    get toBuffer(): ArrayBuffer<T> {
-        return new ArrayBuffer(Array.from(this.items.keys()));
-    }
-
-    contains(item: T): boolean {
-        return this.items.has(item);
-    }
 
     /**
      * Builds a new HashSet by applying a function to all elements of this $coll.
@@ -54,10 +38,6 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
      */
     map<B>(f: (item: T) => B): HashSet<B> {
         return HashSet.of(...Array.from(this.items).map(i => f(i)));
-    }
-
-    get toArray(): Array<T> {
-        return Array.from(this.items.keys());
     }
 
 
@@ -79,23 +59,29 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
      *            `f` to each element of this HashSet and concatenating the results.
      */
     flatMap<B>(f: (item: T) => HashSet<B>): HashSet<B> {
-        let res = HashSet.empty;
-        this.items.forEach(i => {
-            res = res.union(f(i));
-        });
-        return res;
+        const res = new Set<B>();
+        this.items.forEach(i =>
+            f(i).foreach(e => res.add(e))
+        );
+        return new HashSet(res);
     }
 
-    get isEmpty(): boolean {
-        return this.items.size <= 0;
-    }
 
-    get size(): number {
-        return this.items.size;
-    }
-
-    concat(other: Iterable<T>): HashSet<T> {
-        return this.appendedAll(other);
+    /** Creates a new $coll by adding all elements contained in another collection to this $coll, omitting duplicates.
+     *
+     * This method takes a collection of elements and adds all elements, omitting duplicates, into $coll.
+     *
+     * Example:
+     *  {{{
+     *    scala> val a = Set(1, 2) concat Set(2, 3)
+     *    a: scala.collection.immutable.Set[Int] = Set(1, 2, 3)
+     *  }}}
+     *
+     *  @param that     the collection containing the elements to add.
+     *  @return a new $coll with the given elements added, omitting duplicates.
+     */
+    concat(that: Iterable<T>): HashSet<T> {
+        return this.appendedAll(that);
     }
 
     union(other: Iterable<T>): HashSet<T> {
@@ -103,15 +89,13 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
     }
 
     appended(item: T): HashSet<T> {
-        return HashSet.of(...this.toArray.concat([item]));
+        return this.fromArray(this.toArray.concat([item]));
     }
 
     appendedAll(other: Iterable<T>): HashSet<T> {
-        const res = new Set(Array.from(this.items));
-        for (const element of other) {
-            res.add(element);
-        }
-        return new HashSet(res);
+        const res = Array.from(this.items);
+        res.push(...Array.from(other));
+        return this.fromArray(res);
     }
 
     removed(item: T): HashSet<T> {
@@ -139,5 +123,12 @@ export class HashSet<T> extends ArrayIterable<T, HashSet<T>>{
         return this.filter(x => other.contains(x));
     }
 
+    /**
+     * Creates the immutable HashMap with the contents from this HashMap.
+     * @return immutable HashMap
+     */
+    get toMutable(): mutable.HashSet<T> {
+        return mutable.HashSet.of(...this.items);
+    }
 
 }
