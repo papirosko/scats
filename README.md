@@ -387,6 +387,8 @@ c.head; // 1
 
 ## mutable.HashMap
 ```typescript
+import {mutable} from "scats";
+
 const map = new mutable.HashMap<string, number>()
 map.set('Alice', 11); // ('Alice' -> 11)
 map.set('Bob', 12); // ('Alice' -> 11, 'Bob' -> 12)
@@ -399,4 +401,20 @@ map.subtractOne('Bob'); // ('Steve' -> 14)
 map.addAll([['Alice', 11], ['Bob', 12]]); // ('Steve' -> 14, 'Alice' -> 11, 'Bob' -> 12)
 map.mapValuesInPlace(([name, age]) => age + 1); // ('Steve' -> 15, 'Alice' -> 12, 'Bob' -> 13)
 map.filterInPlace(([name, age]) => age > 13); // ('Steve' -> 15)
+```
+
+
+## mutable.HashSet
+```typescript
+import {mutable} from "scats";
+
+const set = new mutable.HashSet<string, number>()
+set.add(1); // true. set = [1]
+set.add(1); // false. set = [1]
+set.clear(); // []]
+set.add(1); // true. set = [1]
+set.remove(2); false. set = [1]
+set.remove(1); true. set = []
+set.addAll([2, 3]); set = [1, 2, 3]
+set.filterInPlace(x => x > 2); // [3]
 ```
