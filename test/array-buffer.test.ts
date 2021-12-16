@@ -1,10 +1,28 @@
-import {Collection, identity, mutable} from '../src';
+import {Collection, HashMap, HashSet, identity, mutable, option} from '../src';
 import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('ArrayBuffer', () => {
 
-    test('should create ArrayBuffer.of', () => {
+    test('of', () => {
         expect(ArrayBuffer.of(1, 2, 3, 4).toArray).toEqual([1, 2, 3, 4]);
+    });
+
+    test('from', () => {
+        expect(ArrayBuffer.from([1, 2, 3, 4])).toEqual(ArrayBuffer.of(1, 2, 3, 4));
+    });
+
+
+
+    test('equal', () => {
+        const source1 = ArrayBuffer.of(1, 2);
+        const source2 = ArrayBuffer.of(1, 2);
+        expect(source1).toEqual(source2);
+        expect(source1 === source2).toBeFalsy();
+
+        const source3 = ArrayBuffer.of(1, 2);
+        const source4 = ArrayBuffer.of(1, 3);
+        expect(source3).not.toEqual(source4);
+        expect(source3 === source4).toBeFalsy();
     });
 
     test('get', () => {
@@ -12,48 +30,81 @@ describe('ArrayBuffer', () => {
         expect(buff.get(1)).toEqual(2);
     });
 
+    test('empty', () => {
+        const source1 = ArrayBuffer.empty;
+        const source2 = ArrayBuffer.empty;
+        expect(source1).toEqual(source2);
+        expect(source1 === source2).toBeFalsy();
+    });
+
     test('append', () => {
-        expect(ArrayBuffer.of(1, 2, 3, 4).append(5).toArray).toEqual([1, 2, 3, 4, 5]);
+        const source1 = ArrayBuffer.of(1, 2, 3, 4);
+        const res1 = source1.append(5);
+        expect(res1).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5));
+        expect(source1 === res1).toBeTruthy();
     });
 
     test('appendAll', () => {
-        expect(ArrayBuffer.of(1, 2, 3, 4).appendAll([5, 6]).toArray).toEqual([1, 2, 3, 4, 5, 6]);
-        expect(ArrayBuffer.of(1, 2, 3, 4).appendAll(Collection.of(5, 6)).toArray).toEqual([1, 2, 3, 4, 5, 6]);
-        expect(ArrayBuffer.of(1, 2, 3, 4).appendAll(ArrayBuffer.of(5, 6)).toArray).toEqual([1, 2, 3, 4, 5, 6]);
+        const source1 = ArrayBuffer.of(1, 2, 3, 4);
+        const res1 = source1.appendAll([5, 6]);
+        expect(res1).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5, 6));
+        expect(source1 === res1).toBeTruthy();
+
+        const source2 = ArrayBuffer.of(1, 2, 3, 4);
+        const res2 = source2.appendAll(Collection.of(5, 6));
+        expect(res2).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5, 6));
+        expect(source2 === res2).toBeTruthy();
+
+        const source3 = ArrayBuffer.of(1, 2, 3, 4);
+        const res3 = source3.appendAll(ArrayBuffer.of(5, 6));
+        expect(res3).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5, 6));
+        expect(source3 === res3).toBeTruthy();
     });
 
     test('prepend', () => {
-        expect(ArrayBuffer.of(1, 2, 3, 4).prepend(0).toArray).toEqual([0, 1, 2, 3, 4]);
+        const source1 = ArrayBuffer.of(1, 2, 3, 4);
+        const res1 = source1.prepend(0);
+        expect(res1).toEqual(ArrayBuffer.of(0, 1, 2, 3, 4));
+        expect(source1 === res1).toBeTruthy();
     });
 
     test('prependAll', () => {
-        expect(ArrayBuffer.of(2, 3, 4).prependAll([0, 1]).toArray).toEqual([0, 1, 2, 3, 4]);
-        expect(ArrayBuffer.of(2, 3, 4).prependAll(Collection.of(0, 1)).toArray).toEqual([0, 1, 2, 3, 4]);
-        expect(ArrayBuffer.of(2, 3, 4).prependAll(ArrayBuffer.of(0, 1)).toArray).toEqual([0, 1, 2, 3, 4]);
+        const source1 = ArrayBuffer.of(2, 3, 4);
+        const res1 = source1.prependAll([0, 1]);
+        expect(res1).toEqual(ArrayBuffer.of(0, 1, 2, 3, 4));
+        expect(source1 === res1).toBeTruthy();
+
+        const source2 = ArrayBuffer.of(2, 3, 4);
+        const res2 = source2.prependAll(Collection.of(0, 1));
+        expect(res2).toEqual(ArrayBuffer.of(0, 1, 2, 3, 4));
+        expect(source2 === res2).toBeTruthy();
+
+        const source3 = ArrayBuffer.of(2, 3, 4);
+        const res3 = source3.prependAll(ArrayBuffer.of(0, 1));
+        expect(res3).toEqual(ArrayBuffer.of(0, 1, 2, 3, 4));
+        expect(source3 === res3).toBeTruthy();
     });
 
     test('insert', () => {
         const buf = ArrayBuffer.of(1, 2, 3, 5);
         buf.insert(3, 4);
-        expect(buf.toArray).toEqual([1, 2, 3, 4, 5]);
+        expect(buf).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5));
     });
 
     test('insertAll', () => {
         const buf = ArrayBuffer.of(1, 2, 3, 6);
         buf.insertAll(3, [4, 5]);
-        expect(buf.toArray).toEqual([1, 2, 3, 4, 5, 6]);
+        expect(buf).toEqual(ArrayBuffer.of(1, 2, 3, 4, 5, 6));
     });
 
     test('remove', () => {
         const buf = ArrayBuffer.of(1, 2, 3);
-        const removed = buf.remove(1);
-        expect(removed).toEqual(2);
-        expect(buf.toArray).toEqual([1, 3]);
+        buf.remove(1);
+        expect(buf).toEqual(ArrayBuffer.of(1, 3));
 
         const buf2 = ArrayBuffer.of(1, 2, 3);
-        const removed2 = buf2.remove(1, 2);
-        expect(removed2).toEqual(2);
-        expect(buf2.toArray).toEqual([1]);
+        buf2.remove(1, 2);
+        expect(buf2).toEqual(ArrayBuffer.of(1));
 
         expect(() => {
             const buf2 = ArrayBuffer.of(1, 2, 3);
@@ -63,19 +114,22 @@ describe('ArrayBuffer', () => {
     });
 
     test('sort', () => {
-        expect(ArrayBuffer.of(2, 1, 3).sort((a, b) => a - b).toArray).toEqual([1, 2, 3]);
+        const source1 = ArrayBuffer.of(2, 1, 3);
+        const res1 = source1.sort((a, b) => a - b);
+        expect(res1).toEqual(ArrayBuffer.of(1, 2, 3));
+        expect(source1 === res1).toBeTruthy();
     });
 
     test('clear', () => {
         const buf = ArrayBuffer.of(1, 2, 3);
         buf.clear();
-        expect(buf.toArray).toEqual([]);
+        expect(buf).toEqual(ArrayBuffer.empty);
     });
 
     test('update', () => {
         const buf = ArrayBuffer.of(1, 2, 3);
         buf.update(1, 10);
-        expect(buf.toArray).toEqual([1, 10, 3]);
+        expect(buf).toEqual(ArrayBuffer.of(1, 10, 3));
 
         expect(() => buf.update(-1, 10)).toThrow(Error);
         expect(() => buf.update(5, 10)).toThrow(Error);
@@ -85,7 +139,7 @@ describe('ArrayBuffer', () => {
     test('set', () => {
         const buf = ArrayBuffer.of(1, 2, 3);
         buf.set(1, 10);
-        expect(buf.toArray).toEqual([1, 10, 3]);
+        expect(buf).toEqual(ArrayBuffer.of(1, 10, 3));
 
         expect(() => buf.set(-1, 10)).toThrow(Error);
         expect(() => buf.set(5, 10)).toThrow(Error);
@@ -97,41 +151,75 @@ describe('ArrayBuffer', () => {
     });
 
     test('toCollection', () => {
-        expect(ArrayBuffer.of(1, 2, 3).toCollection.toArray).toEqual(Collection.of(1, 2, 3).toArray);
+        expect(ArrayBuffer.of(1, 2, 3).toCollection).toEqual(Collection.of(1, 2, 3));
     });
 
     test('subtractOne', () => {
-        expect(ArrayBuffer.of(1, 2, 3).subtractOne(2).toArray).toEqual([1, 3]);
+        const source = ArrayBuffer.of(1, 2, 3);
+        const res = source.subtractOne(2);
+        expect(res).toEqual(ArrayBuffer.of(1, 3));
+        expect(source === res).toBeTruthy();
     });
 
     test('take', () => {
-        expect(ArrayBuffer.of(1, 2, 3).take(2)).toEqual(ArrayBuffer.of(1, 2));
+        const source = ArrayBuffer.of(1, 2, 3);
+        const res = source.take(2);
+        expect(res).toEqual(ArrayBuffer.of(1, 2));
+        expect(source === res).toBeFalsy();
     });
 
     test('subtractAll', () => {
-        expect(ArrayBuffer.of(1, 2, 3).subtractAll([2, 3]).toArray).toEqual([1]);
+        const source = ArrayBuffer.of(1, 2, 3);
+        const res = source.subtractAll([2, 3]);
+        expect(res).toEqual(ArrayBuffer.of(1));
+        expect(source === res).toBeTruthy();
 
         const buf = ArrayBuffer.of(1, 2, 3);
-        buf.subtractAll(buf);
-        expect(buf.toArray).toEqual([]);
+        const res2 = buf.subtractAll(buf);
+        expect(buf).toEqual(ArrayBuffer.empty);
+        expect(buf === res2).toBeTruthy();
 
         const items = [1, 2, 3];
         const buf2 = new ArrayBuffer(items);
-        buf2.subtractAll(items);
-        expect(buf2.toArray).toEqual([]);
+        const res3 = buf2.subtractAll(items);
+        expect(buf2).toEqual(ArrayBuffer.empty);
+        expect(buf2 === res3).toBeTruthy();
 
     });
 
     test('appended, appendedAll, prepended, prependedAll, concat', () => {
-        expect(ArrayBuffer.of(2).appended(1)).toEqual(ArrayBuffer.of(2, 1));
-        expect(ArrayBuffer.of(2).prepended(1)).toEqual(ArrayBuffer.of(1, 2));
-        expect(ArrayBuffer.of(2).appendedAll(ArrayBuffer.of(3, 4))).toEqual(ArrayBuffer.of(2, 3, 4));
-        expect(ArrayBuffer.of(2).concat(ArrayBuffer.of(3, 4))).toEqual(ArrayBuffer.of(2, 3, 4));
-        expect(ArrayBuffer.of(2).prependedAll(ArrayBuffer.of(0, 1))).toEqual(ArrayBuffer.of(0, 1, 2));
+        const source1 = ArrayBuffer.of(2);
+        const res1 = source1.appended(1);
+        expect(res1).toEqual(ArrayBuffer.of(2, 1));
+        expect(source1 === res1).toBeFalsy();
+
+        const source2 = ArrayBuffer.of(2);
+        const res2 = source2.prepended(1);
+        expect(res2).toEqual(ArrayBuffer.of(1, 2));
+        expect(source2 === res2).toBeFalsy();
+
+        const source3 = ArrayBuffer.of(2);
+        const res3 = source3.appendedAll(ArrayBuffer.of(3, 4));
+        expect(res3).toEqual(ArrayBuffer.of(2, 3, 4));
+        expect(source3 === res3).toBeFalsy();
+
+        const source4 = ArrayBuffer.of(2);
+        const res4 = source4.concat(ArrayBuffer.of(3, 4));
+        expect(res4).toEqual(ArrayBuffer.of(2, 3, 4));
+        expect(source4 === res4).toBeFalsy();
+
+        const source5 = ArrayBuffer.of(2);
+        const res5 = source5.prependedAll(ArrayBuffer.of(0, 1));
+        expect(res5).toEqual(ArrayBuffer.of(0, 1, 2));
+        expect(source5 === res5).toBeFalsy();
     });
 
     test('slice', () => {
-        expect(ArrayBuffer.of(1, 2, 3).slice(0, 2)).toEqual(ArrayBuffer.of(1, 2));
+        const source1 = ArrayBuffer.of(1, 2, 3);
+        const res1 = source1.slice(0, 2);
+        expect(res1).toEqual(ArrayBuffer.of(1, 2));
+        expect(source1 === res1).toBeFalsy();
+
         expect(ArrayBuffer.of(1, 2, 3).slice(0, 3)).toEqual(ArrayBuffer.of(1, 2, 3));
         expect(ArrayBuffer.of(1, 2, 3).slice(5, 7)).toEqual(ArrayBuffer.empty);
     });
@@ -139,15 +227,15 @@ describe('ArrayBuffer', () => {
 
     test('flatten', () => {
 
-        expect(ArrayBuffer.of<any>(1, ArrayBuffer.of(2, 3), 4).flatten().toArray)
-            .toEqual([1, 2, 3, 4]);
+        expect(ArrayBuffer.of<any>(1, ArrayBuffer.of(2, 3), 4).flatten())
+            .toEqual(ArrayBuffer.of(1, 2, 3, 4));
 
     });
 
     test('flatMap', () => {
 
-        expect(ArrayBuffer.of<any>(1, 2).flatMap(n => ArrayBuffer.fill(n)(() => n)).toArray)
-            .toEqual([1, 2, 2]);
+        expect(ArrayBuffer.of<any>(1, 2).flatMap(n => ArrayBuffer.fill(n)(() => n)))
+            .toEqual(ArrayBuffer.of(1, 2, 2));
 
     });
 
@@ -220,8 +308,6 @@ describe('ArrayBuffer', () => {
     });
 
 
-
-
     test('distinct', () => {
         expect(ArrayBuffer.of(1, 1, 2, 2, 3).distinct).toEqual(ArrayBuffer.of(1, 2, 3));
     });
@@ -243,7 +329,24 @@ describe('ArrayBuffer', () => {
     });
 
     test('reverse', () => {
-        expect(ArrayBuffer.of(1, 2).reverse).toEqual(ArrayBuffer.of(2, 1));
+        const source1 = ArrayBuffer.of(1, 2);
+        const res1 = source1.reverse;
+        expect(res1).toEqual(ArrayBuffer.of(2, 1));
+        expect(source1 === res1).toBeFalsy();
     });
+
+    test('toMap', () => {
+        expect(ArrayBuffer.of(1, 2).toMap(x => [x, x + 2])).toEqual(HashMap.of([1, 3], [2, 4]));
+    });
+
+    test('toSet', () => {
+        expect(ArrayBuffer.of(1, 2, 2).toSet).toEqual(HashSet.of(1, 2));
+    });
+
+    test('flatMapOption', () => {
+        expect(ArrayBuffer.of<any>(1, 2).flatMapOption(x => option(x).filter(x => x >= 2)))
+            .toEqual(ArrayBuffer.of(2));
+    });
+
 
 });

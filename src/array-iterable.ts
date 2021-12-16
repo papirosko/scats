@@ -1,6 +1,4 @@
-import {none, option, Option, some} from './option';
-import {HashMap} from './hashmap';
-import {Collection} from './collection';
+import {Collection, HashMap, none, option, Option, some} from './index';
 
 export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implements Iterable<T> {
 
@@ -53,20 +51,34 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
     count(p: (item: T) => boolean): number {
         let res = 0;
         this.toArray.forEach(i => {
-            if (p(i)) { res++; }
+            if (p(i)) {
+                res++;
+            }
         });
 
         return res;
     }
 
+    /**
+     * Tests whether the collection is empty.
+     * @return `true` if the collection contains no elements, `false` otherwise.
+     */
     get isEmpty(): boolean {
         return this.size <= 0;
     }
 
+    /**
+     * Tests whether the collection is not empty.
+     * @return `true` if the collection contains at least one element, `false` otherwise.
+     */
     get nonEmpty(): boolean {
         return !this.isEmpty;
     }
 
+    /**
+     * The size of this collection.
+     * @return the number of elements in this collection.
+     */
     get size(): number {
         return this.toArray.length;
     }
@@ -113,7 +125,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
         const array = this.toArray;
         let acc = array[0];
         if (array.length > 1) {
-            for (let i = 1; i< array.length; i++) {
+            for (let i = 1; i < array.length; i++) {
                 acc = op(acc, array[i]);
             }
         }
@@ -140,7 +152,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
         let acc = this.last;
         const array = this.toArray.reverse();
         if (array.length > 1) {
-            for (let i = 1; i< array.length; i++) {
+            for (let i = 1; i < array.length; i++) {
                 acc = op(acc, array[i]);
             }
         }
@@ -150,7 +162,6 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
     reduceRightOption(op: (i1: T, i2: T) => T): Option<T> {
         return this.isEmpty ? none : some(this.reduceRight(op));
     }
-
 
 
     foldLeft<B>(initial: B): (op: (acc: B, next: T) => B) => B {
@@ -254,7 +265,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
         } else if (n === 0) {
             return this as unknown as C;
         } else {
-            return this.fromArray(array.slice(n , array.length));
+            return this.fromArray(array.slice(n, array.length));
         }
     }
 
@@ -265,7 +276,7 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
         } else if (n === 0) {
             return this as unknown as C;
         } else {
-            return this.fromArray(array.slice(0 , array.length - n));
+            return this.fromArray(array.slice(0, array.length - n));
         }
 
     }
@@ -322,6 +333,12 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
     }
 
 
+    /**
+     * Sums up the elements of this collection.
+     *
+     * @param   elementToNum  a parameter converting an element to a number.
+     * @return  the sum of all elements produced by elementToNum over the elements of this collection.
+     */
     sum(elementToNum: (element: T) => number): number {
         if (this.isEmpty) {
             return 0;
@@ -367,7 +384,6 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
     }
 
 
-
     /** The rest of the collection without its first element. */
     get tail(): C {
         if (this.isEmpty) throw new Error('empty.tail');
@@ -407,8 +423,6 @@ export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implemen
 
         };
     }
-
-
 
 
     /**

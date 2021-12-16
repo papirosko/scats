@@ -218,7 +218,6 @@ map.size; // 1
 map.isEmpty; // false
 HashMap.empty.isEmpty; // true
 map.nonEmpty; // true
-map.nonEmpty; // true
 map.get('1'); // some(1)
 map.get('5'); // none
 map.getOrElse('1', () => 5); // 1
@@ -229,7 +228,7 @@ map.values; // Collection.of(1, 2)
 map.entries; // Collection.of(['1', 1], ['2', 2])
 map.appendedAll(HashMap.of(['3', 3])); // HashMap.of(['1', 1], ['2', 2], ['3', 3])
 map.set('2', 3); // HashMap.of(['1', 1], ['2', 3])
-map.remove('2'); // HashMap.of(['1', 1])
+map.removed('2'); // HashMap.of(['1', 1])
 map.updated('2', 4); // HashMap.of(['1', 1], ['2', 4])
 ```
 
@@ -383,4 +382,21 @@ c.sum(identity); // 6. We have to provide identity to convert element to number
 c.take(2); // Collection.of(1, 2)
 c.drop(1); // Collection.of(2, 3);
 c.head; // 1
+```
+
+
+## mutable.HashMap
+```typescript
+const map = new mutable.HashMap<string, number>()
+map.set('Alice', 11); // ('Alice' -> 11)
+map.set('Bob', 12); // ('Alice' -> 11, 'Bob' -> 12)
+map.clear(); // ()
+map.put('Steve', 14); // returns some(14), map: ('Steve' -> 14)
+map.update('Alice', 11); // ('Steve' -> 14, 'Alice' -> 11)
+map.remove('Alice'); // ('Steve' -> 14)
+map.addOne(['Bob', 12]); // ('Steve' -> 14, 'Bob' -> 12)
+map.subtractOne('Bob'); // ('Steve' -> 14)
+map.addAll([['Alice', 11], ['Bob', 12]]); // ('Steve' -> 14, 'Alice' -> 11, 'Bob' -> 12)
+map.mapValuesInPlace(([name, age]) => age + 1); // ('Steve' -> 15, 'Alice' -> 12, 'Bob' -> 13)
+map.filterInPlace(([name, age]) => age > 13); // ('Steve' -> 15)
 ```

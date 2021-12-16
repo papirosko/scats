@@ -1,12 +1,10 @@
-import {HashSet, identity, none, some} from '../src';
+import {HashSet, identity, mutable, none, some} from '../src';
 
 describe('HashSet', () => {
 
     test('constructor', () => {
-
-        expect(new HashSet(new Set([1, 1, 2, 3])).toSet).toEqual(new Set([1, 2, 3]));
         expect(HashSet.of(1, 1, 2, 3).toSet).toEqual(new Set([1, 2, 3]));
-
+        expect(HashSet.from([1, 1, 2, 3])).toEqual(HashSet.of(1, 2, 3));
     });
 
     test('toCollection', () => {
@@ -243,6 +241,11 @@ describe('HashSet', () => {
         expect(buf.size).toEqual(2);
         expect(buf.contains(1)).toBeTruthy();
         expect(buf.contains(2)).toBeTruthy();
+    });
+
+    test('toMutable', () => {
+        const set = HashSet.of(1, 2).toMutable;
+        expect(set).toEqual(mutable.HashSet.of(1, 2));
     });
 
 });

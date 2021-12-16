@@ -1,21 +1,25 @@
-import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step, mutable} from '../src';
+import {Collection, forComprehension, HashMap, HashSet, identity, Nil, none, some, step, mutable, option} from '../src';
 import ArrayBuffer = mutable.ArrayBuffer;
 
 describe('Collection', () => {
 
-    test('should create collection of', () => {
+    test('of', () => {
         expect(Collection.of(1, 2, 3, 4).toArray).toEqual([1, 2, 3, 4]);
     });
 
-    test('should create collection fill', () => {
+    test('from', () => {
+        expect(Collection.from([1, 2, 3, 4])).toEqual(Collection.of(1, 2, 3, 4));
+    });
+
+    test('fill', () => {
         expect(Collection.fill(4)(n => n).toArray).toEqual([0, 1, 2, 3]);
     });
 
-    test('should filter', () => {
+    test('filter', () => {
         expect(Collection.of(1, 2, 3, 4).filter(x => x > 2).toArray).toEqual([3, 4]);
     });
 
-    test('should filterNot', () => {
+    test('filterNot', () => {
         expect(Collection.of(1, 2, 3, 4).filterNot(x => x > 2).toArray).toEqual([1, 2]);
     });
 
@@ -27,10 +31,13 @@ describe('Collection', () => {
     });
 
     test('flatMap', () => {
+        expect(Collection.of<any>(1, 2).flatMap(n => Collection.fill(n)(() => n)))
+            .toEqual(Collection.of(1, 2, 2));
+    });
 
-        expect(Collection.of<any>(1, 2).flatMap(n => Collection.fill(n)(() => n)).toArray)
-            .toEqual([1, 2, 2]);
-
+    test('flatMapOption', () => {
+        expect(Collection.of<any>(1, 2).flatMapOption(x => option(x).filter(x => x >= 2)))
+            .toEqual(Collection.of(2));
     });
 
     test('mapPromise', async () => {

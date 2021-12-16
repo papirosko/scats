@@ -1,76 +1,73 @@
-import {option, Option} from './option';
-import {Collection} from './collection';
-import {HashSet} from './hashset';
-import {ArrayIterable} from './array-iterable';
+import {mutable, Option} from './index';
+import {AbstractMap, Tuple2} from './abstract-map';
 
-export type Tuple2<K, V> = [K, V];
 
-export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
+
+export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
 
     protected fromArray(array: Tuple2<K, V>[]): HashMap<K, V> {
         return HashMap.of(...array);
     }
 
-    constructor(private readonly map: Map<K, V>) {
-        super();
+    protected constructor(protected readonly map: Map<K, V>) {
+        super(map);
     }
 
     static of<K, V>(...values: Tuple2<K, V>[]): HashMap<K, V> {
         return new HashMap<K, V>(new Map(values));
     }
 
+    static from<K, V>(values: Iterable<Tuple2<K, V>>): HashMap<K, V> {
+        return HashMap.of(...Array.from(values));
+    }
+
     static empty = new HashMap(new Map());
-
-    get size(): number {
-        return this.map.size;
-    }
-
-    get isEmpty(): boolean {
-        return this.map.size <= 0;
-    }
-
-    get(key: K): Option<V> {
-        return option(this.map.get(key));
-    }
-
-    getOrElse(key: K, defaultValue: () => V): V {
-        return this.get(key).getOrElse(defaultValue);
-    }
-
-    getOrElseValue(key: K, defaultValue: V): V {
-        return this.get(key).getOrElseValue(defaultValue);
-    }
-
-    get keySet(): HashSet<K> {
-        return HashSet.of(...Array.from(this.map.keys()));
-    }
-
-    get keyIterator(): IterableIterator<K> {
-        return this.map.keys();
-    }
-
-    get keys(): Collection<K> {
-        return new Collection(Array.from(this.map.keys()));
-    }
-
-    get values(): Collection<V> {
-        return new Collection(Array.from(this.map.values()));
-    }
-
-    get valueIterator(): IterableIterator<V> {
-        return this.map.values();
-    }
-
-    get entries(): Collection<Tuple2<K, V>> {
-        return new Collection(Array.from(this.map.entries()));
-    }
-
-    get entriesIterator(): IterableIterator<Tuple2<K, V>> {
-        return this.map.entries();
-    }
 
     appendedAll(map: HashMap<K, V>): HashMap<K, V> {
         return this.concat(map);
+    }
+
+    appended(key: K, value: V): HashMap<K, V> {
+        return this.set(key, value);
+    }
+
+    /**
+     * Creates a new map obtained by updating this map with a given key/value pair.
+     * @param  key the key
+     * @param  value the value
+     * @tparam V1 the type of the added value
+     * @return A new map with the new key/value mapping added to this map.
+     */
+    updated(key: K, value: V): HashMap<K, V> {
+        return this.set(key, value);
+    }
+
+    /**
+     * Removes a key from this map, returning a new map.
+     *
+     * @param key the key to be removed
+     * @return a new map without a binding for ''key''
+     */
+    removed(key: K): HashMap<K, V> {
+        const next = new Map(this.map);
+        next.delete(key);
+        return new HashMap<K, V>(next);
+    }
+
+    /**
+     * Creates a new map from this map by removing all elements of another
+     * collection.
+     *
+     * @param keys   the collection containing the removed elements.
+     * @return a new map that contains all elements of the current map
+     * except one less occurrence of each of the elements of `elems`.
+     */
+    removedAll(keys: Iterable<K>): HashMap<K, V> {
+        const next = new Map(this.map);
+        for (const key of keys) {
+            next.delete(key);
+        }
+        return new HashMap<K, V>(next);
     }
 
     concat(map: HashMap<K, V>): HashMap<K, V> {
@@ -85,28 +82,6 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         const next = new Map(this.map);
         next.set(key, value);
         return new HashMap<K, V>(new Map(next));
-    }
-
-    removed(key: K): HashMap<K, V> {
-        const next = new Map(this.map);
-        next.delete(key);
-        return new HashMap<K, V>(next);
-    }
-
-    removedAll(keys: Iterable<K>): HashMap<K, V> {
-        const next = new Map(this.map);
-        for (const key of keys) {
-            next.delete(key);
-        }
-        return new HashMap<K, V>(next);
-    }
-
-    containsKey(key: K): boolean {
-        return this.map.has(key);
-    }
-
-    updated(key: K, value: V): HashMap<K, V> {
-        return this.set(key, value);
     }
 
     /**
@@ -135,15 +110,7 @@ export class HashMap<K, V> extends ArrayIterable<Tuple2<K, V>, HashMap<K, V>> {
         };
     }
 
-    get toCollection(): Collection<Tuple2<K, V>> {
-        return new Collection<Tuple2<K, V>>(Array.from(this.map.entries()));
-    }
-
-    get toMap(): Map<K, V> {
-        return this.map;
-    }
-
-    get toArray(): Array<Tuple2<K, V>> {
-        return Array.from(this.map.entries());
+    get toMutable(): mutable.HashMap<K, V> {
+        return mutable.HashMap.of(...Array.from(this.map.entries()));
     }
 }

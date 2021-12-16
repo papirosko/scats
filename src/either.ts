@@ -305,7 +305,7 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
 
     async mapPromise<RIGHT1>(f: (v: RIGHT) => Promise<RIGHT1>): Promise<Either<LEFT, RIGHT1>> {
         return this.match({
-            right: async v => right(await f(v)) as Either<LEFT, RIGHT1>,
+            right: async v => right<RIGHT1>(await f(v)) as Either<LEFT, RIGHT1>,
             left: () => Promise.resolve(this as unknown as Either<LEFT, RIGHT1>)
         });
     }
@@ -438,7 +438,7 @@ export namespace Either {
 
         mapPromise<A1, B1 extends B>(f: (item: A) => Promise<A1>): Promise<Either<A1, B1>> {
             return this.e.match<Promise<Either<A1, B1>>>({
-                left: async v => left(await f(v)),
+                left: async v => left<A1>(await f(v)),
                 right: () => Promise.resolve(this.e as unknown as Either<A1, B1>)
             }) as Promise<Either<A1, B1>>;
         }

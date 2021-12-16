@@ -57,7 +57,7 @@ export abstract class TryLike<T> implements Mappable<T>{
                     f(e);
                     return this;
                 } catch (ex) {
-                    return failure(ex);
+                    return failure(ex as Error);
                 }
             }
         });
@@ -120,7 +120,7 @@ export class Success<T> extends TryLike<T> {
         try {
             return f(this.result);
         } catch (e) {
-            return failure(e);
+            return failure(e as Error);
         }
     }
 
@@ -132,7 +132,7 @@ export class Success<T> extends TryLike<T> {
                 return failure(new Error('Predicate does not hold for ' + this.result));
             }
         } catch (e) {
-            return failure(e);
+            return failure(e as Error);
         }
     }
 
@@ -144,7 +144,7 @@ export class Success<T> extends TryLike<T> {
         try {
             return fb(this.result);
         } catch (e) {
-            return fa(e);
+            return fa(e as Error);
         }
     }
 
@@ -202,7 +202,7 @@ export class Failure extends TryLike<any> {
         try {
             return value();
         } catch (e) {
-            return failure(e);
+            return failure(e as Error);
         }
     }
 
@@ -230,7 +230,7 @@ export class Failure extends TryLike<any> {
         try {
             return success(f(this.error));
         } catch (ex) {
-            return failure(ex);
+            return failure(ex as Error);
         }
     }
 
@@ -242,7 +242,7 @@ export class Failure extends TryLike<any> {
         try {
             return f(this.error);
         } catch (ex) {
-            return failure(ex);
+            return failure(ex as Error);
         }
     }
 
@@ -254,7 +254,7 @@ export function Try<T>(block: () => T): TryLike<T> {
     try {
         return new Success(block());
     } catch (e) {
-        return new Failure(e);
+        return new Failure(e as Error);
     }
 }
 
@@ -265,7 +265,7 @@ export namespace Try {
                 .then(res => new Success(res))
                 .catch(e => new Failure(e));
         } catch (e) {
-            return Promise.resolve(new Failure(e));
+            return Promise.resolve(new Failure(e as Error));
         }
     }
 }
