@@ -30,7 +30,7 @@ export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
             this.items.add(elem);
             return true;
         } else {
-            return res;
+            return !res;
         }
     }
 
@@ -88,7 +88,7 @@ export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
         if (this.nonEmpty) {
             const arr = this.toArray;
             for (const t of arr) {
-                if (p(t)) {
+                if (!p(t)) {
                     this.remove(t);
                 }
             }
@@ -126,7 +126,8 @@ export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
         return this;
     }
 
-    /** Creates a new $coll by adding all elements contained in another collection to this $coll, omitting duplicates.
+    /**
+     * Creates a new $coll by adding all elements contained in another collection to this $coll, omitting duplicates.
      *
      * This method takes a collection of elements and adds all elements, omitting duplicates, into $coll.
      *
@@ -144,11 +145,12 @@ export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
         return new HashSet<T>(newSet);
     }
 
-    /** Computes the intersection between this set and another set.
+    /**
+     * Computes the intersection between this set and another set.
      *
-     *  @param   that  the set to intersect with.
-     *  @return  a new set consisting of all elements that are both in this
-     *  set and in the given set `that`.
+     * @param   that  the set to intersect with.
+     * @return  a new set consisting of all elements that are both in this
+     * set and in the given set `that`.
      */
     intersect(that: AbstractSet<T, any>): HashSet<T> {
         return this.filter(x => that.contains(x));
