@@ -293,7 +293,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
         return new ArrayBuffer<any>([]);
     }
 
-    constructor(protected readonly items: T[]) {
+    constructor(protected readonly items: T[] = []) {
         super();
     }
 
@@ -323,6 +323,9 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
         }
     }
 
+    private normalized(n: number): number {
+        return Math.min(Math.max(n, 0), this.length);
+    }
 
 
     /** Replaces element at given index with a new value.
@@ -475,6 +478,53 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
     sort(compareFn?: (a: T, b: T) => number): this {
         this.items.sort(compareFn);
         return this;
+    }
+
+
+    filterInPlace(p: (element: T) => boolean): this {
+        let i = 0, j = 0;
+        while (i < this.size) {
+            if (p(this.items[i])) {
+                if (i != j) {
+                    this.items[j] = this.items[i];
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+
+        if (i == j) {
+            return this;
+        } else {
+            return this.takeInPlace(j);
+        }
+
+    }
+
+    dropInPlace(n: number): this {
+        this.remove(0, this.normalized(n));
+        return this;
+    }
+
+    dropRightInPlace(n: number): this {
+        const norm = this.normalized(n);
+        this.remove(this.length - norm, norm);
+        return this;
+    }
+
+    takeInPlace(n: number): this {
+        const norm = this.normalized(n);
+        this.remove(norm, this.length - norm);
+        return this;
+    }
+
+    takeRightInPlace(n: number): this {
+        this.remove(0, this.length - this.normalized(n));
+        return this;
+    }
+
+    sliceInPlace(start: number, end: number): this {
+        return this.takeInPlace(end).dropInPlace(start);
     }
 
     get toCollection(): Collection<T> {
