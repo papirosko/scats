@@ -1,6 +1,6 @@
 {
   "name": "scats",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Useful scala classes in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
