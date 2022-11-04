@@ -349,4 +349,30 @@ describe('ArrayBuffer', () => {
     });
 
 
+    test('filterInPlace', () => {
+        expect(ArrayBuffer.of<any>(1, 2, 3, 4).filterInPlace(x => x <= 2))
+            .toEqual(ArrayBuffer.of(1, 2));
+    });
+
+    test('dropInPlace', () => {
+        expect(ArrayBuffer.of<any>(1, 2, 3, 4).dropInPlace(2))
+            .toEqual(ArrayBuffer.of(3, 4));
+    });
+
+    test('dropRightInPlace', () => {
+        expect(ArrayBuffer.of<any>(1, 2, 3, 4).dropRightInPlace(2))
+            .toEqual(ArrayBuffer.of(1, 2));
+    });
+
+    test('takeInPlace', () => {
+        expect(ArrayBuffer.of<any>(1, 2, 3, 4).takeInPlace(2))
+            .toEqual(ArrayBuffer.of(1, 2));
+    });
+
+    test('takeRightInPlace', () => {
+        expect(ArrayBuffer.of<any>(1, 2, 3, 4).takeRightInPlace(2))
+            .toEqual(ArrayBuffer.of(3, 4));
+    });
+
+
 });
