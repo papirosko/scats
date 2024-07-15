@@ -133,9 +133,10 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
     }
 
     flatMap<B>(f: (item: T) => Collection<B>): Collection<B> {
-        const res: B[] = [];
+        //https://stackoverflow.com/questions/61740599/rangeerror-maximum-call-stack-size-exceeded-with-array-push
+        let res: B[] = [];
         this.items.forEach(i => {
-            res.push(...f(i).items);
+            res = res.concat(f(i).items);
         });
         return new Collection<B>(res);
     }
@@ -201,10 +202,10 @@ export class Collection<T> extends ArrayBackedCollection<T, Collection<T>> imple
      * @param f
      */
     async flatMapPromise<B>(f: (item: T) => Promise<Collection<B>>): Promise<Collection<B>> {
-        const res: B[] = [];
+        let res: B[] = [];
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
-            res.push(...(await f(item)).items);
+            res = res.concat((await f(item)).items);
         }
         return new Collection<B>(res);
     }
@@ -553,7 +554,7 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
         //https://stackoverflow.com/questions/61740599/rangeerror-maximum-call-stack-size-exceeded-with-array-push
         let res: B[] = [];
         this.items.forEach(i => {
-            res = res.concat(...f(i).items);
+            res = res.concat(f(i).items);
         });
         return new ArrayBuffer<B>(res);
     }
