@@ -550,9 +550,10 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
      *                `f` to each element of this $coll and concatenating the results.
      */
     flatMap<B>(f: (item: T) => ArrayBuffer<B>): ArrayBuffer<B> {
-        const res: B[] = [];
+        //https://stackoverflow.com/questions/61740599/rangeerror-maximum-call-stack-size-exceeded-with-array-push
+        let res: B[] = [];
         this.items.forEach(i => {
-            res.push(...f(i).items);
+            res = res.concat(...f(i).items);
         });
         return new ArrayBuffer<B>(res);
     }
@@ -569,10 +570,11 @@ export class ArrayBuffer<T> extends ArrayBackedCollection<T, ArrayBuffer<T>> imp
 
 
     async flatMapPromise<B>(f: (item: T) => Promise<ArrayBuffer<B>>): Promise<ArrayBuffer<B>> {
-        const res: B[] = [];
+        //https://stackoverflow.com/questions/61740599/rangeerror-maximum-call-stack-size-exceeded-with-array-push
+        let res: B[] = [];
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
-            res.push(...(await f(item)).items);
+            res = res.concat((await f(item)).items);
         }
         return new ArrayBuffer<B>(res);
     }
