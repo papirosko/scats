@@ -1,9 +1,9 @@
-import {Collection} from './collection';
-import {Either, Left, left, Right, right} from './either';
-import {ArrayIterable} from './array-iterable';
-import {HashSet} from './hashset';
-import {HashMap} from './hashmap';
-import {Mappable} from './mappable';
+import {Collection} from './collection.js';
+import {Either, Left, left, Right, right} from './either.js';
+import {ArrayIterable} from './array-iterable.js';
+import {HashSet} from './hashset.js';
+import {HashMap} from './hashmap.js';
+import {Mappable} from './mappable.js';
 
 export interface OptionMatch<A, T> {
     some: (value: A) => T;

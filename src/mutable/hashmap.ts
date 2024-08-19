@@ -1,6 +1,6 @@
-import {Option} from '../option';
-import {AbstractMap, Tuple2} from '../abstract-map';
-import * as immutable from '../hashmap';
+import {Option} from '../option.js';
+import {AbstractMap, Tuple2} from '../abstract-map.js';
+import * as immutable from '../hashmap.js';
 
 export class HashMap<K, V> extends AbstractMap<K, V, HashMap<K, V>> {
 

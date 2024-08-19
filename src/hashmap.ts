@@ -1,5 +1,5 @@
-import {mutable, Option} from './index';
-import {AbstractMap, Tuple2} from './abstract-map';
+import {mutable, Option} from './index.js';
+import {AbstractMap, Tuple2} from './abstract-map.js';
 
 
 

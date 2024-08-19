@@ -1,7 +1,9 @@
 .idea
-.eslintrc.js
+.eslintrc.cjs
 test
-jest.config.ts
+jest.config.js
 package-lock.json
 tsconfig.json
 tsconfig-eslint.json
+coverage
+src

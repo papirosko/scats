@@ -1,4 +1,4 @@
-import {Collection, HashMap, none, option, Option, some} from './index';
+import {Collection, HashMap, none, option, Option, some} from './index.js';
 
 export abstract class ArrayIterable<T, C extends ArrayIterable<T, any>> implements Iterable<T> {
 

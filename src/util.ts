@@ -1,5 +1,5 @@
-import {none, Option, some} from './option';
-import {Mappable} from './mappable';
+import {none, Option, some} from './option.js';
+import {Mappable} from './mappable.js';
 
 export function identity<T>(x: T): T {
     return x;

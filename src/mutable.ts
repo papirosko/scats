@@ -1,3 +1,3 @@
-export {ArrayBuffer} from './collection';
-export {HashMap} from './mutable/hashmap';
-export {HashSet} from './mutable/hashset';
+export {ArrayBuffer} from './collection.js';
+export {HashMap} from './mutable/hashmap.js';
+export {HashSet} from './mutable/hashset.js';

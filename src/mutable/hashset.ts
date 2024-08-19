@@ -1,5 +1,5 @@
-import {AbstractSet} from '../abstract-set';
-import * as immutable from '../hashset';
+import {AbstractSet} from '../abstract-set.js';
+import * as immutable from '../hashset.js';
 
 export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
 

@@ -1,8 +1,8 @@
-import {none, Option, some} from './option';
-import {Collection, Nil} from './collection';
-import {failure, success, TryLike} from './try';
-import {toErrorConversion} from './util';
-import {Mappable} from './mappable';
+import {none, Option, some} from './option.js';
+import {Collection, Nil} from './collection.js';
+import {failure, success, TryLike} from './try.js';
+import {toErrorConversion} from './util.js';
+import {Mappable} from './mappable.js';
 
 export interface EitherMatch<LEFT, RIGHT, T> {
     right: (right: RIGHT) => T;

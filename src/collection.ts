@@ -1,7 +1,7 @@
-import {Mappable} from './mappable';
-import {HashMap, HashSet, Option} from './index';
-import {Filterable} from './util';
-import {ArrayIterable} from './array-iterable';
+import {Mappable} from './mappable.js';
+import {HashMap, HashSet, Option} from './index.js';
+import {Filterable} from './util.js';
+import {ArrayIterable} from './array-iterable.js';
 
 export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> extends ArrayIterable<T, C> {
 

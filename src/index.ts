@@ -1,10 +1,10 @@
-export * from './collection';
-export * from './either';
-export * from './hashmap';
-export * from './hashset';
-export * from './option';
-export * from './try';
-export * from './util';
+export * from './collection.js';
+export * from './either.js';
+export * from './hashmap.js';
+export * from './hashset.js';
+export * from './option.js';
+export * from './try.js';
+export * from './util.js';
 
-import * as mutable from './mutable';
+import * as mutable from './mutable.js';
 export {mutable};

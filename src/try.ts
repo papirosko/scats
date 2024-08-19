@@ -1,7 +1,7 @@
-import {none, Option, some} from './option';
-import {Either, left, right} from './either';
-import {identity} from './util';
-import {Mappable} from './mappable';
+import {none, Option, some} from './option.js';
+import {Either, left, right} from './either.js';
+import {identity} from './util.js';
+import {Mappable} from './mappable.js';
 
 export interface TryMatch<T, R> {
     success: (result: T) => R;

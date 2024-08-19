@@ -1,7 +1,7 @@
-import {ArrayIterable} from './array-iterable';
-import {option, Option} from './option';
-import {HashSet} from './hashset';
-import {Collection} from './collection';
+import {ArrayIterable} from './array-iterable.js';
+import {option, Option} from './option.js';
+import {HashSet} from './hashset.js';
+import {Collection} from './collection.js';
 
 export type Tuple2<K, V> = [K, V];
 

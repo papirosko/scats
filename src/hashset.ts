@@ -1,6 +1,6 @@
-import {HashMap} from './hashmap';
-import {AbstractSet} from './abstract-set';
-import * as mutable from './mutable/hashset';
+import {HashMap} from './hashmap.js';
+import {AbstractSet} from './abstract-set.js';
+import * as mutable from './mutable/hashset.js';
 
 export class HashSet<T> extends AbstractSet<T, HashSet<T>> {
 

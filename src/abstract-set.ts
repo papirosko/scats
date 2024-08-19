@@ -1,5 +1,5 @@
-import {ArrayIterable} from './array-iterable';
-import {ArrayBuffer, Collection} from './collection';
+import {ArrayIterable} from './array-iterable.js';
+import {ArrayBuffer, Collection} from './collection.js';
 
 export abstract class AbstractSet<T, S extends AbstractSet<T, any>> extends ArrayIterable<T, S> {
 
