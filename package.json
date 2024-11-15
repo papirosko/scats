@@ -1,6 +1,6 @@
 {
   "name": "scats",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "Useful scala classes in typescript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,12 @@
     "prebuild": "npm run clean && npm run lint && npm run test",
     "test": "jest",
     "compile": "tsc",
-    "build": "npm run compile"
+    "rollup": "npx rollup dist/index.js --file dist/index.cjs --format cjs",
+    "build": "npm run compile && npm run rollup"
+  },
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "repository": {
     "type": "git",
@@ -43,6 +48,7 @@
     "eslint": "7.32.0",
     "eslint-plugin-import": "2.25.3",
     "jest": "27.4.4",
+    "rollup": "^4.26.0",
     "ts-jest": "27.1.1",
     "ts-node": "10.4.0",
     "typescript": "4.5.5"
