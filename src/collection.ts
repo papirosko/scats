@@ -57,7 +57,7 @@ export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> 
     }
 
     appendedAll(other: Iterable<T>): C {
-        return this.fromArray(this.items.concat(...other));
+        return this.fromArray(this.items.concat([...other]));
     }
 
     prepended(item: T): C {
@@ -69,7 +69,7 @@ export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> 
     }
 
     concat(other: Iterable<T>): C {
-        return this.appendedAll(other);
+        return this.fromArray(this.items.concat([...other]));
     }
 
     slice(from: number, until: number): C {
