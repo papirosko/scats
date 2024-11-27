@@ -69,7 +69,7 @@ export abstract class ArrayBackedCollection<T, C extends ArrayIterable<T, any>> 
     }
 
     concat(other: Iterable<T>): C {
-        return this.fromArray(this.items.concat([...other]));
+        return this.appendedAll(other);
     }
 
     slice(from: number, until: number): C {
