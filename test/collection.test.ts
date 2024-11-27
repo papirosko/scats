@@ -436,7 +436,11 @@ describe('Collection', () => {
         expect(Collection.of(2).appended(1)).toEqual(Collection.of(2, 1));
         expect(Collection.of(2).prepended(1)).toEqual(Collection.of(1, 2));
         expect(Collection.of(2).appendedAll(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
+        expect(Collection.of(2 as any).appendedAll(Collection.of([3, 4], [5, 6]))).toEqual(Collection.of<any>(2, [3, 4], [5, 6]));
+        expect(Collection.of(2 as any).appendedAll(Collection.of(Collection.of(3, 4), Collection.of(5, 6)))).toEqual(Collection.of<any>(2, Collection.of(3, 4), Collection.of(5, 6)));
         expect(Collection.of(2).concat(Collection.of(3, 4))).toEqual(Collection.of(2, 3, 4));
+        expect(Collection.of(2 as any).concat(Collection.of<any>([3, 4], [5, 6]))).toEqual(Collection.of<any>(2, [3, 4], [5, 6]));
+        expect(Collection.of(2 as any).concat(Collection.of<any>(Collection.of(3, 4), Collection.of(5, 6)))).toEqual(Collection.of<any>(2, Collection.of(3, 4), Collection.of(5, 6)));
         expect(Collection.of(2).prependedAll(Collection.of(0, 1))).toEqual(Collection.of(0, 1, 2));
     });
 
