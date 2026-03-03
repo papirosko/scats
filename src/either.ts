@@ -9,6 +9,15 @@ export interface EitherMatch<LEFT, RIGHT, T> {
     left: (left: LEFT) => T;
 }
 
+function joinEitherValues<LEFT>(values: unknown[], eithers: Either<LEFT, any>[]): Either<LEFT, unknown[]> {
+    if (eithers.length <= 0) {
+        return right(values);
+    }
+
+    const [current, ...rest] = eithers;
+    return current.flatMap(value => joinEitherValues([...values, value], rest));
+}
+
 export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
 
     abstract match<T>(matcher: EitherMatch<LEFT, RIGHT, T>): T;
@@ -270,6 +279,10 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
         });
     }
 
+    join<OTHERS extends Either<LEFT, any>[]>(...others: OTHERS): Either<LEFT, [RIGHT, ...Either.RightValues<OTHERS>]> {
+        return this.flatMap(value => joinEitherValues([value], others)) as unknown as Either<LEFT, [RIGHT, ...Either.RightValues<OTHERS>]>;
+    }
+
 
     /** Binds the given function across `Right`.
      *
@@ -430,6 +443,16 @@ export class Right<T> extends Either<any, T> {
 }
 
 export namespace Either {
+    export type RightValue<E> = E extends Either<any, infer RIGHT> ? RIGHT : never;
+    export type RightValues<ES extends Either<any, any>[]> = {
+        [K in keyof ES]: RightValue<ES[K]>;
+    };
+
+    export function join<LEFT, ES extends [Either<LEFT, any>, ...Either<LEFT, any>[]]>(...eithers: ES): Either<LEFT, RightValues<ES>> {
+        const [head, ...tail] = eithers;
+        return head.flatMap(value => joinEitherValues([value], tail)) as unknown as Either<LEFT, RightValues<ES>>;
+    }
+
     export class LeftProjection<A, B> {
 
         constructor(private readonly e: Either<A, B>) {

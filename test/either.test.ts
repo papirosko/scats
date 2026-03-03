@@ -1,5 +1,6 @@
 import {
     Collection,
+    Either,
     failure,
     forComprehension,
     left,
@@ -131,6 +132,17 @@ describe('Either', () => {
         expect(left(12).exists(_ => true)).toBeFalsy();
         expect(left(12).left.exists(_ => _ > 10)).toBeTruthy();
         expect(left(12).left.exists(_ => _ < 10)).toBeFalsy();
+    });
+
+    test('join', () => {
+        const x1 = right<number>(1);
+        const x2 = right<string>('x');
+        const x3 = right<boolean>(true);
+
+        expect(x1.join(x2, x3)).toEqual(right([1, 'x', true]));
+        expect(Either.join(x1, x2, x3)).toEqual(right([1, 'x', true]));
+        expect(left('error').withRight<number>().join(x2, x3)).toEqual(left('error'));
+        expect(x1.join(left('error').withRight<string>(), x3)).toEqual(left('error'));
     });
 
     test('flatMap', () => {
