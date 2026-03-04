@@ -191,6 +191,34 @@ export abstract class Either<LEFT, RIGHT> implements Mappable<RIGHT> {
         });
     }
 
+    /** Returns the value from this `Right` or `null` if this is a `Left`.
+     *
+     *  ```
+     *  right(12).orNull() // 12
+     *  left(12).orNull()  // null
+     *  ```
+     */
+    orNull(): RIGHT | null {
+        return this.match({
+            right: b => b,
+            left: () => null
+        });
+    }
+
+    /** Returns the value from this `Right` or `undefined` if this is a `Left`.
+     *
+     *  ```
+     *  right(12).orUndefined() // 12
+     *  left(12).orUndefined()  // undefined
+     *  ```
+     */
+    orUndefined(): RIGHT | undefined {
+        return this.match({
+            right: b => b,
+            left: () => undefined
+        });
+    }
+
     /** Returns this `Right` or the given argument if this is a `Left`.
      *
      *  ```

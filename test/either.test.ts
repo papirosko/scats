@@ -107,6 +107,13 @@ describe('Either', () => {
         expect(left(1).orElseValue(left(2)).orElseValue(right(3))).toEqual(right(3));
     });
 
+    test('orNull, orUndefined', () => {
+        expect(right(1).orNull()).toEqual(1);
+        expect(left(1).orNull()).toBeNull();
+        expect(right(1).orUndefined()).toEqual(1);
+        expect(left(1).orUndefined()).toBeUndefined();
+    });
+
     test('contains', () => {
         expect(right(1).contains(1)).toBeTruthy();
         expect(right(1).contains(2)).toBeFalsy();
